@@ -377,6 +377,7 @@ def parse_excel_data(file_path):
                 
                 p_obj = {
                     'name': name,
+                    'hito': hito_name,
                     'role': d.get('role', 'Estudiante'),
                     'school': sch,
                     'gender': gender,
@@ -518,6 +519,111 @@ def parse_excel_data(file_path):
             'participants': paired_list
         }
 
+    # 3. Resumen Global consolidado (Hito 3 y Hito 4)
+    all_paired_glob = []
+    for hname in ['Hito 3', 'Hito 4']:
+        if hname in hitos_data:
+            for p in hitos_data[hname]['participants']:
+                all_paired_glob.append(p)
+
+    N_glob = len(all_paired_glob)
+    if N_glob > 0:
+        avg_pre_glob = sum(p['pre_score'] for p in all_paired_glob) / N_glob
+        avg_post_glob = sum(p['post_score'] for p in all_paired_glob) / N_glob
+        avg_delta_glob = sum(p['delta'] for p in all_paired_glob) / N_glob
+        status_c_glob = Counter(p['status'] for p in all_paired_glob)
+        g_list_glob = [(p['post_score'] - p['pre_score']) / (5.0 - p['pre_score']) for p in all_paired_glob if p['pre_score'] < 5]
+        hake_g_glob = sum(g_list_glob) / len(g_list_glob) if g_list_glob else 0
+
+        # Colegios consolidados
+        by_school_glob = defaultdict(list)
+        for p in all_paired_glob:
+            by_school_glob[p['school']].append(p)
+
+        schools_glob = []
+        for sname, plist in by_school_glob.items():
+            s_n = len(plist)
+            s_pre = sum(p['pre_score'] for p in plist) / s_n
+            s_post = sum(p['post_score'] for p in plist) / s_n
+            s_del = sum(p['delta'] for p in plist) / s_n
+            s_st = Counter(p['status'] for p in plist)
+            meta = schools.get(sname, {})
+            schools_glob.append({
+                'school': sname,
+                'n': s_n,
+                'pre_avg': round(s_pre, 2),
+                'post_avg': round(s_post, 2),
+                'delta_avg': round(s_del, 2),
+                'status_counts': dict(s_st),
+                'pct_mejora': round(s_st['Mejoró'] / s_n * 100, 1) if s_n else 0,
+                'lider1': meta.get('lider1', ''),
+                'email1': meta.get('email1', ''),
+                'tel1': meta.get('tel1', ''),
+                'lider2': meta.get('lider2', ''),
+                'email2': meta.get('email2', ''),
+                'tel2': meta.get('tel2', ''),
+                'dependencia': meta.get('dependencia', 'Municipal'),
+                'certificacion': meta.get('certificacion', 'No'),
+                'has_data': True
+            })
+        schools_glob.sort(key=lambda x: -x['delta_avg'])
+
+        # Género consolidado
+        by_gender_glob = defaultdict(list)
+        for p in all_paired_glob:
+            by_gender_glob[p['gender']].append(p)
+
+        gender_metrics_glob = {}
+        for gname, plist in by_gender_glob.items():
+            g_n = len(plist)
+            g_pre = sum(p['pre_score'] for p in plist) / g_n
+            g_post = sum(p['post_score'] for p in plist) / g_n
+            g_del = sum(p['delta'] for p in plist) / g_n
+            g_st = Counter(p['status'] for p in plist)
+            gender_metrics_glob[gname] = {
+                'n': g_n,
+                'pre_avg': round(g_pre, 2),
+                'post_avg': round(g_post, 2),
+                'delta_avg': round(g_del, 2),
+                'status_counts': dict(g_st),
+                'pct_mejora': round(g_st['Mejoró'] / g_n * 100, 1) if g_n else 0
+            }
+
+        glob_questions = []
+        if 'Hito 3' in hitos_data:
+            for q in hitos_data['Hito 3']['questions']:
+                qc = dict(q)
+                qc['hito'] = 'Hito 3'
+                qc['title'] = f"[Hito 3] {qc['title']}"
+                glob_questions.append(qc)
+        if 'Hito 4' in hitos_data:
+            for q in hitos_data['Hito 4']['questions']:
+                qc = dict(q)
+                qc['hito'] = 'Hito 4'
+                qc['title'] = f"[Hito 4] {qc['title']}"
+                glob_questions.append(qc)
+
+        glob_open = []
+        if 'Hito 3' in hitos_data:
+            glob_open.extend([f"[Hito 3] {t}" for t in hitos_data['Hito 3']['open_questions']])
+        if 'Hito 4' in hitos_data:
+            glob_open.extend([f"[Hito 4] {t}" for t in hitos_data['Hito 4']['open_questions']])
+
+        hitos_data['Global'] = {
+            'desafio': 'Resumen Global Línea Verde (Hito 3 y Hito 4)',
+            'n_participants': N_glob,
+            'avg_pre': round(avg_pre_glob, 2),
+            'avg_post': round(avg_post_glob, 2),
+            'avg_delta': round(avg_delta_glob, 2),
+            'hake_gain': round(hake_g_glob, 3),
+            'status_counts': dict(status_c_glob),
+            'questions': glob_questions,
+            'open_questions': glob_open,
+            'schools': schools_glob,
+            'gender': gender_metrics_glob,
+            'participants': all_paired_glob
+        }
+
     return {
         'metadata': {
             'programa': 'Programa de Acción Climática (PAC) 2026',
@@ -529,3 +635,16 @@ def parse_excel_data(file_path):
         'hitos': hitos_data,
         'all_participants': list(all_participants.values())
     }
+
+if __name__ == '__main__':
+    import json
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    excel_path = os.path.join(current_dir, '..', 'datos_evaluacion', 'Participantes PAC 2026.xlsx')
+    parsed = parse_excel_data(excel_path)
+    out_file = os.path.join(current_dir, 'data.json')
+    with open(out_file, 'w', encoding='utf-8') as f:
+        json.dump(parsed, f, ensure_ascii=False, indent=2)
+    print(f"data.json generado correctamente en: {out_file}")
+    print("Hitos disponibles:", list(parsed['hitos'].keys()))
+    print(f"Total evaluaciones globales: {parsed['hitos']['Global']['n_participants']}")
+
