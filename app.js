@@ -18,12 +18,17 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupEventListeners() {
-  document.getElementById('btn-reload').addEventListener('click', () => {
-    loadDashboardData(true);
-  });
+  const reloadBtn = document.getElementById('btn-reload');
+  if (reloadBtn) {
+    reloadBtn.addEventListener('click', () => {
+      loadDashboardData(true);
+    });
+  }
 
   const fileInput = document.getElementById('file-input');
-  fileInput.addEventListener('change', handleFileUpload);
+  if (fileInput) {
+    fileInput.addEventListener('change', handleFileUpload);
+  }
 }
 
 // Cargar datos desde la API local o data.json de respaldo
@@ -49,14 +54,142 @@ async function loadDashboardData(forceReload = false) {
       syncStatus.className = 'flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200';
     } catch (e2) {
       console.error('Error crítico al cargar datos:', e2);
-      syncText.innerText = 'Error al cargar datos. Sube un archivo .xlsx';
+      syncText.innerText = 'Error al cargar datos.';
       syncStatus.className = 'flex items-center gap-1.5 text-xs text-rose-800 bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200';
       return;
     }
   }
 
+  ensureGlobalHito(RAW_DATA);
   populateFilterDropdowns();
   updateUI();
+}
+
+// Garantiza la existencia y consistencia del Resumen Global consolidado
+function ensureGlobalHito(data) {
+  if (!data || !data.hitos) return;
+  if (data.hitos['Global'] && data.hitos['Global'].participants && data.hitos['Global'].participants.length > 0) {
+    return;
+  }
+
+  const allPaired = [];
+  ['Hito 3', 'Hito 4'].forEach(hname => {
+    if (data.hitos[hname] && data.hitos[hname].participants) {
+      data.hitos[hname].participants.forEach(p => {
+        const pCopy = Object.assign({}, p, { hito: p.hito || hname });
+        allPaired.push(pCopy);
+      });
+    }
+  });
+
+  const N = allPaired.length;
+  if (N === 0) return;
+
+  const avgPre = allPaired.reduce((acc, p) => acc + p.pre_score, 0) / N;
+  const avgPost = allPaired.reduce((acc, p) => acc + p.post_score, 0) / N;
+  const avgDelta = allPaired.reduce((acc, p) => acc + p.delta, 0) / N;
+
+  const statusCounts = { 'Mejoró': 0, 'Mantuvo': 0, 'Retrocedió': 0 };
+  allPaired.forEach(p => { statusCounts[p.status] = (statusCounts[p.status] || 0) + 1; });
+
+  const gList = allPaired.filter(p => p.pre_score < 5).map(p => (p.post_score - p.pre_score) / (5.0 - p.pre_score));
+  const hakeGain = gList.length ? gList.reduce((a, b) => a + b, 0) / gList.length : 0;
+
+  // Colegios consolidados
+  const bySchool = {};
+  allPaired.forEach(p => {
+    if (!bySchool[p.school]) bySchool[p.school] = [];
+    bySchool[p.school].push(p);
+  });
+
+  const schoolsRankings = [];
+  for (const [sname, plist] of Object.entries(bySchool)) {
+    const sn = plist.length;
+    const spre = plist.reduce((a, p) => a + p.pre_score, 0) / sn;
+    const spost = plist.reduce((a, p) => a + p.post_score, 0) / sn;
+    const sdel = plist.reduce((a, p) => a + p.delta, 0) / sn;
+    const sst = { 'Mejoró': 0, 'Mantuvo': 0, 'Retrocedió': 0 };
+    plist.forEach(p => { sst[p.status] = (sst[p.status] || 0) + 1; });
+    const meta = (data.schools_directory && data.schools_directory[sname]) || {};
+    schoolsRankings.push({
+      school: sname,
+      n: sn,
+      pre_avg: parseFloat(spre.toFixed(2)),
+      post_avg: parseFloat(spost.toFixed(2)),
+      delta_avg: parseFloat(sdel.toFixed(2)),
+      status_counts: sst,
+      pct_mejora: parseFloat(((sst['Mejoró'] / sn) * 100).toFixed(1)),
+      lider1: meta.lider1 || '',
+      email1: meta.email1 || '',
+      tel1: meta.tel1 || '',
+      lider2: meta.lider2 || '',
+      email2: meta.email2 || '',
+      tel2: meta.tel2 || '',
+      dependencia: meta.dependencia || 'Municipal',
+      certificacion: meta.certificacion || 'No',
+      has_data: true
+    });
+  }
+  schoolsRankings.sort((a, b) => b.delta_avg - a.delta_avg);
+
+  // Género consolidado
+  const byGender = {};
+  allPaired.forEach(p => {
+    if (!byGender[p.gender]) byGender[p.gender] = [];
+    byGender[p.gender].push(p);
+  });
+  const genderMetrics = {};
+  for (const [gname, plist] of Object.entries(byGender)) {
+    const gn = plist.length;
+    const gpre = plist.reduce((a, p) => a + p.pre_score, 0) / gn;
+    const gpost = plist.reduce((a, p) => a + p.post_score, 0) / gn;
+    const gdel = plist.reduce((a, p) => a + p.delta, 0) / gn;
+    const gst = { 'Mejoró': 0, 'Mantuvo': 0, 'Retrocedió': 0 };
+    plist.forEach(p => { gst[p.status] = (gst[p.status] || 0) + 1; });
+    genderMetrics[gname] = {
+      n: gn,
+      pre_avg: parseFloat(gpre.toFixed(2)),
+      post_avg: parseFloat(gpost.toFixed(2)),
+      delta_avg: parseFloat(gdel.toFixed(2)),
+      status_counts: gst,
+      pct_mejora: parseFloat(((gst['Mejoró'] / gn) * 100).toFixed(1))
+    };
+  }
+
+  const globQuestions = [];
+  if (data.hitos['Hito 3']) {
+    data.hitos['Hito 3'].questions.forEach(q => {
+      globQuestions.push(Object.assign({}, q, { hito: 'Hito 3', title: `[Hito 3] ${q.title}` }));
+    });
+  }
+  if (data.hitos['Hito 4']) {
+    data.hitos['Hito 4'].questions.forEach(q => {
+      globQuestions.push(Object.assign({}, q, { hito: 'Hito 4', title: `[Hito 4] ${q.title}` }));
+    });
+  }
+
+  const globOpen = [];
+  if (data.hitos['Hito 3']) {
+    data.hitos['Hito 3'].open_questions.forEach(t => globOpen.push(`[Hito 3] ${t}`));
+  }
+  if (data.hitos['Hito 4']) {
+    data.hitos['Hito 4'].open_questions.forEach(t => globOpen.push(`[Hito 4] ${t}`));
+  }
+
+  data.hitos['Global'] = {
+    desafio: 'Resumen Global Línea Verde (Hito 3 y Hito 4)',
+    n_participants: N,
+    avg_pre: parseFloat(avgPre.toFixed(2)),
+    avg_post: parseFloat(avgPost.toFixed(2)),
+    avg_delta: parseFloat(avgDelta.toFixed(2)),
+    hake_gain: parseFloat(hakeGain.toFixed(3)),
+    status_counts: statusCounts,
+    questions: globQuestions,
+    open_questions: globOpen,
+    schools: schoolsRankings,
+    gender: genderMetrics,
+    participants: allPaired
+  };
 }
 
 // Manejo de carga de archivo Excel directamente en el navegador con SheetJS
@@ -568,6 +701,7 @@ function processWorkbookInBrowser(wb, fileName) {
       all_participants: Object.values(allParticipants)
     };
 
+    ensureGlobalHito(RAW_DATA);
     syncText.innerText = `Cálculo autónomo: ${fileName}`;
     syncStatus.className = 'flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200';
 
@@ -633,18 +767,18 @@ function setHito(hito) {
 
   const btn4 = document.getElementById('btn-hito-4');
   const btn3 = document.getElementById('btn-hito-3');
-  const btnAmbos = document.getElementById('btn-hito-ambos');
+  const btnGlobal = document.getElementById('btn-hito-global') || document.getElementById('btn-hito-ambos');
 
-  [btn4, btn3, btnAmbos].forEach(btn => {
-    btn.className = 'px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition';
+  [btn4, btn3, btnGlobal].forEach(btn => {
+    if (btn) btn.className = 'px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition';
   });
 
   if (hito === 'Hito 4') {
-    btn4.className = 'px-3 py-1.5 rounded-lg font-semibold bg-white text-emerald-800 shadow-sm transition';
+    if (btn4) btn4.className = 'px-3 py-1.5 rounded-lg font-semibold bg-white text-emerald-800 shadow-sm transition';
   } else if (hito === 'Hito 3') {
-    btn3.className = 'px-3 py-1.5 rounded-lg font-semibold bg-white text-emerald-800 shadow-sm transition';
+    if (btn3) btn3.className = 'px-3 py-1.5 rounded-lg font-semibold bg-white text-emerald-800 shadow-sm transition';
   } else {
-    btnAmbos.className = 'px-3 py-1.5 rounded-lg font-semibold bg-white text-emerald-800 shadow-sm transition';
+    if (btnGlobal) btnGlobal.className = 'px-3 py-1.5 rounded-lg font-semibold bg-white text-emerald-800 shadow-sm transition';
   }
 
   updateUI();
@@ -659,8 +793,8 @@ function applyFilters() {
 function getFilteredParticipants() {
   if (!RAW_DATA || !RAW_DATA.hitos) return [];
 
-  const hitoKey = CURRENT_HITO === 'Ambos' ? 'Hito 4' : CURRENT_HITO;
-  const hitoData = RAW_DATA.hitos[hitoKey];
+  const hitoKey = (CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global') ? 'Global' : CURRENT_HITO;
+  const hitoData = RAW_DATA.hitos[hitoKey] || RAW_DATA.hitos['Hito 4'];
   if (!hitoData) return [];
 
   let list = hitoData.participants;
@@ -717,13 +851,15 @@ function updateBanner() {
     if (h4) hakeEl.innerText = `g = +${h4.hake_gain}`;
   } else if (CURRENT_HITO === 'Hito 3') {
     titleEl.innerText = 'Los otros vecinos de Antofagasta (Hito 3)';
-    descEl.innerText = 'Evaluación del aprendizaje sobre la biodiversidad del desierto costero, el Humedal La Chimba, el Gaviotín Chico (Sternula lorata), cadenas tróficas y especies descomponedoras.';
+    descEl.innerText = 'Evaluación del aprendizaje sobre biodiversidad del desierto costero, tramas tróficas, fauna y flora aledaña a la ciudad de Antofagasta (Gaviotín Chico, descomponedores) y el humedal La Chimba.';
     const h3 = RAW_DATA.hitos['Hito 3'];
     if (h3) hakeEl.innerText = `g = +${h3.hake_gain}`;
   } else {
-    titleEl.innerText = 'Comparativa Consolidada: Hito 3 vs Hito 4';
-    descEl.innerText = 'Contraste entre el diagnóstico basal de biodiversidad y humedales (Hito 3) versus la atmósfera y contaminación lumínica (Hito 4).';
-    hakeEl.innerText = 'Global PAC';
+    titleEl.innerText = 'Resumen Global del Programa (Hito 3 y Hito 4)';
+    descEl.innerText = 'Consolidado general de aprendizajes en la Línea Verde del Programa de Acción Climática (PAC 2026), integrando tramas tróficas, biodiversidad aledaña a Antofagasta, atmósfera y preservación de cielos limpios.';
+    const glob = RAW_DATA.hitos['Global'];
+    if (glob) hakeEl.innerText = `g = +${glob.hake_gain}`;
+    else hakeEl.innerText = 'Global PAC';
   }
 }
 
@@ -830,20 +966,39 @@ function renderCharts() {
     </div>
   `;
 
-  // 2. Question Accuracy Bar Chart
-  const hitoKey = CURRENT_HITO === 'Ambos' ? 'Hito 4' : CURRENT_HITO;
-  const questionsMeta = RAW_DATA.hitos[hitoKey].questions;
-  const key = RAW_DATA.hitos[hitoKey].questions.map(q => q.correct_key.toLowerCase());
+  // 2. Question Accuracy Bar Chart / Milestone Comparison
+  const isGlobal = CURRENT_HITO === 'Global' || CURRENT_HITO === 'Ambos';
+  let labels = [];
+  let prePcts = [];
+  let postPcts = [];
 
-  const prePcts = [];
-  const postPcts = [];
-  const labels = ['Pregunta 1', 'Pregunta 2', 'Pregunta 3', 'Pregunta 4', 'Pregunta 5'];
+  if (isGlobal) {
+    const h3 = RAW_DATA.hitos['Hito 3'];
+    const h4 = RAW_DATA.hitos['Hito 4'];
+    const glob = RAW_DATA.hitos['Global'];
 
-  for (let i = 0; i < 5; i++) {
-    const preC = filtered.filter(p => p.pre_mc[i] === key[i]).length;
-    const postC = filtered.filter(p => p.post_mc[i] === key[i]).length;
-    prePcts.push(N ? ((preC / N) * 100).toFixed(1) : 0);
-    postPcts.push(N ? ((postC / N) * 100).toFixed(1) : 0);
+    labels = ['Hito 3: Otros Vecinos', 'Hito 4: Escudo Invisible', 'Promedio General PAC'];
+    const h3Pre = h3 ? ((h3.avg_pre / 5) * 100).toFixed(1) : 0;
+    const h3Post = h3 ? ((h3.avg_post / 5) * 100).toFixed(1) : 0;
+    const h4Pre = h4 ? ((h4.avg_pre / 5) * 100).toFixed(1) : 0;
+    const h4Post = h4 ? ((h4.avg_post / 5) * 100).toFixed(1) : 0;
+    const globPre = glob ? ((glob.avg_pre / 5) * 100).toFixed(1) : 0;
+    const globPost = glob ? ((glob.avg_post / 5) * 100).toFixed(1) : 0;
+
+    prePcts = [h3Pre, h4Pre, globPre];
+    postPcts = [h3Post, h4Post, globPost];
+  } else {
+    const hitoKey = CURRENT_HITO;
+    const questionsMeta = RAW_DATA.hitos[hitoKey].questions;
+    const key = questionsMeta.map(q => q.correct_key.toLowerCase());
+    labels = ['Pregunta 1', 'Pregunta 2', 'Pregunta 3', 'Pregunta 4', 'Pregunta 5'];
+
+    for (let i = 0; i < 5; i++) {
+      const preC = filtered.filter(p => p.pre_mc && p.pre_mc[i] === key[i]).length;
+      const postC = filtered.filter(p => p.post_mc && p.post_mc[i] === key[i]).length;
+      prePcts.push(N ? ((preC / N) * 100).toFixed(1) : 0);
+      postPcts.push(N ? ((postC / N) * 100).toFixed(1) : 0);
+    }
   }
 
   const ctxQuestions = document.getElementById('chart-questions-bar').getContext('2d');
@@ -885,6 +1040,7 @@ function renderCharts() {
   });
 
   // 3. Schools Delta Bar Chart
+  const hitoKey = isGlobal ? 'Global' : CURRENT_HITO;
   const schoolsMeta = RAW_DATA.hitos[hitoKey].schools.filter(s => s.has_data !== false);
   const schoolLabels = schoolsMeta.map(s => s.school.replace('Escuela ', 'Esc. ').replace('Colegio ', 'Col. '));
   const schoolDeltas = schoolsMeta.map(s => s.delta_avg);
@@ -960,7 +1116,7 @@ function renderCharts() {
 
 // 2. TAB: ESTABLECIMIENTOS TABLE
 function renderSchoolsTab() {
-  const hitoKey = CURRENT_HITO === 'Ambos' ? 'Hito 4' : CURRENT_HITO;
+  const hitoKey = (CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global') ? 'Global' : CURRENT_HITO;
   const schools = RAW_DATA.hitos[hitoKey].schools;
   const tbody = document.getElementById('schools-table-body');
   tbody.innerHTML = '';
@@ -1027,12 +1183,31 @@ function renderSchoolsTab() {
 
 // 3. TAB: PREGUNTAS Y DISTRACTORES
 function renderQuestionsTab() {
-  const hitoKey = CURRENT_HITO === 'Ambos' ? 'Hito 4' : CURRENT_HITO;
+  const isGlobal = CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global';
+  const hitoKey = isGlobal ? 'Global' : CURRENT_HITO;
   const questions = RAW_DATA.hitos[hitoKey].questions;
   const container = document.getElementById('questions-detail-container');
   container.innerHTML = '';
 
-  questions.forEach((q) => {
+  let currentSectionHito = null;
+
+  questions.forEach((q, idx) => {
+    if (isGlobal) {
+      const qHito = q.hito || (idx < 5 ? 'Hito 3' : 'Hito 4');
+      if (qHito !== currentSectionHito) {
+        currentSectionHito = qHito;
+        const sectionHeader = document.createElement('div');
+        sectionHeader.className = qHito === 'Hito 3' ? 
+          'p-3.5 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 font-bold text-xs flex items-center gap-2 mt-2 mb-1' :
+          'p-3.5 bg-teal-50 rounded-xl border border-teal-200 text-teal-900 font-bold text-xs flex items-center gap-2 mt-6 mb-1';
+        sectionHeader.innerHTML = `
+          <i data-lucide="${qHito === 'Hito 3' ? 'leaf' : 'shield'}" class="w-4 h-4"></i>
+          <span>${qHito === 'Hito 3' ? 'Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y tramas tróficas)' : 'Hito 4: Proteger nuestro escudo invisible (Atmósfera y cielos oscuros)'}</span>
+        `;
+        container.appendChild(sectionHeader);
+      }
+    }
+
     const card = document.createElement('div');
     card.className = 'border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-white transition space-y-3';
 
@@ -1086,7 +1261,8 @@ function renderQuestionsTab() {
 
 // 4. TAB: CUALITATIVO RIGUROSO
 function renderQualitativeTab() {
-  const hitoKey = CURRENT_HITO === 'Ambos' ? 'Hito 4' : CURRENT_HITO;
+  const isGlobal = CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global';
+  const hitoKey = isGlobal ? 'Global' : CURRENT_HITO;
   const openQuestions = RAW_DATA.hitos[hitoKey].open_questions;
   const selectEl = document.getElementById('select-open-q');
 
@@ -1095,7 +1271,7 @@ function renderQualitativeTab() {
     openQuestions.forEach((oq, idx) => {
       const opt = document.createElement('option');
       opt.value = idx;
-      opt.textContent = `P${idx + 1}: ${oq.substring(0, 65)}...`;
+      opt.textContent = isGlobal ? `${oq.substring(0, 75)}...` : `P${idx + 1}: ${oq.substring(0, 65)}...`;
       selectEl.appendChild(opt);
     });
     selectEl.dataset.hito = hitoKey;
@@ -1107,13 +1283,24 @@ function renderQualitativeTab() {
   listEl.innerHTML = '';
 
   filtered.forEach(p => {
-    const qData = p.open_analysis[selectedIdx];
+    let qData = null;
+    if (isGlobal) {
+      if (selectedIdx < 4) {
+        if (p.hito !== 'Hito 3') return;
+        qData = p.open_analysis && p.open_analysis[selectedIdx];
+      } else {
+        if (p.hito !== 'Hito 4') return;
+        qData = p.open_analysis && p.open_analysis[selectedIdx - 4];
+      }
+    } else {
+      qData = p.open_analysis && p.open_analysis[selectedIdx];
+    }
+
     if (!qData) return;
 
     const item = document.createElement('div');
     item.className = 'bg-white p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition text-xs space-y-2.5';
 
-    // Determinar badge según estado CUALITATIVO de esta pregunta específica
     let badgeClass = 'bg-slate-100 text-slate-700 border border-slate-300';
     let badgeText = qData.status;
 
@@ -1142,6 +1329,7 @@ function renderQualitativeTab() {
         <div>
           <span class="font-bold text-slate-900 text-sm">${p.name}</span>
           <span class="text-slate-500 ml-1.5">· ${p.school}</span>
+          ${isGlobal ? `<span class="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-semibold ${p.hito === 'Hito 4' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800'}">${p.hito}</span>` : ''}
         </div>
         <div class="flex items-center gap-2">
           <span class="px-2.5 py-0.5 rounded text-[11px] font-semibold ${badgeClass}">${badgeText}</span>
@@ -1169,9 +1357,9 @@ function renderQualitativeTab() {
   });
 }
 
-// 5. TAB: CASOS CRÍTICOS & PEDAGÓGICO
+// 5. TAB: CASOS CRÍTICOS Y ORIENTACIONES PEDAGÓGICAS
 function renderPedagogicalTab() {
-  const hitoKey = CURRENT_HITO === 'Ambos' ? 'Hito 4' : CURRENT_HITO;
+  const hitoKey = (CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global') ? 'Global' : CURRENT_HITO;
   const schools = RAW_DATA.hitos[hitoKey].schools;
   const container = document.getElementById('pedagogical-cards');
   container.innerHTML = '';
@@ -1187,13 +1375,13 @@ function renderPedagogicalTab() {
       recomendacion = `<strong>Sin evaluaciones registradas en este hito:</strong> Este establecimiento no registra respuestas PRE ni POST para este desafío. Se sugiere coordinar directamente con el profesor/a líder (<strong>${s.lider1 || 'Coordinador'}</strong>) para verificar la ejecución de la actividad en terreno o aplicar la evaluación de manera diferida.`;
       statusClass = 'bg-amber-50 border-amber-200 text-amber-900';
     } else if (s.delta_avg > 0.7) {
-      recomendacion = `<strong>Consolidación y Prototipado:</strong> Este equipo demostró una comprensión sobresaliente de los conceptos de la intervención (+${s.delta_avg} pts). Se sugiere a la líder <strong>${s.lider1 || 'Docente Líder'}</strong> canalizar este entusiasmo directamente al diseño de soluciones en la fase <em>Diseñador</em> de VERDICAL (ej. prototipos de pantallas para luminarias o maquetas de protección de cielos y humedales).`;
+      recomendacion = `<strong>Consolidación e Ideación:</strong> Este equipo demostró una comprensión sobresaliente de los conceptos de la intervención (+${s.delta_avg} pts). Se sugiere a la líder <strong>${s.lider1 || 'Docente Líder'}</strong> canalizar este entusiasmo directamente hacia la etapa de ideación (ej. iniciativas escolares de protección de cielos oscuros o conservación de la biodiversidad local).`;
       statusClass = 'bg-emerald-50 border-emerald-200 text-emerald-800';
     } else if (s.delta_avg >= 0.2) {
-      recomendacion = `<strong>Refuerzo de conceptos intermedios:</strong> El equipo tiene una asimilación positiva pero heterogénea (+${s.delta_avg} pts). Se recomienda a la líder <strong>${s.lider1 || 'Docente Líder'}</strong> realizar un plenario corto de 15 minutos repasando las diferencias entre efecto invernadero natural y emisiones artificiales, antes de la entrega final.`;
+      recomendacion = `<strong>Refuerzo de conceptos intermedios:</strong> El equipo tiene una asimilación positiva pero heterogénea (+${s.delta_avg} pts). Se recomienda a la líder <strong>${s.lider1 || 'Docente Líder'}</strong> realizar un plenario corto de 15 minutos repasando las diferencias conceptuales clave, antes de pasar a la etapa de ideación.`;
       statusClass = 'bg-amber-50 border-amber-200 text-amber-800';
     } else {
-      recomendacion = `<strong>Atención a 'Efecto Techo' y Distractores:</strong> El puntaje basal fue muy elevado o se registraron confusiones sutiles en las opciones cerradas (${s.delta_avg} pts). No interpretar esto como falta de aprendizaje: cualitativamente los estudiantes manejan la terminología. Se aconseja pedirles que expliquen con sus propias palabras el impacto en la fauna local para afianzar la seguridad en sus conocimientos.`;
+      recomendacion = `<strong>Atención a 'Efecto Techo' y Distractores:</strong> El puntaje basal fue muy elevado o se registraron confusiones sutiles en las opciones cerradas (${s.delta_avg} pts). No interpretar esto como falta de aprendizaje: cualitativamente los estudiantes manejan la terminología. Se aconseja pedirles que expliquen con sus propias palabras el impacto en la fauna local para afianzar la seguridad en sus conocimientos antes de la etapa de ideación.`;
       statusClass = 'bg-slate-50 border-slate-200 text-slate-800';
     }
 
@@ -1228,6 +1416,7 @@ function renderPedagogicalTab() {
 
 // 6. TAB: FICHAS INDIVIDUALES
 function renderParticipantsTab() {
+  const isGlobal = CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global';
   const filtered = getFilteredParticipants();
   document.getElementById('participants-count-filtered').innerText = filtered.length;
 
@@ -1242,12 +1431,15 @@ function renderParticipantsTab() {
     const deltaSign = p.delta >= 0 ? '+' : '';
     const badgeClass = p.status === 'Mejoró' ? 'badge-improved' : (p.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained');
 
+    const hitoBadge = isGlobal ? 
+      `<span class="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-semibold ${p.hito === 'Hito 4' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800'}">${p.hito}</span>` : '';
+
     tr.innerHTML = `
       <td class="py-3 px-4 font-semibold text-slate-900 flex items-center gap-2">
         <span class="w-2 h-2 rounded-full ${p.gender === 'Femenino' ? 'bg-pink-400' : 'bg-blue-400'}"></span>
         ${p.name}
       </td>
-      <td class="py-3 px-3 text-slate-600">${p.school}</td>
+      <td class="py-3 px-3 text-slate-600">${p.school} ${hitoBadge}</td>
       <td class="py-3 px-3 text-slate-500 text-[11px]">${p.gender}</td>
       <td class="py-3 px-3 text-center text-slate-600 font-medium">${p.pre_score} / 5</td>
       <td class="py-3 px-3 text-center text-emerald-700 font-bold">${p.post_score} / 5</td>
@@ -1272,12 +1464,13 @@ function renderParticipantsTab() {
 function openModal(p) {
   if (!p) return;
 
-  const hitoKey = CURRENT_HITO === 'Ambos' ? 'Hito 4' : CURRENT_HITO;
-  const questionsMeta = RAW_DATA.hitos[hitoKey].questions;
-  const key = questionsMeta.map(q => q.correct_key);
+  const isGlobal = CURRENT_HITO === 'Global' || CURRENT_HITO === 'Ambos';
+  const hitoKey = p.hito || (isGlobal ? 'Hito 4' : CURRENT_HITO);
+  const questionsMeta = (RAW_DATA.hitos[hitoKey] && RAW_DATA.hitos[hitoKey].questions) || RAW_DATA.hitos['Hito 4'].questions;
+  const key = questionsMeta.slice(0, 5).map(q => q.correct_key);
 
   document.getElementById('modal-name').innerText = p.name;
-  document.getElementById('modal-school').innerText = `${p.school} · Género: ${p.gender} · Rol: ${p.role || 'Estudiante'}`;
+  document.getElementById('modal-school').innerText = `${p.school} · ${p.hito || CURRENT_HITO} · Género: ${p.gender} · Rol: ${p.role || 'Estudiante'}`;
   document.getElementById('modal-role').innerText = p.real_status || 'Estudiante';
 
   document.getElementById('modal-pre-score').innerText = `${p.pre_score} / 5`;
@@ -1293,6 +1486,7 @@ function openModal(p) {
   mcList.innerHTML = '';
 
   p.q_evo.forEach((evo, idx) => {
+    if (idx >= questionsMeta.length) return;
     const qRow = document.createElement('div');
     const isCorrectPost = p.post_mc[idx] === key[idx].toLowerCase();
     const isCorrectPre = p.pre_mc[idx] === key[idx].toLowerCase();
@@ -1364,7 +1558,7 @@ function closeModal() {
 
 // Exportar tabla a CSV
 function exportSchoolsTable() {
-  const hitoKey = CURRENT_HITO === 'Ambos' ? 'Hito 4' : CURRENT_HITO;
+  const hitoKey = (CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global') ? 'Global' : CURRENT_HITO;
   const schools = RAW_DATA.hitos[hitoKey].schools;
 
   let csv = 'Establecimiento,Dependencia,N_Participantes,Puntaje_PRE,Puntaje_POST,Delta,Pct_Mejora,Lider_1,Email_1,Telefono_1\n';

@@ -44,27 +44,20 @@
             <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Evaluación de Aprendizajes · Línea Verde</h1>
             <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">PAC 2026</span>
           </div>
-          <p class="text-xs text-slate-500">Antofagasta: Laboratorio Vivo hacia el 2050 · Hito 3 &amp; Hito 4</p>
         </div>
       </div>
 
-      <!-- Action buttons & File Sync Status -->
+      <!-- Action buttons y File Sync Status -->
       <div class="flex items-center gap-2.5 flex-wrap">
         <div id="sync-status" class="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span id="sync-text">Cargando datos...</span>
         </div>
 
-        <button id="btn-reload" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 active:bg-slate-100 transition shadow-sm" title="Recargar archivo Excel">
+        <button id="btn-reload" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 active:bg-slate-100 transition shadow-sm" title="Recargar datos">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
           <span>Actualizar</span>
         </button>
-
-        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-300 rounded-lg hover:bg-emerald-100 cursor-pointer transition shadow-sm">
-          <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-          <span>Subir otro .xlsx</span>
-          <input type="file" id="file-input" accept=".xlsx, .xls" class="hidden">
-        </label>
       </div>
     </div>
 
@@ -80,7 +73,7 @@
       </button>
       <button onclick="switchTab('preguntas')" class="nav-tab flex items-center gap-2 py-3 px-3.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap" id="tab-btn-preguntas">
         <i data-lucide="help-circle" class="w-4 h-4"></i>
-        <span>Preguntas &amp; Distractores</span>
+        <span>Preguntas y Distractores</span>
       </button>
       <button onclick="switchTab('cualitativo')" class="nav-tab flex items-center gap-2 py-3 px-3.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap" id="tab-btn-cualitativo">
         <i data-lucide="message-square-text" class="w-4 h-4"></i>
@@ -88,7 +81,7 @@
       </button>
       <button onclick="switchTab('pedagogico')" class="nav-tab flex items-center gap-2 py-3 px-3.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap" id="tab-btn-pedagogico">
         <i data-lucide="lightbulb" class="w-4 h-4"></i>
-        <span>Casos Críticos &amp; Orientaciones</span>
+        <span>Casos Críticos y Orientaciones</span>
       </button>
       <button onclick="switchTab('participantes')" class="nav-tab flex items-center gap-2 py-3 px-3.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap" id="tab-btn-participantes">
         <i data-lucide="users" class="w-4 h-4"></i>
@@ -104,13 +97,13 @@
       <!-- Hito selection pills -->
       <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
         <button onclick="setHito('Hito 4')" id="btn-hito-4" class="px-3 py-1.5 rounded-lg font-semibold bg-white text-emerald-800 shadow-sm transition">
-          Hito 4: Escudo Invisible (Atmósfera)
+          Hito 4: Escudo Invisible
         </button>
         <button onclick="setHito('Hito 3')" id="btn-hito-3" class="px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition">
-          Hito 3: Otros Vecinos (Humedales)
+          Hito 3: Otros Vecinos
         </button>
-        <button onclick="setHito('Ambos')" id="btn-hito-ambos" class="px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition">
-          Comparativa H3 vs H4
+        <button onclick="setHito('Global')" id="btn-hito-global" class="px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition">
+          Resumen Global
         </button>
       </div>
 
@@ -246,7 +239,7 @@
         </div>
       </div>
 
-      <!-- CHARTS ROW 2: By School & By Gender -->
+      <!-- CHARTS ROW 2: Por Escuela y Por Género -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Schools Delta Bar Chart -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -319,7 +312,7 @@
     <section id="view-preguntas" class="tab-view hidden space-y-6">
       <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
         <div class="mb-4">
-          <h3 class="font-bold text-slate-900 text-base">Matriz de Preguntas Cerradas &amp; Análisis de Distractores</h3>
+          <h3 class="font-bold text-slate-900 text-base">Matriz de Preguntas Cerradas y Análisis de Distractores</h3>
           <p class="text-xs text-slate-500 mt-0.5">Evaluación detallada de la asimilación conceptual y alternativas erróneas más frecuentes</p>
         </div>
 
@@ -359,7 +352,7 @@
       </div>
     </section>
 
-    <!-- 5. TAB: CASOS CRÍTICOS & PEDAGÓGICO -->
+    <!-- 5. TAB: CASOS CRÍTICOS Y ORIENTACIONES -->
     <section id="view-pedagogico" class="tab-view hidden space-y-6">
       <!-- Diagnostic header -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -371,7 +364,6 @@
           <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside">
             <li><strong>Efecto distractor atractivo:</strong> En el post-test, opciones con términos técnicos nuevos pero incorrectos atraen respuestas intuitivas.</li>
             <li><strong>Falso positivo en el pre-test:</strong> Estudiantes que acertaron al azar en el PRE y eligieron otra opción en el POST.</li>
-            <li><strong>Cansancio o apuro:</strong> La evaluación POST se aplicó inmediatamente tras la caminata en terreno.</li>
           </ul>
         </div>
 
@@ -391,7 +383,7 @@
             <span>Acción para Profesores Líderes</span>
           </div>
           <p class="text-xs text-slate-600 leading-relaxed">
-            Se entregan recomendaciones diferenciadas para que los profesores líderes refuercen los conceptos en aula antes de pasar a la etapa de <strong>Diseño y Prototipado (Metodología VERDICAL)</strong>.
+            Se entregan recomendaciones diferenciadas para que los profesores líderes refuercen los conceptos en aula antes de pasar a la etapa de ideación.
           </p>
         </div>
       </div>
