@@ -1,9 +1,10 @@
 /**
  * Lógica principal del Dashboard Interactivo de Evaluación Línea Verde - PAC 2026
+ * Con evaluación cualitativa rigurosa y normalización canónica de datos
  */
 
 let RAW_DATA = null;
-let CURRENT_HITO = 'Hito 4'; // Default to Hito 4 (Escudo invisible)
+let CURRENT_HITO = 'Hito 4'; // Default a Hito 4
 let ACTIVE_TAB = 'resumen';
 let CHARTS = {};
 
@@ -33,20 +34,19 @@ async function loadDashboardData(forceReload = false) {
   syncStatus.className = 'flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200';
 
   try {
-    // Intentar primero desde el servidor API local con timestamp para evitar caché
     const response = await fetch(`/api/data?t=${Date.now()}`);
     if (!response.ok) throw new Error('API local no respondió');
     RAW_DATA = await response.json();
     syncText.innerText = 'Conectado a Excel (En vivo)';
     syncStatus.className = 'flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200';
   } catch (err) {
-    console.warn('Fallo API local, intentando cargar data.json estático...', err);
+    console.warn('Fallo API local, cargando data.json estático...', err);
     try {
       const respStatic = await fetch(`./data.json?t=${Date.now()}`);
       if (!respStatic.ok) throw new Error('data.json no disponible');
       RAW_DATA = await respStatic.json();
       syncText.innerText = 'Datos locales cargados (data.json)';
-      syncStatus.className = 'flex items-center gap-1.5 text-xs text-amber-800 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200';
+      syncStatus.className = 'flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200';
     } catch (e2) {
       console.error('Error crítico al cargar datos:', e2);
       syncText.innerText = 'Error al cargar datos. Sube un archivo .xlsx';
@@ -77,6 +77,140 @@ function handleFileUpload(e) {
   reader.readAsArrayBuffer(file);
 }
 
+// Helpers de normalización canónica
+function stripAccents(s) {
+  if (!s) return '';
+  return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+
+function canonicalSchoolName(name) {
+  if (!name) return '';
+  const n = String(name).trim().replace(/"/g, '').replace(/'/g, '');
+  const nc = stripAccents(n);
+  if (nc.includes('heroes')) return 'Escuela Héroes de la Concepción';
+  if (nc.includes('sabella')) return 'Liceo Bicentenario Andrés Sabella';
+  if (nc.includes('bet-el') || nc.includes('bet el') || nc.includes('betel')) return 'Colegio Bet-el';
+  if (nc.includes('bandera')) return 'Escuela La Bandera';
+  if (nc.includes('presbiteriana')) return 'Escuela Presbiteriana';
+  if (nc.includes('romulo')) return 'Escuela Rómulo Peña';
+  if (nc.includes('greenhill')) return 'Greenhill School';
+  if (nc.includes('claudio matte')) return 'Escuela Claudio Matte Pérez';
+  if (nc.includes('humberto gonzalez')) return 'Escuela Ecológica Humberto González Echegoyen';
+  if (nc.includes('alberto hurtado')) return 'Escuela Ecológica Padre Alberto Hurtado';
+  if (nc.includes('republica de italia')) return 'Escuela República de Italia';
+  if (nc.includes('domingo herrera')) return 'Liceo Domingo Herrera Rivera';
+  if (nc.includes('estados unidos')) return 'Escuela República de Estados Unidos';
+  if (nc.includes('juan pablo')) return 'Escuela Juan Pablo II';
+  if (nc.includes('javiera carrera')) return 'Escuela Javiera Carrera';
+  return n;
+}
+
+const NON_INFORMATIVE = [
+  'no se', 'nada', 'ninguna', 'no me acuerdo', 'nose', 'no responde', 
+  'no se como decirlo', 'no se como puedo decirlo', 'no se explicarlo', 
+  'no se que poner', 'no sabria decir', 'no responder', 'ninguno', 'no lo se'
+];
+
+function isNonInformative(text) {
+  if (!text) return True;
+  const t = stripAccents(text).replace(/[.,;:_\-]/g, '').trim();
+  if (t.length < 2) return true;
+  for (const b of NON_INFORMATIVE) {
+    if (t === b || t.startsWith(b + ' ') || t.endsWith(' ' + b)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function evaluateConceptualLevel(text, hito) {
+  if (isNonInformative(text)) return [0, 'No sabe / Sin respuesta'];
+  const tc = stripAccents(text);
+  const kwH3 = ['ecosistema', 'biodiversidad', 'gaviotin', '50 gr', '50 gramos', 'microorganismo', 'flora', 'fauna', 'salina', 'desierto costero', 'cadena trofica', 'humedal', 'reserva', 'portada', 'endemica', 'migratoria', 'piqueros', 'piquero', 'pelicano'];
+  const kwH4 = ['atmosfera', 'escudo', 'capa de ozono', 'gases', 'efecto invernadero', 'radiacion', 'uv', 'contaminacion luminica', 'astronomia', 'telescopio', 'paranal', 'luz azul', 'cielos limpios', 'patrimonio', 'postes de luz mirando hacia arriba', 'postes'];
+  const kw = hito === 'Hito 3' ? kwH3 : kwH4;
+  const matches = kw.filter(k => tc.includes(k)).length;
+  const words = tc.split(/\s+/).length;
+
+  if (matches >= 1 && (words >= 4 || tc.includes('gaviotin') || tc.includes('50') || tc.includes('ecosistema') || tc.includes('escudo') || tc.includes('postes'))) {
+    return [3, 'Apropiación Científica'];
+  } else if (matches >= 1 || words >= 3) {
+    return [2, 'Comprensión Intermedia'];
+  } else {
+    return [1, 'Opinión Básica'];
+  }
+}
+
+function compareOpenAnswers(preText, postText, hito) {
+  const preNon = isNonInformative(preText);
+  const postNon = isNonInformative(postText);
+
+  // 1. Ambos sin información
+  if (preNon && postNon) {
+    return {
+      status: 'Sin Evidencia',
+      detail: 'Sin respuesta en PRE ni POST (Requiere revisión con profesor/a líder)',
+      requires_review: true,
+      pre_level: 0,
+      post_level: 0
+    };
+  }
+
+  // 2. Pre no sabía y post sí tiene respuesta real
+  if (preNon && !postNon) {
+    const [lvl, lbl] = evaluateConceptualLevel(postText, hito);
+    return {
+      status: 'Mejoró',
+      detail: `Avance conceptual real: Pasa de no responder a expresar ${lbl}`,
+      requires_review: false,
+      pre_level: 0,
+      post_level: lvl
+    };
+  }
+
+  // 3. Pre tenía respuesta y en post dejó de responder
+  if (!preNon && postNon) {
+    const [lvlPre, lblPre] = evaluateConceptualLevel(preText, hito);
+    return {
+      status: 'Retrocedió',
+      detail: `Dejó de contestar en el POST (Basal era ${lblPre})`,
+      requires_review: true,
+      pre_level: lvlPre,
+      post_level: 0
+    };
+  }
+
+  // 4. Ambos informados
+  const [lvlPre, lblPre] = evaluateConceptualLevel(preText, hito);
+  const [lvlPost, lblPost] = evaluateConceptualLevel(postText, hito);
+
+  if (lvlPost > lvlPre) {
+    return {
+      status: 'Mejoró',
+      detail: `Mayor precisión y vocabulario (${lblPre} ➔ ${lblPost})`,
+      requires_review: false,
+      pre_level: lvlPre,
+      post_level: lvlPost
+    };
+  } else if (lvlPost === lvlPre) {
+    return {
+      status: 'Mantuvo',
+      detail: `Mantuvo respuesta informada (${lblPost})`,
+      requires_review: false,
+      pre_level: lvlPre,
+      post_level: lvlPost
+    };
+  } else {
+    return {
+      status: 'Retrocedió',
+      detail: `Menor nivel de detalle (${lblPre} ➔ ${lblPost})`,
+      requires_review: false,
+      pre_level: lvlPre,
+      post_level: lvlPost
+    };
+  }
+}
+
 // Procesar libro Excel en navegador con SheetJS (100% autónomo sin backend)
 function processWorkbookInBrowser(wb, fileName) {
   const syncText = document.getElementById('sync-text');
@@ -89,7 +223,6 @@ function processWorkbookInBrowser(wb, fileName) {
     };
 
     const cleanStr = (s) => (s === null || s === undefined) ? '' : String(s).trim();
-    const stripAcc = (s) => s ? s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim() : '';
 
     const femaleNames = new Set([
       'amanda', 'danna', 'isabella', 'paulina', 'sophia', 'xochtiel', 'abigail', 'ayleen', 
@@ -103,25 +236,10 @@ function processWorkbookInBrowser(wb, fileName) {
     ]);
 
     const inferGender = (name) => {
-      const first = stripAcc(name).split(' ')[0] || '';
+      const first = stripAccents(name).split(' ')[0] || '';
       if (femaleNames.has(first)) return 'Femenino';
       if (first.endsWith('a')) return 'Femenino';
       return 'Masculino';
-    };
-
-    const evalOpenText = (text, hito) => {
-      if (!text || text.trim().length < 3) return { level: 0, label: 'Sin respuesta', text: '' };
-      const tc = stripAcc(text);
-      if (['no se', 'nada', 'ninguna', 'no me acuerdo', 'nose'].some(b => tc.includes(b))) {
-        return { level: 1, label: 'Básico / Desconocimiento', text };
-      }
-      const kw = hito === 'Hito 3' ? 
-        ['ecosistema', 'biodiversidad', 'gaviotin', '50 gr', '50 gramos', 'microorganismo', 'flora', 'fauna', 'salina', 'desierto costero', 'cadena trofica', 'humedal', 'reserva', 'portada', 'endemica', 'migratoria'] :
-        ['atmosfera', 'escudo', 'capa de ozono', 'gases', 'efecto invernadero', 'radiacion', 'uv', 'contaminacion luminica', 'astronomia', 'telescopio', 'paranal', 'luz azul', 'cielos limpios', 'patrimonio'];
-      const matches = kw.filter(k => tc.includes(k)).length;
-      if (matches >= 2 || tc.split(/\s+/).length >= 10) return { level: 3, label: 'Apropiación Científica', text };
-      if (matches === 1 || tc.split(/\s+/).length >= 4) return { level: 2, label: 'Comprensión Inicial', text };
-      return { level: 1, label: 'Básico / Desconocimiento', text };
     };
 
     // 1. Extraer Directorio de Establecimientos
@@ -132,8 +250,7 @@ function processWorkbookInBrowser(wb, fileName) {
       for (let r = 1; r < rows.length; r++) {
         const row = rows[r];
         if (!row || !row[1]) continue;
-        let sch = cleanStr(row[1]);
-        if (sch.includes('Sabella')) sch = 'Liceo Andrés Sabella';
+        const sch = canonicalSchoolName(row[1]);
         if (!schools[sch]) {
           schools[sch] = {
             nombre: sch,
@@ -159,20 +276,22 @@ function processWorkbookInBrowser(wb, fileName) {
       for (let r = 1; r < rows.length; r++) {
         const row = rows[r];
         if (!row || !row[1]) continue;
-        let sch = cleanStr(row[1]);
-        if (sch.includes('Sabella')) sch = 'Liceo Andrés Sabella';
-        if (schools[sch]) {
-          if (!schools[sch].lider1) {
-            schools[sch].lider1 = cleanStr(row[2]);
-            schools[sch].tel1 = cleanStr(row[3]);
-            schools[sch].email1 = cleanStr(row[4]);
-          }
-          if (!schools[sch].lider2) {
-            schools[sch].lider2 = cleanStr(row[5]);
-            schools[sch].tel2 = cleanStr(row[6]);
-            schools[sch].email2 = cleanStr(row[7]);
-          }
+        const sch = canonicalSchoolName(row[1]);
+        if (!schools[sch]) {
+          schools[sch] = {
+            nombre: sch,
+            dependencia: 'Municipal',
+            certificacion: 'No',
+            lider1: '', email1: '', tel1: '',
+            lider2: '', email2: '', tel2: ''
+          };
         }
+        if (row[2]) schools[sch].lider1 = cleanStr(row[2]);
+        if (row[3]) schools[sch].tel1 = cleanStr(row[3]);
+        if (row[4]) schools[sch].email1 = cleanStr(row[4]);
+        if (row[5]) schools[sch].lider2 = cleanStr(row[5]);
+        if (row[6]) schools[sch].tel2 = cleanStr(row[6]);
+        if (row[7]) schools[sch].email2 = cleanStr(row[7]);
       }
     }
 
@@ -202,8 +321,7 @@ function processWorkbookInBrowser(wb, fileName) {
         if (!row || !row[0]) continue;
         const name = cleanStr(row[0]);
         const role = cleanStr(row[1]) || 'Estudiante';
-        let school = cleanStr(row[2]);
-        if (school.includes('Sabella')) school = 'Liceo Andrés Sabella';
+        const school = canonicalSchoolName(cleanStr(row[2]));
         const pp = cleanStr(row[3]).toUpperCase();
         if (pp !== 'PRE' && pp !== 'POST') continue;
 
@@ -229,7 +347,7 @@ function processWorkbookInBrowser(wb, fileName) {
           const preScore = d.PRE.score;
           const postScore = d.POST.score;
           const delta = postScore - preScore;
-          const status = delta > 0 ? 'Mejoró' : (delta === 0 ? 'Mantuvo' : 'Retrocedió');
+          const mcStatus = delta > 0 ? 'Mejoró' : (delta === 0 ? 'Mantuvo' : 'Retrocedió');
 
           const qEvo = [];
           for (let i = 0; i < 5; i++) {
@@ -242,19 +360,36 @@ function processWorkbookInBrowser(wb, fileName) {
           }
 
           const openAnalysis = [];
+          const qualStats = { 'Mejoró': 0, 'Mantuvo': 0, 'Retrocedió': 0, 'Sin Evidencia': 0 };
+
           for (let i = 0; i < 4; i++) {
             const tPre = d.PRE.open[i];
             const tPost = d.POST.open[i];
-            const evPre = evalOpenText(tPre, hitoName);
-            const evPost = evalOpenText(tPost, hitoName);
+            const res = compareOpenAnswers(tPre, tPost, hitoName);
+            qualStats[res.status] += 1;
+
             openAnalysis.push({
               question: openTitles[i],
               pre_text: tPre,
               post_text: tPost,
-              pre_eval: evPre,
-              post_eval: evPost,
-              level_delta: evPost.level - evPre.level
+              status: res.status,
+              detail: res.detail,
+              requires_review: res.requires_review
             });
+          }
+
+          // Estado Real Integrado
+          let realStatus = 'Rendimiento Estable';
+          if (qualStats['Sin Evidencia'] === 4) {
+            realStatus = 'Sin evidencia suficiente (Requiere revisión con líder)';
+          } else if (qualStats['Mejoró'] > 0 || qualStats['Mantuvo'] >= 2) {
+            if (mcStatus === 'Mejoró') realStatus = 'Avance Integral Demostrado';
+            else if (mcStatus === 'Mantuvo') realStatus = 'Aprendizaje Consolidado';
+            else realStatus = 'Avance Conceptual Cualitativo (con ajuste en alternativas)';
+          } else if (mcStatus === 'Retrocedió' && qualStats['Retrocedió'] > 0) {
+            realStatus = 'Dificultad Conceptual (Requiere acompañamiento)';
+          } else if (mcStatus === 'Mejoró') {
+            realStatus = 'Mejora en Alternativas';
           }
 
           const pObj = {
@@ -265,7 +400,9 @@ function processWorkbookInBrowser(wb, fileName) {
             pre_score: preScore,
             post_score: postScore,
             delta,
-            status,
+            status: mcStatus,
+            real_status: realStatus,
+            qual_stats: qualStats,
             q_evo: qEvo,
             pre_mc: d.PRE.mc,
             post_mc: d.POST.mc,
@@ -344,10 +481,40 @@ function processWorkbookInBrowser(wb, fileName) {
           email2: meta.email2 || '',
           tel2: meta.tel2 || '',
           dependencia: meta.dependencia || 'Municipal',
-          certificacion: meta.certificacion || 'No'
+          certificacion: meta.certificacion || 'No',
+          has_data: true
         };
       });
-      schoolRankings.sort((a, b) => b.delta_avg - a.delta_avg);
+
+      // Incluir Colegio Bet-El explícitamente si no está en este hito
+      if (!bySchool['Colegio Bet-el']) {
+        const bMeta = schools['Colegio Bet-el'] || {};
+        schoolRankings.push({
+          school: 'Colegio Bet-el',
+          n: 0,
+          pre_avg: null,
+          post_avg: null,
+          delta_avg: 0.0,
+          status_counts: { 'Mejoró': 0, 'Mantuvo': 0, 'Retrocedió': 0 },
+          pct_mejora: 0.0,
+          lider1: bMeta.lider1 || 'Pamela Pizarro Juica',
+          email1: bMeta.email1 || 'pizarropamela2015@gmail.com',
+          tel1: bMeta.tel1 || '56995779316',
+          lider2: bMeta.lider2 || '',
+          email2: bMeta.email2 || '',
+          tel2: bMeta.tel2 || '',
+          dependencia: 'Particular Subvencionado',
+          certificacion: 'No',
+          has_data: false,
+          note: 'Sin datos registrados en este hito'
+        });
+      }
+
+      schoolRankings.sort((a, b) => {
+        if (a.has_data === false) return 1;
+        if (b.has_data === false) return -1;
+        return b.delta_avg - a.delta_avg;
+      });
 
       // Género agrupado
       const byGender = {};
@@ -421,7 +588,9 @@ function populateFilterDropdowns() {
   const schoolsSet = new Set();
   if (RAW_DATA && RAW_DATA.hitos) {
     for (const h of Object.values(RAW_DATA.hitos)) {
-      h.schools.forEach(s => schoolsSet.add(s.school));
+      h.schools.forEach(s => {
+        if (s.has_data !== false) schoolsSet.add(s.school);
+      });
     }
   }
 
@@ -642,7 +811,6 @@ function renderCharts() {
     }
   });
 
-  // Dynamic legend for donut
   const legendEl = document.getElementById('legend-status');
   legendEl.innerHTML = `
     <div>
@@ -711,22 +879,13 @@ function renderCharts() {
         }
       },
       plugins: {
-        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
-        tooltip: {
-          callbacks: {
-            title: (items) => {
-              const idx = items[0].dataIndex;
-              return `Q${idx + 1}: ${questionsMeta[idx].title.substring(0, 60)}...`;
-            },
-            label: (item) => `${item.dataset.label}: ${item.raw}%`
-          }
-        }
+        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
       }
     }
   });
 
   // 3. Schools Delta Bar Chart
-  const schoolsMeta = RAW_DATA.hitos[hitoKey].schools;
+  const schoolsMeta = RAW_DATA.hitos[hitoKey].schools.filter(s => s.has_data !== false);
   const schoolLabels = schoolsMeta.map(s => s.school.replace('Escuela ', 'Esc. ').replace('Colegio ', 'Col. '));
   const schoolDeltas = schoolsMeta.map(s => s.delta_avg);
 
@@ -810,37 +969,58 @@ function renderSchoolsTab() {
     const tr = document.createElement('tr');
     tr.className = 'hover:bg-slate-50/80 transition';
 
-    const deltaSign = s.delta_avg >= 0 ? '+' : '';
-    const deltaColor = s.delta_avg > 0 ? 'text-emerald-700 font-bold' : (s.delta_avg === 0 ? 'text-slate-600' : 'text-rose-600 font-bold');
+    if (s.has_data === false || s.n === 0) {
+      tr.innerHTML = `
+        <td class="py-3 px-4 font-semibold text-slate-800">${s.school}</td>
+        <td class="py-3 px-3">
+          <span class="px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-700 font-medium">${s.dependencia}</span>
+        </td>
+        <td class="py-3 px-3 text-center text-slate-400 italic font-semibold">0 (Sin datos)</td>
+        <td class="py-3 px-3 text-center text-slate-400">-</td>
+        <td class="py-3 px-3 text-center text-slate-400">-</td>
+        <td class="py-3 px-3 text-center">
+          <span class="px-2 py-0.5 rounded text-[10px] bg-amber-50 text-amber-800 border border-amber-200 font-medium">Sin datos en este hito</span>
+        </td>
+        <td class="py-3 px-3 text-center text-slate-400">-</td>
+        <td class="py-3 px-3 text-center text-slate-400 text-[10px]">No evaluado</td>
+        <td class="py-3 px-4">
+          <div class="text-slate-800 font-medium">${s.lider1 || 'Coordinador del equipo'}</div>
+          <div class="text-[10px] text-slate-400">${s.email1 || ''} ${s.tel1 ? '· Tel: ' + s.tel1 : ''}</div>
+        </td>
+      `;
+    } else {
+      const deltaSign = s.delta_avg >= 0 ? '+' : '';
+      const deltaColor = s.delta_avg > 0 ? 'text-emerald-700 font-bold' : (s.delta_avg === 0 ? 'text-slate-600' : 'text-rose-600 font-bold');
 
-    tr.innerHTML = `
-      <td class="py-3 px-4 font-semibold text-slate-800">${s.school}</td>
-      <td class="py-3 px-3">
-        <span class="px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-700 font-medium">${s.dependencia}</span>
-      </td>
-      <td class="py-3 px-3 text-center font-bold text-slate-800">${s.n}</td>
-      <td class="py-3 px-3 text-center text-slate-600">${s.pre_avg.toFixed(2)}</td>
-      <td class="py-3 px-3 text-center text-emerald-700 font-semibold">${s.post_avg.toFixed(2)}</td>
-      <td class="py-3 px-3 text-center ${deltaColor}">${deltaSign}${s.delta_avg.toFixed(2)}</td>
-      <td class="py-3 px-3 text-center">
-        <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${s.pct_mejora >= 50 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'}">
-          ${s.pct_mejora}%
-        </span>
-      </td>
-      <td class="py-3 px-3">
-        <div class="flex items-center gap-1 text-[10px]">
-          <span class="text-emerald-700 font-medium" title="Mejoró">${s.status_counts['Mejoró'] || 0}↗</span>
-          <span class="text-slate-400">·</span>
-          <span class="text-slate-600" title="Mantuvo">${s.status_counts['Mantuvo'] || 0}=</span>
-          <span class="text-slate-400">·</span>
-          <span class="text-rose-600 font-medium" title="Retrocedió">${s.status_counts['Retrocedió'] || 0}↘</span>
-        </div>
-      </td>
-      <td class="py-3 px-4">
-        <div class="text-slate-800 font-medium">${s.lider1 || 'Sin registrar'}</div>
-        <div class="text-[10px] text-slate-400">${s.email1 || ''} ${s.tel1 ? '· Tel: ' + s.tel1 : ''}</div>
-      </td>
-    `;
+      tr.innerHTML = `
+        <td class="py-3 px-4 font-semibold text-slate-800">${s.school}</td>
+        <td class="py-3 px-3">
+          <span class="px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-700 font-medium">${s.dependencia}</span>
+        </td>
+        <td class="py-3 px-3 text-center font-bold text-slate-800">${s.n}</td>
+        <td class="py-3 px-3 text-center text-slate-600">${s.pre_avg !== null ? s.pre_avg.toFixed(2) : '-'}</td>
+        <td class="py-3 px-3 text-center text-emerald-700 font-semibold">${s.post_avg !== null ? s.post_avg.toFixed(2) : '-'}</td>
+        <td class="py-3 px-3 text-center ${deltaColor}">${deltaSign}${s.delta_avg.toFixed(2)}</td>
+        <td class="py-3 px-3 text-center">
+          <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${s.pct_mejora >= 50 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'}">
+            ${s.pct_mejora}%
+          </span>
+        </td>
+        <td class="py-3 px-3">
+          <div class="flex items-center gap-1 text-[10px]">
+            <span class="text-emerald-700 font-medium" title="Mejoró">${s.status_counts['Mejoró'] || 0}↗</span>
+            <span class="text-slate-400">·</span>
+            <span class="text-slate-600" title="Mantuvo">${s.status_counts['Mantuvo'] || 0}=</span>
+            <span class="text-slate-400">·</span>
+            <span class="text-rose-600 font-medium" title="Retrocedió">${s.status_counts['Retrocedió'] || 0}↘</span>
+          </div>
+        </td>
+        <td class="py-3 px-4">
+          <div class="text-slate-800 font-medium">${s.lider1 || 'Coordinador del equipo'}</div>
+          <div class="text-[10px] text-slate-400">${s.email1 || ''} ${s.tel1 ? '· Tel: ' + s.tel1 : ''}</div>
+        </td>
+      `;
+    }
     tbody.appendChild(tr);
   });
 }
@@ -852,11 +1032,10 @@ function renderQuestionsTab() {
   const container = document.getElementById('questions-detail-container');
   container.innerHTML = '';
 
-  questions.forEach((q, i) => {
+  questions.forEach((q) => {
     const card = document.createElement('div');
     card.className = 'border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-white transition space-y-3';
 
-    // Distractor pills
     const distractorPills = Object.entries(q.post_distractors)
       .map(([opt, count]) => `<span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-medium text-[11px]">Opción ${opt}: ${count} veces</span>`)
       .join(' ') || '<span class="text-slate-400 text-xs">Sin errores registrados</span>';
@@ -905,13 +1084,12 @@ function renderQuestionsTab() {
   });
 }
 
-// 4. TAB: CUALITATIVO
+// 4. TAB: CUALITATIVO RIGUROSO
 function renderQualitativeTab() {
   const hitoKey = CURRENT_HITO === 'Ambos' ? 'Hito 4' : CURRENT_HITO;
   const openQuestions = RAW_DATA.hitos[hitoKey].open_questions;
   const selectEl = document.getElementById('select-open-q');
 
-  // Populate open questions select if empty or changed
   if (selectEl.children.length === 0 || selectEl.dataset.hito !== hitoKey) {
     selectEl.innerHTML = '';
     openQuestions.forEach((oq, idx) => {
@@ -933,36 +1111,59 @@ function renderQualitativeTab() {
     if (!qData) return;
 
     const item = document.createElement('div');
-    item.className = 'bg-white p-3.5 rounded-xl border border-slate-200 hover:border-slate-300 transition text-xs space-y-2';
+    item.className = 'bg-white p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition text-xs space-y-2.5';
 
-    const deltaBadge = qData.level_delta > 0 ?
-      '<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">Crecimiento conceptual ↗</span>' :
-      (qData.level_delta < 0 ? '<span class="text-[10px] font-medium px-2 py-0.5 rounded bg-rose-100 text-rose-800">Menor detalle</span>' : '<span class="text-[10px] text-slate-400">Nivel similar</span>');
+    // Determinar badge según estado CUALITATIVO de esta pregunta específica
+    let badgeClass = 'bg-slate-100 text-slate-700 border border-slate-300';
+    let badgeText = qData.status;
+
+    if (qData.status === 'Sin Evidencia') {
+      badgeClass = 'bg-slate-100 text-slate-600 border border-slate-300';
+      badgeText = 'Sin Evidencia (Revisar con líder)';
+    } else if (qData.status === 'Mejoró') {
+      badgeClass = 'badge-improved font-bold';
+      badgeText = 'Mejora Cualitativa ↗';
+    } else if (qData.status === 'Mantuvo') {
+      badgeClass = 'bg-blue-50 text-blue-700 border border-blue-200 font-medium';
+      badgeText = 'Mantuvo Respuesta Informada =';
+    } else if (qData.status === 'Retrocedió') {
+      badgeClass = 'badge-regressed font-bold';
+      badgeText = 'Retroceso en Texto ↘';
+    }
+
+    const reviewAlert = qData.requires_review ? 
+      `<div class="mt-2 text-[11px] font-semibold text-amber-800 bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-200 flex items-center gap-1.5">
+        <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-600 shrink-0"></i>
+        <span>Elemento de evaluación no concluyente por falta de respuesta escrita. Se sugiere revisión individual con el profesor/a líder.</span>
+      </div>` : '';
 
     item.innerHTML = `
-      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
         <div>
-          <span class="font-bold text-slate-900">${p.name}</span>
-          <span class="text-slate-400 ml-1">(${p.school})</span>
+          <span class="font-bold text-slate-900 text-sm">${p.name}</span>
+          <span class="text-slate-500 ml-1.5">· ${p.school}</span>
         </div>
         <div class="flex items-center gap-2">
-          ${deltaBadge}
-          <span class="font-medium text-[11px] px-2 py-0.5 rounded ${p.status === 'Mejoró' ? 'badge-improved' : (p.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${p.status}</span>
+          <span class="px-2.5 py-0.5 rounded text-[11px] font-semibold ${badgeClass}">${badgeText}</span>
         </div>
+      </div>
+
+      <div class="text-[11px] text-slate-500 font-medium">
+        Diagnóstico conceptual: <span class="text-slate-700">${qData.detail}</span>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-          <span class="text-[10px] font-semibold text-slate-400 block uppercase mb-1">Respuesta PRE:</span>
-          <p class="text-slate-700 italic">"${qData.pre_text || '<span class=\"text-slate-400\">Sin respuesta registrada</span>'}"</p>
-          <div class="mt-1 text-[10px] font-medium text-slate-500">Nivel basal: ${qData.pre_eval.label}</div>
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200/80">
+          <span class="text-[10px] font-bold text-slate-500 block uppercase tracking-wide mb-1">Respuesta PRE (Inicial):</span>
+          <p class="text-slate-700 italic">${qData.pre_text && qData.pre_text.trim() ? '"' + qData.pre_text + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta o no sabe)</span>'}</p>
         </div>
-        <div class="bg-emerald-50/40 p-2.5 rounded-lg border border-emerald-100">
-          <span class="text-[10px] font-semibold text-emerald-700 block uppercase mb-1">Respuesta POST:</span>
-          <p class="text-slate-800 font-medium">"${qData.post_text || '<span class=\"text-slate-400\">Sin respuesta registrada</span>'}"</p>
-          <div class="mt-1 text-[10px] font-semibold text-emerald-700">Nivel final: ${qData.post_eval.label}</div>
+        <div class="bg-emerald-50/30 p-3 rounded-lg border border-emerald-100">
+          <span class="text-[10px] font-bold text-emerald-800 block uppercase tracking-wide mb-1">Respuesta POST (Final en terreno):</span>
+          <p class="text-slate-800 font-medium">${qData.post_text && qData.post_text.trim() ? '"' + qData.post_text + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta o no sabe)</span>'}</p>
         </div>
       </div>
+
+      ${reviewAlert}
     `;
     listEl.appendChild(item);
   });
@@ -979,15 +1180,17 @@ function renderPedagogicalTab() {
     const card = document.createElement('div');
     card.className = 'border border-slate-200 rounded-xl p-4 bg-white shadow-sm space-y-3';
 
-    // Generar sugerencia personalizada según su comportamiento
     let recomendacion = '';
     let statusClass = 'bg-emerald-50 border-emerald-200 text-emerald-800';
 
-    if (s.delta_avg > 0.7) {
-      recomendacion = `<strong>Consolidación y Prototipado:</strong> Este equipo demostró una comprensión sobresaliente de los conceptos de la intervención (+${s.delta_avg} pts). Se sugiere al profesor líder canalizar este entusiasmo directamente al diseño de soluciones en la fase <em>Diseñador</em> de VERDICAL (ej. prototipos solares o luminarias apantalladas).`;
+    if (s.has_data === false || s.n === 0) {
+      recomendacion = `<strong>Sin evaluaciones registradas en este hito:</strong> Este establecimiento no registra respuestas PRE ni POST para este desafío. Se sugiere coordinar directamente con el profesor/a líder (<strong>${s.lider1 || 'Coordinador'}</strong>) para verificar la ejecución de la actividad en terreno o aplicar la evaluación de manera diferida.`;
+      statusClass = 'bg-amber-50 border-amber-200 text-amber-900';
+    } else if (s.delta_avg > 0.7) {
+      recomendacion = `<strong>Consolidación y Prototipado:</strong> Este equipo demostró una comprensión sobresaliente de los conceptos de la intervención (+${s.delta_avg} pts). Se sugiere a la líder <strong>${s.lider1 || 'Docente Líder'}</strong> canalizar este entusiasmo directamente al diseño de soluciones en la fase <em>Diseñador</em> de VERDICAL (ej. prototipos de pantallas para luminarias o maquetas de protección de cielos y humedales).`;
       statusClass = 'bg-emerald-50 border-emerald-200 text-emerald-800';
     } else if (s.delta_avg >= 0.2) {
-      recomendacion = `<strong>Refuerzo de conceptos intermedios:</strong> El equipo tiene una asimilación positiva pero heterogénea (+${s.delta_avg} pts). Se recomienda realizar un plenario corto de 15 minutos repasando las diferencias entre efecto invernadero natural y antropogénico, antes de la entrega final.`;
+      recomendacion = `<strong>Refuerzo de conceptos intermedios:</strong> El equipo tiene una asimilación positiva pero heterogénea (+${s.delta_avg} pts). Se recomienda a la líder <strong>${s.lider1 || 'Docente Líder'}</strong> realizar un plenario corto de 15 minutos repasando las diferencias entre efecto invernadero natural y emisiones artificiales, antes de la entrega final.`;
       statusClass = 'bg-amber-50 border-amber-200 text-amber-800';
     } else {
       recomendacion = `<strong>Atención a 'Efecto Techo' y Distractores:</strong> El puntaje basal fue muy elevado o se registraron confusiones sutiles en las opciones cerradas (${s.delta_avg} pts). No interpretar esto como falta de aprendizaje: cualitativamente los estudiantes manejan la terminología. Se aconseja pedirles que expliquen con sus propias palabras el impacto en la fauna local para afianzar la seguridad en sus conocimientos.`;
@@ -998,11 +1201,15 @@ function renderPedagogicalTab() {
       <div class="flex items-center justify-between border-b border-slate-100 pb-2">
         <div>
           <h4 class="font-bold text-slate-900 text-sm">${s.school}</h4>
-          <span class="text-[11px] text-slate-500">Líder: ${s.lider1 || 'Coordinador del equipo'}</span>
+          <span class="text-[11px] text-slate-600 font-medium">Líder: ${s.lider1 || 'Coordinador del equipo'} ${s.lider2 ? '/ ' + s.lider2 : ''}</span>
         </div>
         <div class="text-right">
-          <span class="text-xs font-bold ${s.delta_avg >= 0 ? 'text-emerald-600' : 'text-rose-600'}">Delta: ${s.delta_avg >= 0 ? '+' : ''}${s.delta_avg}</span>
-          <div class="text-[10px] text-slate-400">${s.pct_mejora}% mejoró</div>
+          ${s.has_data !== false ? `
+            <span class="text-xs font-bold ${s.delta_avg >= 0 ? 'text-emerald-600' : 'text-rose-600'}">Delta: ${s.delta_avg >= 0 ? '+' : ''}${s.delta_avg}</span>
+            <div class="text-[10px] text-slate-400">${s.pct_mejora}% mejoró</div>
+          ` : `
+            <span class="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">Sin datos</span>
+          `}
         </div>
       </div>
 
@@ -1012,7 +1219,7 @@ function renderPedagogicalTab() {
 
       <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1">
         <span>Estudiantes evaluados: <strong>${s.n}</strong></span>
-        <span>${s.email1 ? '✉ ' + s.email1 : ''}</span>
+        <span>${s.email1 ? '✉ ' + s.email1 : ''} ${s.tel1 ? '· Tel: ' + s.tel1 : ''}</span>
       </div>
     `;
     container.appendChild(card);
@@ -1047,6 +1254,7 @@ function renderParticipantsTab() {
       <td class="py-3 px-3 text-center font-bold ${p.delta >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${deltaSign}${p.delta}</td>
       <td class="py-3 px-3 text-center">
         <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${badgeClass}">${p.status}</span>
+        <div class="text-[10px] text-slate-500 mt-0.5 font-medium">${p.real_status || ''}</div>
       </td>
       <td class="py-3 px-4 text-center">
         <button onclick="event.stopPropagation(); openModal(window.currentFiltered[${idx}])" class="px-2.5 py-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-md border border-emerald-200 transition">
@@ -1069,8 +1277,8 @@ function openModal(p) {
   const key = questionsMeta.map(q => q.correct_key);
 
   document.getElementById('modal-name').innerText = p.name;
-  document.getElementById('modal-school').innerText = `${p.school} · Género: ${p.gender}`;
-  document.getElementById('modal-role').innerText = p.role || 'Estudiante';
+  document.getElementById('modal-school').innerText = `${p.school} · Género: ${p.gender} · Rol: ${p.role || 'Estudiante'}`;
+  document.getElementById('modal-role').innerText = p.real_status || 'Estudiante';
 
   document.getElementById('modal-pre-score').innerText = `${p.pre_score} / 5`;
   document.getElementById('modal-post-score').innerText = `${p.post_score} / 5`;
@@ -1113,22 +1321,35 @@ function openModal(p) {
   const openList = document.getElementById('modal-open-list');
   openList.innerHTML = '';
 
-  p.open_analysis.forEach((oq, idx) => {
+  p.open_analysis.forEach((oq) => {
     const oRow = document.createElement('div');
     oRow.className = 'p-3 rounded-lg border border-slate-200 bg-slate-50 space-y-2';
 
+    let oBadge = 'badge-maintained';
+    if (oq.status === 'Mejoró') oBadge = 'badge-improved';
+    else if (oq.status === 'Retrocedió') oBadge = 'badge-regressed';
+    else if (oq.status === 'Sin Evidencia') oBadge = 'bg-slate-100 text-slate-600 border border-slate-300';
+
+    const reviewTag = oq.requires_review ? 
+      `<div class="text-[10px] text-amber-800 bg-amber-50 p-1.5 rounded border border-amber-200 font-medium">⚠️ Sin evidencia en texto: Requiere revisión individual con el profesor/a líder.</div>` : '';
+
     oRow.innerHTML = `
-      <div class="font-bold text-slate-800 text-xs">${oq.question}</div>
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-slate-800 text-xs">${oq.question}</span>
+        <span class="text-[10px] font-semibold px-2 py-0.5 rounded ${oBadge}">${oq.status}</span>
+      </div>
+      <div class="text-[10px] text-slate-500 font-medium">${oq.detail}</div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-        <div class="bg-white p-2 rounded border border-slate-200">
+        <div class="bg-white p-2.5 rounded border border-slate-200">
           <span class="text-[10px] font-bold text-slate-400 block uppercase">PRE:</span>
-          <p class="italic text-slate-700">"${oq.pre_text || 'Sin respuesta'}"</p>
+          <p class="italic text-slate-700">${oq.pre_text && oq.pre_text.trim() ? '"' + oq.pre_text + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta)</span>'}</p>
         </div>
-        <div class="bg-white p-2 rounded border border-emerald-200">
+        <div class="bg-white p-2.5 rounded border border-emerald-200">
           <span class="text-[10px] font-bold text-emerald-700 block uppercase">POST:</span>
-          <p class="font-medium text-slate-800">"${oq.post_text || 'Sin respuesta'}"</p>
+          <p class="font-medium text-slate-800">${oq.post_text && oq.post_text.trim() ? '"' + oq.post_text + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta)</span>'}</p>
         </div>
       </div>
+      ${reviewTag}
     `;
     openList.appendChild(oRow);
   });
@@ -1148,7 +1369,10 @@ function exportSchoolsTable() {
 
   let csv = 'Establecimiento,Dependencia,N_Participantes,Puntaje_PRE,Puntaje_POST,Delta,Pct_Mejora,Lider_1,Email_1,Telefono_1\n';
   schools.forEach(s => {
-    csv += `"${s.school}","${s.dependencia}",${s.n},${s.pre_avg},${s.post_avg},${s.delta_avg},${s.pct_mejora}%,"${s.lider1}","${s.email1}","${s.tel1}"\n`;
+    const pre = s.pre_avg !== null ? s.pre_avg : 'Sin datos';
+    const post = s.post_avg !== null ? s.post_avg : 'Sin datos';
+    const del = s.has_data !== false ? s.delta_avg : 'Sin datos';
+    csv += `"${s.school}","${s.dependencia}",${s.n},"${pre}","${post}","${del}","${s.pct_mejora}%","${s.lider1}","${s.email1}","${s.tel1}"\n`;
   });
 
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

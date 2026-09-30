@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Módulo de extracción y cálculo de métricas para Participantes PAC 2026.
-Se ejecuta en cada recarga para garantizar datos 100% actualizados desde el Excel.
+Implementa normalización canónica de establecimientos y evaluación
+cualitativa rigurosa según directrices pedagógicas.
 """
 
 import openpyxl
@@ -18,6 +19,43 @@ def strip_accents(s):
     if not s:
         return ''
     return ''.join(c for c in unicodedata.normalize('NFD', str(s)) if unicodedata.category(c) != 'Mn').strip().lower()
+
+def canonical_school_name(name):
+    if not name:
+        return ''
+    n = str(name).strip().replace('"', '').replace("'", "")
+    nc = strip_accents(n)
+    if 'heroes' in nc:
+        return 'Escuela Héroes de la Concepción'
+    if 'sabella' in nc:
+        return 'Liceo Bicentenario Andrés Sabella'
+    if 'bet-el' in nc or 'bet el' in nc or 'betel' in nc:
+        return 'Colegio Bet-el'
+    if 'bandera' in nc:
+        return 'Escuela La Bandera'
+    if 'presbiteriana' in nc:
+        return 'Escuela Presbiteriana'
+    if 'romulo' in nc:
+        return 'Escuela Rómulo Peña'
+    if 'greenhill' in nc:
+        return 'Greenhill School'
+    if 'claudio matte' in nc:
+        return 'Escuela Claudio Matte Pérez'
+    if 'humberto gonzalez' in nc:
+        return 'Escuela Ecológica Humberto González Echegoyen'
+    if 'alberto hurtado' in nc:
+        return 'Escuela Ecológica Padre Alberto Hurtado'
+    if 'republica de italia' in nc:
+        return 'Escuela República de Italia'
+    if 'domingo herrera' in nc:
+        return 'Liceo Domingo Herrera Rivera'
+    if 'estados unidos' in nc:
+        return 'Escuela República de Estados Unidos'
+    if 'juan pablo' in nc:
+        return 'Escuela Juan Pablo II'
+    if 'javiera carrera' in nc:
+        return 'Escuela Javiera Carrera'
+    return n
 
 FEMALE_NAMES = {
     'amanda', 'danna', 'isabella', 'paulina', 'sophia', 'xochtiel', 'abigail', 'ayleen', 
@@ -55,25 +93,103 @@ KEYS = {
     'Hito 4': ['b', 'c', 'a', 'b', 'b']
 }
 
-KEYWORDS_SCIENTIFIC_H3 = ['ecosistema', 'biodiversidad', 'gaviotin', '50 gr', '50 gramos', 'microorganismo', 'flora', 'fauna', 'salina', 'desierto costero', 'cadena trofica', 'humedal', 'reserva', 'portada', 'endemica', 'migratoria']
-KEYWORDS_SCIENTIFIC_H4 = ['atmosfera', 'escudo', 'capa de ozono', 'gases', 'efecto invernadero', 'radiacion', 'uv', 'contaminacion luminica', 'astronomia', 'telescopio', 'paranal', 'luz azul', 'cielos limpios', 'patrimonio']
+NON_INFORMATIVE = [
+    'no se', 'nada', 'ninguna', 'no me acuerdo', 'nose', 'no responde', 
+    'no se como decirlo', 'no se como puedo decirlo', 'no se explicarlo', 
+    'no se que poner', 'no sabria decir', 'no responder', 'ninguno', 'no lo se'
+]
 
-def evaluate_open_text(text, hito):
-    if not text or len(text.strip()) < 3:
-        return {'level': 0, 'label': 'Sin respuesta', 'text': ''}
-    t_clean = strip_accents(text)
-    if any(b in t_clean for b in ['no se', 'nada', 'ninguna', 'no me acuerdo', 'nose']):
-        return {'level': 1, 'label': 'Básico / Desconocimiento', 'text': text}
-    
-    keywords = KEYWORDS_SCIENTIFIC_H3 if hito == 'Hito 3' else KEYWORDS_SCIENTIFIC_H4
-    matches = sum(1 for kw in keywords if kw in t_clean)
-    
-    if matches >= 2 or len(t_clean.split()) >= 10:
-        return {'level': 3, 'label': 'Apropiación Científica', 'text': text}
-    elif matches == 1 or len(t_clean.split()) >= 4:
-        return {'level': 2, 'label': 'Comprensión Inicial', 'text': text}
+def is_non_informative(text):
+    if not text:
+        return True
+    t = strip_accents(str(text)).strip(' .,;:-_')
+    if len(t) < 2:
+        return True
+    for b in NON_INFORMATIVE:
+        if t == b or t.startswith(b + ' ') or t.endswith(' ' + b):
+            return True
+    return False
+
+def evaluate_conceptual_level(text, hito):
+    if is_non_informative(text):
+        return 0, 'No sabe / Sin respuesta'
+    tc = strip_accents(text)
+    kw_h3 = ['ecosistema', 'biodiversidad', 'gaviotin', '50 gr', '50 gramos', 'microorganismo', 'flora', 'fauna', 'salina', 'desierto costero', 'cadena trofica', 'humedal', 'reserva', 'portada', 'endemica', 'migratoria', 'piqueros', 'piquero', 'pelicano']
+    kw_h4 = ['atmosfera', 'escudo', 'capa de ozono', 'gases', 'efecto invernadero', 'radiacion', 'uv', 'contaminacion luminica', 'astronomia', 'telescopio', 'paranal', 'luz azul', 'cielos limpios', 'patrimonio', 'postes de luz mirando hacia arriba', 'postes']
+    kw = kw_h3 if hito == 'Hito 3' else kw_h4
+    matches = sum(1 for k in kw if k in tc)
+    words = len(tc.split())
+    if matches >= 1 and (words >= 4 or 'gaviotin' in tc or '50' in tc or 'ecosistema' in tc or 'escudo' in tc or 'postes' in tc):
+        return 3, 'Apropiación Científica / Específica'
+    elif matches >= 1 or words >= 3:
+        return 2, 'Comprensión Intermedia / Intuitiva'
     else:
-        return {'level': 1, 'label': 'Básico / Desconocimiento', 'text': text}
+        return 1, 'Opinión Básica / Opinión General'
+
+def compare_open_answers(pre_text, post_text, hito):
+    pre_non = is_non_informative(pre_text)
+    post_non = is_non_informative(post_text)
+    
+    # 1. Ambos sin información o "no sé"
+    if pre_non and post_non:
+        return {
+            'status': 'Sin Evidencia',
+            'detail': 'Sin respuesta en PRE ni POST (Requiere revisión con profesor/a líder)',
+            'requires_review': True,
+            'pre_level': 0,
+            'post_level': 0
+        }
+        
+    # 2. Inicialmente dijo "no sé" o en blanco, y en post sí tiene respuesta real
+    if pre_non and not post_non:
+        lvl, lbl = evaluate_conceptual_level(post_text, hito)
+        return {
+            'status': 'Mejoró',
+            'detail': f'Avance conceptual real: Pasa de no responder a expresar {lbl}',
+            'requires_review': False,
+            'pre_level': 0,
+            'post_level': lvl
+        }
+        
+    # 3. Tenía respuesta y en post dejó de responder o puso "no sé"
+    if not pre_non and post_non:
+        lvl_pre, lbl_pre = evaluate_conceptual_level(pre_text, hito)
+        return {
+            'status': 'Retrocedió',
+            'detail': f'Dejó de responder en el POST (Basal era {lbl_pre})',
+            'requires_review': True,
+            'pre_level': lvl_pre,
+            'post_level': 0
+        }
+        
+    # 4. Ambos tienen respuesta con contenido
+    lvl_pre, lbl_pre = evaluate_conceptual_level(pre_text, hito)
+    lvl_post, lbl_post = evaluate_conceptual_level(post_text, hito)
+    
+    if lvl_post > lvl_pre:
+        return {
+            'status': 'Mejoró',
+            'detail': f'Mayor precisión y vocabulario ({lbl_pre} ➔ {lbl_post})',
+            'requires_review': False,
+            'pre_level': lvl_pre,
+            'post_level': lvl_post
+        }
+    elif lvl_post == lvl_pre:
+        return {
+            'status': 'Mantuvo',
+            'detail': f'Mantuvo respuesta informada ({lbl_post})',
+            'requires_review': False,
+            'pre_level': lvl_pre,
+            'post_level': lvl_post
+        }
+    else:
+        return {
+            'status': 'Retrocedió',
+            'detail': f'Menor nivel de detalle ({lbl_pre} ➔ {lbl_post})',
+            'requires_review': False,
+            'pre_level': lvl_pre,
+            'post_level': lvl_post
+        }
 
 def parse_excel_data(file_path):
     if not os.path.exists(file_path):
@@ -81,15 +197,16 @@ def parse_excel_data(file_path):
         
     wb = openpyxl.load_workbook(file_path, data_only=True)
     
-    # 1. Metadatos de Colegios y Líderes
+    # 1. Metadatos de Colegios y Líderes con normalización canónica
     schools = {}
     if 'Participantes 2026' in wb.sheetnames:
         s_part = wb['Participantes 2026']
         for r in range(2, s_part.max_row + 1):
-            sch = clean_str(s_part.cell(r, 2).value)
-            if 'Sabella' in sch:
-                sch = 'Liceo Andrés Sabella'
-            if sch and sch not in schools:
+            raw_sch = clean_str(s_part.cell(r, 2).value)
+            if not raw_sch:
+                continue
+            sch = canonical_school_name(raw_sch)
+            if sch not in schools:
                 schools[sch] = {
                     'nombre': sch,
                     'equipo': s_part.cell(r, 1).value,
@@ -105,21 +222,38 @@ def parse_excel_data(file_path):
                     'tel2': clean_str(s_part.cell(r, 13).value),
                 }
 
+    # Cruce con Resumen Líderes
     if 'Resumen Líderes' in wb.sheetnames:
         s_lid = wb['Resumen Líderes']
         for r in range(2, s_lid.max_row + 1):
-            sch = clean_str(s_lid.cell(r, 2).value)
-            if 'Sabella' in sch:
-                sch = 'Liceo Andrés Sabella'
-            if sch in schools:
-                if not schools[sch]['lider1']:
-                    schools[sch]['lider1'] = clean_str(s_lid.cell(r, 3).value)
-                    schools[sch]['tel1'] = clean_str(s_lid.cell(r, 4).value)
-                    schools[sch]['email1'] = clean_str(s_lid.cell(r, 5).value)
-                if not schools[sch]['lider2']:
-                    schools[sch]['lider2'] = clean_str(s_lid.cell(r, 6).value)
-                    schools[sch]['tel2'] = clean_str(s_lid.cell(r, 7).value)
-                    schools[sch]['email2'] = clean_str(s_lid.cell(r, 8).value)
+            raw_sch = clean_str(s_lid.cell(r, 2).value)
+            if not raw_sch:
+                continue
+            sch = canonical_school_name(raw_sch)
+            if sch not in schools:
+                schools[sch] = {
+                    'nombre': sch,
+                    'dependencia': 'Municipal' if 'Escuela' in sch or 'Liceo' in sch else 'Particular Subvencionado',
+                    'certificacion': 'No',
+                    'lider1': '', 'email1': '', 'tel1': '',
+                    'lider2': '', 'email2': '', 'tel2': ''
+                }
+            # Asignar líderes desde la pestaña Resumen Líderes si están disponibles
+            l1 = clean_str(s_lid.cell(r, 3).value)
+            t1 = clean_str(s_lid.cell(r, 4).value)
+            e1 = clean_str(s_lid.cell(r, 5).value)
+            l2 = clean_str(s_lid.cell(r, 6).value)
+            t2 = clean_str(s_lid.cell(r, 7).value)
+            e2 = clean_str(s_lid.cell(r, 8).value)
+            
+            if l1:
+                schools[sch]['lider1'] = l1
+                schools[sch]['tel1'] = t1
+                schools[sch]['email1'] = e1
+            if l2:
+                schools[sch]['lider2'] = l2
+                schools[sch]['tel2'] = t2
+                schools[sch]['email2'] = e2
 
     hitos_data = {}
     all_participants = {}
@@ -144,9 +278,7 @@ def parse_excel_data(file_path):
             if not name:
                 continue
             role = clean_str(ws.cell(r, 2).value) or 'Estudiante'
-            school = clean_str(ws.cell(r, 3).value)
-            if 'Sabella' in school:
-                school = 'Liceo Andrés Sabella'
+            school = canonical_school_name(clean_str(ws.cell(r, 3).value))
                 
             pp = clean_str(ws.cell(r, 4).value).upper()
             if pp not in ['PRE', 'POST']:
@@ -191,8 +323,9 @@ def parse_excel_data(file_path):
                 pre_score = d['PRE']['score']
                 post_score = d['POST']['score']
                 delta = post_score - pre_score
-                status = 'Mejoró' if delta > 0 else ('Mantuvo' if delta == 0 else 'Retrocedió')
+                mc_status = 'Mejoró' if delta > 0 else ('Mantuvo' if delta == 0 else 'Retrocedió')
                 
+                # Evolución por pregunta de alternativas
                 q_evo = []
                 for i in range(5):
                     cp = d['PRE']['correct'][i]
@@ -206,20 +339,41 @@ def parse_excel_data(file_path):
                     else:
                         q_evo.append('Retrocedió')
                         
+                # Análisis cualitativo riguroso de preguntas abiertas
                 open_analysis = []
+                qual_stats = {'Mejoró': 0, 'Mantuvo': 0, 'Retrocedió': 0, 'Sin Evidencia': 0}
+                
                 for i in range(4):
                     t_pre = d['PRE']['open'][i]
                     t_post = d['POST']['open'][i]
-                    ev_pre = evaluate_open_text(t_pre, hito_name)
-                    ev_post = evaluate_open_text(t_post, hito_name)
+                    res = compare_open_answers(t_pre, t_post, hito_name)
+                    qual_stats[res['status']] += 1
+                    
                     open_analysis.append({
                         'question': open_q_titles[i],
                         'pre_text': t_pre,
                         'post_text': t_post,
-                        'pre_eval': ev_pre,
-                        'post_eval': ev_post,
-                        'level_delta': ev_post['level'] - ev_pre['level']
+                        'status': res['status'],
+                        'detail': res['detail'],
+                        'requires_review': res['requires_review']
                     })
+                
+                # Determinación del Estado Real de Aprendizajes (Integrado)
+                if qual_stats['Sin Evidencia'] == 4:
+                    real_status = 'Sin evidencia suficiente (Requiere revisión con líder)'
+                elif qual_stats['Mejoró'] > 0 or qual_stats['Mantuvo'] >= 2:
+                    if mc_status == 'Mejoró':
+                        real_status = 'Avance Integral Demostrado'
+                    elif mc_status == 'Mantuvo':
+                        real_status = 'Aprendizaje Consolidado'
+                    else:
+                        real_status = 'Avance Conceptual Cualitativo (con ajuste en alternativas)'
+                elif mc_status == 'Retrocedió' and qual_stats['Retrocedió'] > 0:
+                    real_status = 'Dificultad Conceptual (Requiere acompañamiento)'
+                elif mc_status == 'Mejoró':
+                    real_status = 'Mejora en Alternativas'
+                else:
+                    real_status = 'Rendimiento Estable'
                 
                 p_obj = {
                     'name': name,
@@ -229,7 +383,9 @@ def parse_excel_data(file_path):
                     'pre_score': pre_score,
                     'post_score': post_score,
                     'delta': delta,
-                    'status': status,
+                    'status': mc_status,
+                    'real_status': real_status,
+                    'qual_stats': qual_stats,
                     'q_evo': q_evo,
                     'pre_mc': d['PRE']['mc'],
                     'post_mc': d['POST']['mc'],
@@ -294,9 +450,38 @@ def parse_excel_data(file_path):
                 'email2': meta.get('email2', ''),
                 'tel2': meta.get('tel2', ''),
                 'dependencia': meta.get('dependencia', 'Municipal'),
-                'certificacion': meta.get('certificacion', 'No')
+                'certificacion': meta.get('certificacion', 'No'),
+                'has_data': True
             })
-        school_rankings.sort(key=lambda x: -x['delta_avg'])
+            
+        # Manejo explícito de colegios sin evaluaciones en este hito (ej. Colegio Bet-El en Hito 4)
+        active_school_names = set(by_school.keys())
+        for sname, smeta in schools.items():
+            # Si el colegio participó en el otro hito o está en el programa pero no en este hito
+            if sname not in active_school_names:
+                # Si es Bet-el o colegios clave del programa
+                if sname in ['Colegio Bet-el', 'Escuela Claudio Matte Pérez', 'Escuela República de Italia']:
+                    school_rankings.append({
+                        'school': sname,
+                        'n': 0,
+                        'pre_avg': None,
+                        'post_avg': None,
+                        'delta_avg': 0.0,
+                        'status_counts': {'Mejoró': 0, 'Mantuvo': 0, 'Retrocedió': 0},
+                        'pct_mejora': 0.0,
+                        'lider1': smeta.get('lider1', ''),
+                        'email1': smeta.get('email1', ''),
+                        'tel1': smeta.get('tel1', ''),
+                        'lider2': smeta.get('lider2', ''),
+                        'email2': smeta.get('email2', ''),
+                        'tel2': smeta.get('tel2', ''),
+                        'dependencia': smeta.get('dependencia', 'Particular Subvencionado'),
+                        'certificacion': smeta.get('certificacion', 'No'),
+                        'has_data': False,
+                        'note': 'Sin datos registrados en este hito'
+                    })
+                    
+        school_rankings.sort(key=lambda x: (-1 if not x.get('has_data', True) else 0, -x['delta_avg']))
         
         by_gender = defaultdict(list)
         for p in paired_list:
