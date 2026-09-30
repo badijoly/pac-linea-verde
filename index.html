@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de Evaluación - Línea Verde PAC 2026</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- SheetJS para lectura dinámica de Excel local en navegador -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="icon" type="image/png" href="logo.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 4px;
+    }
+    .badge-improved { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .badge-maintained { background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .badge-regressed { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- TOP NAVBAR -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <!-- Logo oficial del Programa de Acción Climática -->
+        <img src="logo.png" alt="Programa de Acción Climática" class="h-12 w-auto object-contain py-0.5">
+        <div class="border-l border-slate-200 pl-3">
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Evaluación de Aprendizajes · Línea Verde</h1>
+            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">PAC 2026</span>
+          </div>
+          <p class="text-xs text-slate-500">Antofagasta: Laboratorio Vivo hacia el 2050 · Hito 3 &amp; Hito 4</p>
+        </div>
+      </div>
+
+      <!-- Action buttons & File Sync Status -->
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <div id="sync-status" class="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="sync-text">Cargando datos...</span>
+        </div>
+
+        <button id="btn-reload" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 active:bg-slate-100 transition shadow-sm" title="Recargar archivo Excel">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          <span>Actualizar</span>
+        </button>
+
+        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-300 rounded-lg hover:bg-emerald-100 cursor-pointer transition shadow-sm">
+          <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+          <span>Subir otro .xlsx</span>
+          <input type="file" id="file-input" accept=".xlsx, .xls" class="hidden">
+        </label>
+      </div>
+    </div>
+
+    <!-- MAIN TABS NAVIGATION -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-100 flex gap-1 overflow-x-auto custom-scrollbar">
+      <button onclick="switchTab('resumen')" class="nav-tab active-tab flex items-center gap-2 py-3 px-3.5 text-sm font-semibold border-b-2 border-emerald-600 text-emerald-700 whitespace-nowrap" id="tab-btn-resumen">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+        <span>Resumen Ejecutivo</span>
+      </button>
+      <button onclick="switchTab('establecimientos')" class="nav-tab flex items-center gap-2 py-3 px-3.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap" id="tab-btn-establecimientos">
+        <i data-lucide="school" class="w-4 h-4"></i>
+        <span>Por Establecimiento</span>
+      </button>
+      <button onclick="switchTab('preguntas')" class="nav-tab flex items-center gap-2 py-3 px-3.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap" id="tab-btn-preguntas">
+        <i data-lucide="help-circle" class="w-4 h-4"></i>
+        <span>Preguntas &amp; Distractores</span>
+      </button>
+      <button onclick="switchTab('cualitativo')" class="nav-tab flex items-center gap-2 py-3 px-3.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap" id="tab-btn-cualitativo">
+        <i data-lucide="message-square-text" class="w-4 h-4"></i>
+        <span>Análisis Cualitativo</span>
+      </button>
+      <button onclick="switchTab('pedagogico')" class="nav-tab flex items-center gap-2 py-3 px-3.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap" id="tab-btn-pedagogico">
+        <i data-lucide="lightbulb" class="w-4 h-4"></i>
+        <span>Casos Críticos &amp; Orientaciones</span>
+      </button>
+      <button onclick="switchTab('participantes')" class="nav-tab flex items-center gap-2 py-3 px-3.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap" id="tab-btn-participantes">
+        <i data-lucide="users" class="w-4 h-4"></i>
+        <span>Fichas Individuales</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- FILTER CONTROLS BAR -->
+  <div class="bg-white border-b border-slate-200 py-3 px-4 sm:px-6 lg:px-8 shadow-sm">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+      
+      <!-- Hito selection pills -->
+      <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+        <button onclick="setHito('Hito 4')" id="btn-hito-4" class="px-3 py-1.5 rounded-lg font-semibold bg-white text-emerald-800 shadow-sm transition">
+          Hito 4: Escudo Invisible (Atmósfera)
+        </button>
+        <button onclick="setHito('Hito 3')" id="btn-hito-3" class="px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition">
+          Hito 3: Otros Vecinos (Humedales)
+        </button>
+        <button onclick="setHito('Ambos')" id="btn-hito-ambos" class="px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition">
+          Comparativa H3 vs H4
+        </button>
+      </div>
+
+      <!-- Filters: School, Gender, Status -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <!-- School Select -->
+        <div class="flex items-center gap-1.5">
+          <label class="text-slate-500 font-medium">Colegio:</label>
+          <select id="filter-school" onchange="applyFilters()" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500">
+            <option value="ALL">Todos los Establecimientos</option>
+          </select>
+        </div>
+
+        <!-- Gender Select -->
+        <div class="flex items-center gap-1.5">
+          <label class="text-slate-500 font-medium">Género:</label>
+          <select id="filter-gender" onchange="applyFilters()" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500">
+            <option value="ALL">Todos los Géneros</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Masculino">Masculino</option>
+          </select>
+        </div>
+
+        <!-- Status Select -->
+        <div class="flex items-center gap-1.5">
+          <label class="text-slate-500 font-medium">Evolución:</label>
+          <select id="filter-status" onchange="applyFilters()" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500">
+            <option value="ALL">Todos los estados</option>
+            <option value="Mejoró">Mejoró (+pts)</option>
+            <option value="Mantuvo">Mantuvo (0 pts)</option>
+            <option value="Retrocedió">Retrocedió (-pts)</option>
+          </select>
+        </div>
+
+        <!-- Search Input -->
+        <div class="relative">
+          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400"></i>
+          <input type="text" id="filter-search" oninput="applyFilters()" placeholder="Buscar participante..." class="pl-8 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 w-44">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+    <!-- 1. TAB: RESUMEN EJECUTIVO -->
+    <section id="view-resumen" class="tab-view space-y-6">
+      <!-- Challenge banner -->
+      <div id="banner-desafio" class="p-4 rounded-2xl bg-gradient-to-r from-emerald-800 to-teal-900 text-white shadow-md flex items-center justify-between">
+        <div>
+          <span class="text-xs uppercase tracking-wider text-emerald-300 font-semibold">Desafío Territorial Seleccionado</span>
+          <h2 id="banner-title" class="text-xl font-bold mt-0.5">Proteger nuestro escudo invisible (Hito 4)</h2>
+          <p id="banner-desc" class="text-xs text-emerald-100/90 mt-1 max-w-3xl">
+            Evaluación del aprendizaje sobre la atmósfera como regulador climático, la contaminación lumínica en Antofagasta, la protección del cielo oscuro para la astronomía mundial y la fauna costera.
+          </p>
+        </div>
+        <div class="hidden md:flex items-center gap-2 bg-white/10 px-4 py-2.5 rounded-xl backdrop-blur-sm border border-white/10">
+          <i data-lucide="award" class="w-6 h-6 text-emerald-300"></i>
+          <div>
+            <div class="text-[10px] uppercase text-emerald-200 font-medium">Ganancia Normalizada (Hake)</div>
+            <div id="kpi-hake-val" class="text-lg font-extrabold text-white">g = +0.255</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI METRIC CARDS -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Muestra Evaluada</div>
+          <div id="kpi-n" class="text-2xl font-bold text-slate-900 mt-1">61</div>
+          <div class="text-[11px] text-slate-500 mt-1">Participantes con PRE y POST</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Promedio PRE</div>
+          <div id="kpi-pre" class="text-2xl font-bold text-slate-700 mt-1">2.82 <span class="text-xs font-normal text-slate-400">/ 5</span></div>
+          <div class="text-[11px] text-slate-500 mt-1">Nivel basal (56.4%)</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Promedio POST</div>
+          <div id="kpi-post" class="text-2xl font-bold text-emerald-600 mt-1">3.51 <span class="text-xs font-normal text-slate-400">/ 5</span></div>
+          <div class="text-[11px] text-emerald-700 font-medium mt-1">Nivel final (70.2%)</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Variación Neta</div>
+          <div id="kpi-delta" class="text-2xl font-bold text-emerald-600 mt-1">+0.69</div>
+          <div class="text-[11px] text-emerald-700 font-medium mt-1">+24.5% incremento relativo</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Tasa de Mejora</div>
+          <div id="kpi-pct-mejora" class="text-2xl font-bold text-emerald-700 mt-1">54.1%</div>
+          <div id="kpi-count-mejora" class="text-[11px] text-slate-500 mt-1">33 participantes subieron</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Estancados / Menor</div>
+          <div id="kpi-pct-estancados" class="text-2xl font-bold text-amber-600 mt-1">45.9%</div>
+          <div id="kpi-count-estancados" class="text-[11px] text-slate-500 mt-1">15 mantuvieron, 13 bajaron</div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW 1 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Distribution Donut Chart -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm">Distribución de Resultados de Aprendizaje</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Clasificación según variación de puntaje PRE vs POST</p>
+          </div>
+          <div class="h-64 my-auto flex items-center justify-center">
+            <canvas id="chart-status-donut"></canvas>
+          </div>
+          <div id="legend-status" class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 text-center text-xs">
+            <!-- Dynamic legend injected via JS -->
+          </div>
+        </div>
+
+        <!-- Question Accuracy Comparison Bar Chart -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Evolución de Aciertos por Pregunta (% Correctas)</h3>
+              <p class="text-xs text-slate-500 mt-0.5">Comparativa directa antes (PRE) y después (POST) de la actividad en terreno</p>
+            </div>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">5 Ítems Evaluados</span>
+          </div>
+          <div class="h-64 my-auto">
+            <canvas id="chart-questions-bar"></canvas>
+          </div>
+          <div class="text-[11px] text-slate-500 pt-2 border-t border-slate-100 flex items-center justify-between">
+            <span>* Mayores saltos conceptuales: Q3 (Oscuridad natural +27.8%) y Q4 (Luz hacia el cielo +26.2%)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW 2: By School & By Gender -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Schools Delta Bar Chart -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Impacto Pedagógico por Establecimiento (Delta Promedio)</h3>
+              <p class="text-xs text-slate-500 mt-0.5">Ganancia neta en puntos obtenida por cada colegio participante</p>
+            </div>
+          </div>
+          <div class="h-64">
+            <canvas id="chart-schools-delta"></canvas>
+          </div>
+        </div>
+
+        <!-- Gender Comparison -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Evolución Diferenciada por Género</h3>
+              <p class="text-xs text-slate-500 mt-0.5">Puntajes basales y finales según género de los participantes</p>
+            </div>
+          </div>
+          <div class="h-64">
+            <canvas id="chart-gender-comparison"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. TAB: POR ESTABLECIMIENTO -->
+    <section id="view-establecimientos" class="tab-view hidden space-y-6">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div>
+            <h3 class="font-bold text-slate-900 text-base">Desempeño y Directorio de Establecimientos Educacionales</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Resultados desagregados, dependencia institucional y profesores líderes a cargo</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="exportSchoolsTable()" class="px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center gap-1.5 transition">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>Exportar CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4">Establecimiento</th>
+                <th class="py-3 px-3">Dependencia</th>
+                <th class="py-3 px-3 text-center">N° Eval.</th>
+                <th class="py-3 px-3 text-center">Puntaje PRE</th>
+                <th class="py-3 px-3 text-center">Puntaje POST</th>
+                <th class="py-3 px-3 text-center">Variación (Delta)</th>
+                <th class="py-3 px-3 text-center">% Mejora</th>
+                <th class="py-3 px-3">Distribución</th>
+                <th class="py-3 px-4">Profesor/a Líder</th>
+              </tr>
+            </thead>
+            <tbody id="schools-table-body" class="divide-y divide-slate-100">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. TAB: PREGUNTAS Y DISTRACTORES -->
+    <section id="view-preguntas" class="tab-view hidden space-y-6">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="mb-4">
+          <h3 class="font-bold text-slate-900 text-base">Matriz de Preguntas Cerradas &amp; Análisis de Distractores</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Evaluación detallada de la asimilación conceptual y alternativas erróneas más frecuentes</p>
+        </div>
+
+        <div id="questions-detail-container" class="space-y-4">
+          <!-- Dynamically populated per question -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. TAB: ANÁLISIS CUALITATIVO -->
+    <section id="view-cualitativo" class="tab-view hidden space-y-6">
+      <!-- Overview qualitative insight -->
+      <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-3">
+        <i data-lucide="info" class="w-5 h-5 text-amber-700 shrink-0 mt-0.5"></i>
+        <div>
+          <span class="font-bold text-sm block mb-1">Hallazgo Clave del Análisis Cualitativo de Discurso:</span>
+          Las respuestas abiertas demuestran que <strong>incluso aquellos estudiantes cuyo puntaje de opción múltiple se mantuvo o bajó, incorporaron vocabulario y nociones ecológicas complejas</strong> (ej. identificación del <em>gaviotín chico de 50g</em>, comprensión del concepto <em>ecosistema</em> en humedales, y la caracterización de la atmósfera como un <em>escudo protector</em> frente a la radiación y el calor). Esto indica un aprendizaje real que las preguntas de alternativas subestiman debido a distractores sutiles.
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div>
+            <h3 class="font-bold text-slate-900 text-base">Explorador de Respuestas Abiertas: PRE vs POST</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Comparativa directa de expresiones verbales de los participantes por pregunta temática</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="select-open-q" onchange="renderQualitativeTab()" class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-700 font-medium">
+              <!-- Dynamically populated with open questions -->
+            </select>
+          </div>
+        </div>
+
+        <div id="qualitative-responses-list" class="space-y-3.5 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
+          <!-- Dynamically rendered -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. TAB: CASOS CRÍTICOS & PEDAGÓGICO -->
+    <section id="view-pedagogico" class="tab-view hidden space-y-6">
+      <!-- Diagnostic header -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-rose-200 bg-rose-50/30 shadow-sm">
+          <div class="flex items-center gap-2 text-rose-700 font-bold text-sm mb-2">
+            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+            <span>¿Por qué ocurren retrocesos?</span>
+          </div>
+          <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside">
+            <li><strong>Efecto distractor atractivo:</strong> En el post-test, opciones con términos técnicos nuevos pero incorrectos atraen respuestas intuitivas.</li>
+            <li><strong>Falso positivo en el pre-test:</strong> Estudiantes que acertaron al azar en el PRE y eligieron otra opción en el POST.</li>
+            <li><strong>Cansancio o apuro:</strong> La evaluación POST se aplicó inmediatamente tras la caminata en terreno.</li>
+          </ul>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-emerald-200 bg-emerald-50/30 shadow-sm">
+          <div class="flex items-center gap-2 text-emerald-800 font-bold text-sm mb-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+            <span>El valor del avance cualitativo</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            En más del <strong>70% de los casos con retroceso cuantitativo</strong>, las respuestas abiertas muestran un incremento notable en riqueza de vocabulario científico, nombrando especies endémicas y reconociendo el valor de la biodiversidad.
+          </p>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-indigo-200 bg-indigo-50/30 shadow-sm">
+          <div class="flex items-center gap-2 text-indigo-800 font-bold text-sm mb-2">
+            <i data-lucide="compass" class="w-4 h-4"></i>
+            <span>Acción para Profesores Líderes</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Se entregan recomendaciones diferenciadas para que los profesores líderes refuercen los conceptos en aula antes de pasar a la etapa de <strong>Diseño y Prototipado (Metodología VERDICAL)</strong>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Specific Recommendations for Leaders Table -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="font-bold text-slate-900 text-base mb-1">Recomendaciones Pedagógicas Personalizadas por Establecimiento</h3>
+        <p class="text-xs text-slate-500 mb-4">Pautas concretas para el profesor líder de cada escuela según los resultados de su equipo</p>
+
+        <div id="pedagogical-cards" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. TAB: FICHAS INDIVIDUALES DE PARTICIPANTES -->
+    <section id="view-participantes" class="tab-view hidden space-y-6">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div>
+            <h3 class="font-bold text-slate-900 text-base">Fichas Individuales de Participantes</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Explora el rendimiento detallado de cada estudiante y haz clic para ver su expediente completo</p>
+          </div>
+          <div class="text-xs text-slate-500 font-medium">
+            Mostrando <span id="participants-count-filtered" class="font-bold text-slate-800">0</span> participantes
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4">Participante</th>
+                <th class="py-3 px-3">Establecimiento</th>
+                <th class="py-3 px-3">Género</th>
+                <th class="py-3 px-3 text-center">PRE</th>
+                <th class="py-3 px-3 text-center">POST</th>
+                <th class="py-3 px-3 text-center">Variación</th>
+                <th class="py-3 px-3 text-center">Estado</th>
+                <th class="py-3 px-4 text-center">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="participants-table-body" class="divide-y divide-slate-100">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: DETALLE INDIVIDUAL DE PARTICIPANTE -->
+  <div id="participant-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div>
+          <span id="modal-role" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">Estudiante</span>
+          <h3 id="modal-name" class="text-lg font-bold text-slate-900 mt-1">Nombre Participante</h3>
+          <p id="modal-school" class="text-xs text-slate-500">Establecimiento Educacional</p>
+        </div>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-600 transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto custom-scrollbar space-y-6 flex-1 text-xs">
+        <!-- Scores summary -->
+        <div class="grid grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+          <div>
+            <div class="text-[10px] text-slate-500 font-semibold uppercase">Puntaje PRE</div>
+            <div id="modal-pre-score" class="text-xl font-bold text-slate-800 mt-0.5">3 / 5</div>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-500 font-semibold uppercase">Puntaje POST</div>
+            <div id="modal-post-score" class="text-xl font-bold text-emerald-600 mt-0.5">4 / 5</div>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-500 font-semibold uppercase">Diferencia</div>
+            <div id="modal-delta-score" class="text-xl font-bold text-emerald-600 mt-0.5">+1 pt</div>
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-500 font-semibold uppercase">Condición</div>
+            <div id="modal-status-badge" class="mt-1 inline-block font-semibold px-2 py-0.5 rounded text-[11px] badge-improved">Mejoró</div>
+          </div>
+        </div>
+
+        <!-- Question by question breakdown -->
+        <div>
+          <h4 class="font-bold text-slate-900 text-sm mb-3">Desglose de Preguntas Cerradas (Alternativas)</h4>
+          <div id="modal-mc-list" class="space-y-2">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Open questions breakdown -->
+        <div>
+          <h4 class="font-bold text-slate-900 text-sm mb-3">Respuestas a Preguntas Abiertas (Cualitativo)</h4>
+          <div id="modal-open-list" class="space-y-3">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
+        <button onclick="closeModal()" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition shadow-sm">
+          Cerrar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4">
+      Programa de Acción Climática (PAC) 2026 · Habilidades Verdes · Antofagasta, Chile
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
