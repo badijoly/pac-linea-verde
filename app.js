@@ -65,10 +65,134 @@ async function loadDashboardData(forceReload = false) {
   updateUI();
 }
 
+// Obtiene la lista consolidada de participantes únicos (83 estudiantes)
+function getUniqueParticipants(data) {
+  if (!data || !data.hitos) return [];
+  const h3Part = (data.hitos['Hito 3'] && data.hitos['Hito 3'].participants) || [];
+  const h4Part = (data.hitos['Hito 4'] && data.hitos['Hito 4'].participants) || [];
+
+  const h3Map = new Map();
+  h3Part.forEach(p => h3Map.set(stripAccents(p.name), p));
+
+  const h4Map = new Map();
+  h4Part.forEach(p => h4Map.set(stripAccents(p.name), p));
+
+  const allNames = new Set([...h3Map.keys(), ...h4Map.keys()]);
+  const uniqueList = [];
+
+  allNames.forEach(cleanName => {
+    const p3 = h3Map.get(cleanName);
+    const p4 = h4Map.get(cleanName);
+    const baseP = p4 || p3;
+
+    if (p3 && p4) {
+      const preTot = p3.pre_score + p4.pre_score;
+      const postTot = p3.post_score + p4.post_score;
+      const deltaTot = postTot - preTot;
+      const statusTot = deltaTot > 0 ? 'Mejoró' : (deltaTot === 0 ? 'Mantuvo' : 'Retrocedió');
+      
+      uniqueList.push({
+        name: baseP.name,
+        school: baseP.school,
+        gender: baseP.gender,
+        role: baseP.role || 'Estudiante',
+        hito: 'Hito 3 y Hito 4',
+        hitos_completados: ['Hito 3', 'Hito 4'],
+        pre_score: parseFloat(((p3.pre_score + p4.pre_score) / 2).toFixed(2)),
+        post_score: parseFloat(((p3.post_score + p4.post_score) / 2).toFixed(2)),
+        pre_score_raw: preTot,
+        post_score_raw: postTot,
+        max_score: 10,
+        delta: parseFloat(((postTot - preTot) / 2).toFixed(2)),
+        delta_raw: deltaTot,
+        status: statusTot,
+        real_status: (p3.status === 'Mejoró' || p4.status === 'Mejoró') ? 'Avance en Aprendizajes' : (statusTot === 'Mantuvo' ? 'Rendimiento Estable' : 'Requiere Refuerzo'),
+        h3: p3,
+        h4: p4
+      });
+    } else if (p3) {
+      uniqueList.push({
+        name: p3.name,
+        school: p3.school,
+        gender: p3.gender,
+        role: p3.role || 'Estudiante',
+        hito: 'Hito 3',
+        hitos_completados: ['Hito 3'],
+        pre_score: p3.pre_score,
+        post_score: p3.post_score,
+        pre_score_raw: p3.pre_score,
+        post_score_raw: p3.post_score,
+        max_score: 5,
+        delta: p3.delta,
+        delta_raw: p3.delta,
+        status: p3.status,
+        real_status: p3.real_status,
+        h3: p3,
+        h4: null
+      });
+    } else {
+      uniqueList.push({
+        name: p4.name,
+        school: p4.school,
+        gender: p4.gender,
+        role: p4.role || 'Estudiante',
+        hito: 'Hito 4',
+        hitos_completados: ['Hito 4'],
+        pre_score: p4.pre_score,
+        post_score: p4.post_score,
+        pre_score_raw: p4.pre_score,
+        post_score_raw: p4.post_score,
+        max_score: 5,
+        delta: p4.delta,
+        delta_raw: p4.delta,
+        status: p4.status,
+        real_status: p4.real_status,
+        h3: null,
+        h4: p4
+      });
+    }
+  });
+
+  uniqueList.sort((a, b) => a.name.localeCompare(b.name));
+  return uniqueList;
+}
+
+// Búsqueda exhaustiva de las evaluaciones de un participante en ambos hitos
+function getParticipantAllData(name) {
+  if (!name) return { h3: null, h4: null };
+  const target = stripAccents(name.trim());
+  let h3 = null;
+  let h4 = null;
+
+  if (RAW_DATA && RAW_DATA.hitos) {
+    if (RAW_DATA.hitos['Hito 3'] && RAW_DATA.hitos['Hito 3'].participants) {
+      h3 = RAW_DATA.hitos['Hito 3'].participants.find(p => stripAccents(p.name) === target) || null;
+    }
+    if (RAW_DATA.hitos['Hito 4'] && RAW_DATA.hitos['Hito 4'].participants) {
+      h4 = RAW_DATA.hitos['Hito 4'].participants.find(p => stripAccents(p.name) === target) || null;
+    }
+  }
+
+  if ((!h3 || !h4) && RAW_DATA && RAW_DATA.all_participants) {
+    const ap = RAW_DATA.all_participants.find(p => stripAccents(p.name) === target);
+    if (ap && ap.hitos) {
+      if (!h3 && ap.hitos['Hito 3']) h3 = ap.hitos['Hito 3'];
+      if (!h4 && ap.hitos['Hito 4']) h4 = ap.hitos['Hito 4'];
+    }
+  }
+
+  return { h3, h4 };
+}
+
 // Garantiza la existencia y consistencia del Resumen Global consolidado
 function ensureGlobalHito(data) {
   if (!data || !data.hitos) return;
-  if (data.hitos['Global'] && data.hitos['Global'].participants && data.hitos['Global'].participants.length > 0) {
+
+  const uniqueList = getUniqueParticipants(data);
+
+  if (data.hitos['Global']) {
+    data.hitos['Global'].unique_participants = uniqueList;
+    data.hitos['Global'].participants = uniqueList;
     return;
   }
 
@@ -178,7 +302,8 @@ function ensureGlobalHito(data) {
 
   data.hitos['Global'] = {
     desafio: 'Resumen Global Línea Verde (Hito 3 y Hito 4)',
-    n_participants: N,
+    n_participants: uniqueList.length,
+    all_evaluations_count: N,
     avg_pre: parseFloat(avgPre.toFixed(2)),
     avg_post: parseFloat(avgPost.toFixed(2)),
     avg_delta: parseFloat(avgDelta.toFixed(2)),
@@ -188,7 +313,9 @@ function ensureGlobalHito(data) {
     open_questions: globOpen,
     schools: schoolsRankings,
     gender: genderMetrics,
-    participants: allPaired
+    unique_participants: uniqueList,
+    participants: uniqueList,
+    all_evaluations: allPaired
   };
 }
 
@@ -1360,13 +1487,18 @@ function renderQualitativeTab() {
 
   filtered.forEach(p => {
     let qData = null;
+    let originHito = p.hito;
     if (isGlobal) {
       if (selectedIdx < 4) {
-        if (p.hito !== 'Hito 3') return;
-        qData = p.open_analysis && p.open_analysis[selectedIdx];
+        const p3 = p.h3 || (p.hito === 'Hito 3' ? p : null);
+        if (!p3) return;
+        qData = p3.open_analysis && p3.open_analysis[selectedIdx];
+        originHito = 'Hito 3';
       } else {
-        if (p.hito !== 'Hito 4') return;
-        qData = p.open_analysis && p.open_analysis[selectedIdx - 4];
+        const p4 = p.h4 || (p.hito === 'Hito 4' ? p : null);
+        if (!p4) return;
+        qData = p4.open_analysis && p4.open_analysis[selectedIdx - 4];
+        originHito = 'Hito 4';
       }
     } else {
       qData = p.open_analysis && p.open_analysis[selectedIdx];
@@ -1405,7 +1537,7 @@ function renderQualitativeTab() {
         <div>
           <span class="font-extrabold text-slate-900 text-sm">${p.name}</span>
           <span class="text-slate-400 ml-1.5 font-medium">· ${p.school}</span>
-          ${isGlobal ? `<span class="ml-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${p.hito === 'Hito 4' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800'}">${p.hito}</span>` : ''}
+          ${isGlobal ? `<span class="ml-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${originHito === 'Hito 4' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800'}">${originHito}</span>` : ''}
         </div>
         <div class="flex items-center gap-2">
           <span class="px-3 py-1 rounded-full text-[11px] font-bold ${badgeClass}">${badgeText}</span>
@@ -1490,6 +1622,17 @@ function renderPedagogicalTab() {
   });
 }
 
+// Helper para sanitizar texto HTML
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // 6. TAB: FICHAS INDIVIDUALES
 function renderParticipantsTab() {
   const isGlobal = CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global';
@@ -1507,22 +1650,38 @@ function renderParticipantsTab() {
     const deltaSign = p.delta >= 0 ? '+' : '';
     const badgeClass = p.status === 'Mejoró' ? 'badge-improved' : (p.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained');
 
-    const hitoBadge = isGlobal ? 
-      `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold ${p.hito === 'Hito 4' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800'}">${p.hito}</span>` : '';
+    let hitoBadge = '';
+    if (isGlobal) {
+      if (p.hitos_completados && p.hitos_completados.length > 1) {
+        hitoBadge = `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#00d09c]/15 text-[#00a87e] border border-[#00d09c]/30">Ambos Hitos (H3 + H4)</span>`;
+      } else if (p.hito === 'Hito 3') {
+        hitoBadge = `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Solo Hito 3</span>`;
+      } else if (p.hito === 'Hito 4') {
+        hitoBadge = `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800">Solo Hito 4</span>`;
+      }
+    }
+
+    const preDisplay = isGlobal && p.h3 && p.h4 ? 
+      `<div class="font-bold text-slate-800">${p.pre_score} <span class="text-[10px] text-slate-400 font-normal">/ 5</span></div><div class="text-[10px] text-slate-400 font-normal">(${p.pre_score_raw} / 10 pts)</div>` : 
+      `<span class="font-bold text-slate-800">${p.pre_score}</span> <span class="text-[10px] text-slate-400">/ 5</span>`;
+
+    const postDisplay = isGlobal && p.h3 && p.h4 ? 
+      `<div class="font-bold text-[#00a87e]">${p.post_score} <span class="text-[10px] text-emerald-600 font-normal">/ 5</span></div><div class="text-[10px] text-emerald-600 font-normal">(${p.post_score_raw} / 10 pts)</div>` : 
+      `<span class="font-bold text-[#00a87e]">${p.post_score}</span> <span class="text-[10px] text-slate-400">/ 5</span>`;
 
     tr.innerHTML = `
       <td class="py-3.5 px-4 font-bold text-slate-900 flex items-center gap-2.5">
         <span class="w-2.5 h-2.5 rounded-full ${p.gender === 'Femenino' ? 'bg-pink-400' : 'bg-blue-400'}"></span>
-        ${p.name}
+        ${escapeHtml(p.name)}
       </td>
-      <td class="py-3.5 px-3 text-slate-600 font-medium">${p.school} ${hitoBadge}</td>
-      <td class="py-3.5 px-3 text-slate-500 text-[11px]">${p.gender}</td>
-      <td class="py-3.5 px-3 text-center text-slate-600 font-medium">${p.pre_score} / 5</td>
-      <td class="py-3.5 px-3 text-center text-[#00a87e] font-bold">${p.post_score} / 5</td>
+      <td class="py-3.5 px-3 text-slate-600 font-medium">${escapeHtml(p.school)} ${hitoBadge}</td>
+      <td class="py-3.5 px-3 text-slate-500 text-[11px]">${escapeHtml(p.gender)}</td>
+      <td class="py-3.5 px-3 text-center">${preDisplay}</td>
+      <td class="py-3.5 px-3 text-center">${postDisplay}</td>
       <td class="py-3.5 px-3 text-center font-bold ${p.delta >= 0 ? 'text-[#00a87e]' : 'text-rose-600'}">${deltaSign}${p.delta}</td>
       <td class="py-3.5 px-3 text-center">
         <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${badgeClass}">${p.status}</span>
-        <div class="text-[10px] text-slate-400 mt-0.5 font-medium">${p.real_status || ''}</div>
+        <div class="text-[10px] text-slate-400 mt-0.5 font-medium">${escapeHtml(p.real_status || '')}</div>
       </td>
       <td class="py-3.5 px-4 text-center">
         <button onclick="event.stopPropagation(); openModal(window.currentFiltered[${idx}])" class="px-3.5 py-1 text-xs font-bold text-slate-900 bg-[#00d09c] hover:bg-[#00bfa5] rounded-full transition shadow-sm">
@@ -1536,100 +1695,780 @@ function renderParticipantsTab() {
   window.currentFiltered = filtered;
 }
 
-// MODAL INDIVIDUAL PARTICIPANTE
+// Variables de estado del modal
+let currentModalMode = 'consolidado';
+let currentModalParticipant = null;
+
+// MODAL INDIVIDUAL PARTICIPANTE (Soporte integral de ambos desafíos y test-retest)
 function openModal(p) {
   if (!p) return;
 
-  const isGlobal = CURRENT_HITO === 'Global' || CURRENT_HITO === 'Ambos';
-  const hitoKey = p.hito || (isGlobal ? 'Hito 4' : CURRENT_HITO);
-  const questionsMeta = (RAW_DATA.hitos[hitoKey] && RAW_DATA.hitos[hitoKey].questions) || RAW_DATA.hitos['Hito 4'].questions;
-  const key = questionsMeta.slice(0, 5).map(q => q.correct_key);
+  const allData = getParticipantAllData(p.name);
+  const h3Data = p.h3 || allData.h3;
+  const h4Data = p.h4 || allData.h4;
+  p.h3 = h3Data;
+  p.h4 = h4Data;
+  currentModalParticipant = p;
 
+  // Actualizar metadatos en header del modal
   document.getElementById('modal-name').innerText = p.name;
-  document.getElementById('modal-school').innerText = `${p.school} · ${p.hito || CURRENT_HITO} · Género: ${p.gender} · Rol: ${p.role || 'Estudiante'}`;
+  document.getElementById('modal-school').innerText = `${p.school} · Género: ${p.gender}`;
   document.getElementById('modal-role').innerText = p.real_status || 'Estudiante';
 
-  document.getElementById('modal-pre-score').innerText = `${p.pre_score} / 5`;
-  document.getElementById('modal-post-score').innerText = `${p.post_score} / 5`;
-  document.getElementById('modal-delta-score').innerText = `${p.delta >= 0 ? '+' : ''}${p.delta} pts`;
+  // Badge de cobertura de evaluación
+  const badgeContainer = document.getElementById('modal-attendance-badge');
+  if (h3Data && h4Data) {
+    badgeContainer.innerHTML = `<span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">Test-Retest Completo (Hito 3 y Hito 4)</span>`;
+  } else if (h3Data) {
+    badgeContainer.innerHTML = `<span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Evaluado en Hito 3</span>`;
+  } else if (h4Data) {
+    badgeContainer.innerHTML = `<span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">Evaluado en Hito 4</span>`;
+  } else {
+    badgeContainer.innerHTML = '';
+  }
 
-  const badgeEl = document.getElementById('modal-status-badge');
-  badgeEl.innerText = p.status;
-  badgeEl.className = `mt-1 inline-block font-bold px-3 py-0.5 rounded-full text-[11px] ${p.status === 'Mejoró' ? 'badge-improved' : (p.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}`;
+  // Visibilidad de los botones del selector según disponibilidad de datos
+  const btnConsolidado = document.getElementById('btn-modal-mode-consolidado');
+  const btnH3 = document.getElementById('btn-modal-mode-h3');
+  const btnH4 = document.getElementById('btn-modal-mode-h4');
 
-  // Multiple choice questions list
-  const mcList = document.getElementById('modal-mc-list');
-  mcList.innerHTML = '';
+  if (btnConsolidado) {
+    btnConsolidado.style.display = (h3Data && h4Data) ? 'inline-block' : 'none';
+  }
+  if (btnH3) {
+    btnH3.style.display = h3Data ? 'inline-block' : 'none';
+  }
+  if (btnH4) {
+    btnH4.style.display = h4Data ? 'inline-block' : 'none';
+  }
 
-  p.q_evo.forEach((evo, idx) => {
-    if (idx >= questionsMeta.length) return;
-    const qRow = document.createElement('div');
-    const isCorrectPost = p.post_mc[idx] === key[idx].toLowerCase();
-    const isCorrectPre = p.pre_mc[idx] === key[idx].toLowerCase();
+  // Determinar modo inicial
+  let initialMode = 'consolidado';
+  if (CURRENT_HITO === 'Hito 3' && h3Data) {
+    initialMode = 'Hito 3';
+  } else if (CURRENT_HITO === 'Hito 4' && h4Data) {
+    initialMode = 'Hito 4';
+  } else if (h3Data && h4Data) {
+    initialMode = 'consolidado';
+  } else if (h3Data) {
+    initialMode = 'Hito 3';
+  } else if (h4Data) {
+    initialMode = 'Hito 4';
+  }
 
-    qRow.className = `p-3.5 rounded-2xl border text-xs flex items-center justify-between ${isCorrectPost ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/40 border-rose-200'}`;
-
-    qRow.innerHTML = `
-      <div class="space-y-0.5 max-w-[70%]">
-        <span class="font-bold text-slate-800">Q${idx + 1}: ${questionsMeta[idx].title}</span>
-        <div class="text-[11px] text-slate-500">
-          Respuesta PRE: <span class="font-bold ${isCorrectPre ? 'text-[#00a87e]' : 'text-slate-700'}">${p.pre_mc[idx].toUpperCase() || 'N/A'}</span> ➔ 
-          Respuesta POST: <span class="font-bold ${isCorrectPost ? 'text-[#00a87e]' : 'text-rose-600'}">${p.post_mc[idx].toUpperCase() || 'N/A'}</span>
-          <span class="text-slate-400 font-medium">(Correcta: ${key[idx]})</span>
-        </div>
-      </div>
-      <div>
-        <span class="text-[10px] font-bold px-3 py-1 rounded-full ${evo === 'Mejoró' ? 'bg-[#00d09c]/20 text-[#00a87e]' : (evo === 'Retrocedió' ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700')}">
-          ${evo}
-        </span>
-      </div>
-    `;
-    mcList.appendChild(qRow);
-  });
-
-  // Open questions list
-  const openList = document.getElementById('modal-open-list');
-  openList.innerHTML = '';
-
-  p.open_analysis.forEach((oq) => {
-    const oRow = document.createElement('div');
-    oRow.className = 'p-4 rounded-2xl border border-slate-100 bg-slate-50/70 space-y-2.5';
-
-    let oBadge = 'badge-maintained';
-    if (oq.status === 'Mejoró') oBadge = 'badge-improved';
-    else if (oq.status === 'Retrocedió') oBadge = 'badge-regressed';
-    else if (oq.status === 'Sin Evidencia') oBadge = 'bg-slate-100 text-slate-600 border border-slate-300';
-
-    const reviewTag = oq.requires_review ? 
-      `<div class="text-[10px] text-amber-800 bg-amber-50 p-2 rounded-xl border border-amber-200 font-medium">⚠️ Sin evidencia en texto: Requiere revisión individual con el profesor/a líder.</div>` : '';
-
-    oRow.innerHTML = `
-      <div class="flex items-center justify-between">
-        <span class="font-bold text-slate-800 text-xs">${oq.question}</span>
-        <span class="text-[10px] font-bold px-3 py-0.5 rounded-full ${oBadge}">${oq.status}</span>
-      </div>
-      <div class="text-[10px] text-slate-500 font-medium">${oq.detail}</div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-        <div class="bg-white p-3 rounded-xl border border-slate-200">
-          <span class="text-[10px] font-bold text-slate-400 block uppercase">PRE:</span>
-          <p class="italic text-slate-700">${oq.pre_text && oq.pre_text.trim() ? '"' + oq.pre_text + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta)</span>'}</p>
-        </div>
-        <div class="bg-white p-3 rounded-xl border border-emerald-200">
-          <span class="text-[10px] font-bold text-[#00a87e] block uppercase">POST:</span>
-          <p class="font-medium text-slate-800">${oq.post_text && oq.post_text.trim() ? '"' + oq.post_text + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta)</span>'}</p>
-        </div>
-      </div>
-      ${reviewTag}
-    `;
-    openList.appendChild(oRow);
-  });
-
+  setModalViewMode(initialMode);
   document.getElementById('participant-modal').classList.remove('hidden');
   if (window.lucide) lucide.createIcons();
 }
 
+function setModalViewMode(mode) {
+  currentModalMode = mode;
+  const p = currentModalParticipant;
+  if (!p) return;
+
+  const btnConsolidado = document.getElementById('btn-modal-mode-consolidado');
+  const btnH3 = document.getElementById('btn-modal-mode-h3');
+  const btnH4 = document.getElementById('btn-modal-mode-h4');
+  const caption = document.getElementById('modal-mode-caption');
+
+  const activeClasses = 'px-3.5 py-1 rounded-full text-xs font-bold bg-[#00d09c] text-slate-950 shadow-sm transition';
+  const inactiveClasses = 'px-3.5 py-1 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 transition';
+
+  if (btnConsolidado) btnConsolidado.className = mode === 'consolidado' ? activeClasses : inactiveClasses;
+  if (btnH3) btnH3.className = mode === 'Hito 3' ? activeClasses : inactiveClasses;
+  if (btnH4) btnH4.className = mode === 'Hito 4' ? activeClasses : inactiveClasses;
+
+  if (caption) {
+    if (mode === 'consolidado') {
+      caption.innerText = 'Desglose integral combinado (10 preguntas cerradas y 8 cualitativas)';
+    } else if (mode === 'Hito 3') {
+      caption.innerText = 'Desglose Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y Humedales)';
+    } else if (mode === 'Hito 4') {
+      caption.innerText = 'Desglose Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos Limpios)';
+    }
+  }
+
+  renderModalContent(mode);
+}
+
+// Renderiza el contenido dinámico del modal según el modo seleccionado
+function renderModalContent(mode) {
+  const container = document.getElementById('modal-content-area');
+  if (!container || !currentModalParticipant) return;
+  const p = currentModalParticipant;
+  const h3Data = p.h3;
+  const h4Data = p.h4;
+
+  const h3Meta = (RAW_DATA.hitos['Hito 3'] && RAW_DATA.hitos['Hito 3'].questions) || [];
+  const h4Meta = (RAW_DATA.hitos['Hito 4'] && RAW_DATA.hitos['Hito 4'].questions) || [];
+
+  container.innerHTML = '';
+
+  if (mode === 'consolidado') {
+    // 1. Resumen consolidado KPIs
+    const h3Pre = h3Data ? h3Data.pre_score : 0;
+    const h3Post = h3Data ? h3Data.post_score : 0;
+    const h4Pre = h4Data ? h4Data.pre_score : 0;
+    const h4Post = h4Data ? h4Data.post_score : 0;
+    const totPre = h3Pre + h4Pre;
+    const totPost = h3Post + h4Post;
+    const totDelta = totPost - totPre;
+    const deltaSign = totDelta >= 0 ? '+' : '';
+
+    const kpiSummary = document.createElement('div');
+    kpiSummary.className = 'grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50/90 p-4 rounded-2xl border border-slate-200 text-center';
+    kpiSummary.innerHTML = `
+      <div class="p-2.5 bg-white rounded-xl border border-slate-100 shadow-sm">
+        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Puntaje Total Combinado</div>
+        <div class="text-xl font-extrabold text-slate-900 mt-1">${totPost} <span class="text-xs text-slate-400 font-medium">/ 10 pts</span></div>
+        <div class="text-[11px] text-slate-500 font-medium mt-0.5">PRE: ${totPre} / 10 · ${deltaSign}${totDelta} pts</div>
+      </div>
+      <div class="p-2.5 bg-emerald-50/40 rounded-xl border border-emerald-100 shadow-sm">
+        <div class="text-[10px] text-emerald-800 font-bold uppercase tracking-wider">Hito 3 (Biodiversidad)</div>
+        <div class="text-xl font-extrabold text-[#00a87e] mt-1">${h3Data ? h3Data.post_score : '-'} <span class="text-xs text-slate-400 font-medium">/ 5 pts</span></div>
+        <div class="text-[11px] text-slate-500 font-medium mt-0.5">${h3Data ? `PRE: ${h3Data.pre_score} · ${h3Data.delta >= 0 ? '+' : ''}${h3Data.delta} pts` : 'No registrado'}</div>
+      </div>
+      <div class="p-2.5 bg-indigo-50/40 rounded-xl border border-indigo-100 shadow-sm">
+        <div class="text-[10px] text-indigo-800 font-bold uppercase tracking-wider">Hito 4 (Atmósfera)</div>
+        <div class="text-xl font-extrabold text-indigo-700 mt-1">${h4Data ? h4Data.post_score : '-'} <span class="text-xs text-slate-400 font-medium">/ 5 pts</span></div>
+        <div class="text-[11px] text-slate-500 font-medium mt-0.5">${h4Data ? `PRE: ${h4Data.pre_score} · ${h4Data.delta >= 0 ? '+' : ''}${h4Data.delta} pts` : 'No registrado'}</div>
+      </div>
+      <div class="p-2.5 bg-white rounded-xl border border-slate-100 shadow-sm">
+        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Diagnóstico de Aprendizajes</div>
+        <div class="mt-1">
+          <span class="inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${p.status === 'Mejoró' ? 'badge-improved' : (p.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${p.status}</span>
+        </div>
+        <div class="text-[10px] text-slate-500 font-semibold mt-1">${escapeHtml(p.real_status || 'Rendimiento Registrado')}</div>
+      </div>
+    `;
+    container.appendChild(kpiSummary);
+
+    // 2. Preguntas Cerradas
+    const mcSection = document.createElement('div');
+    mcSection.className = 'space-y-4';
+    mcSection.innerHTML = `
+      <div class="flex items-center gap-2 border-b border-slate-200 pb-2">
+        <i data-lucide="check-circle-2" class="w-4 h-4 text-[#00d09c]"></i>
+        <h4 class="font-bold text-slate-900 text-sm">Desglose de Preguntas Cerradas (Alternativas) - Ambos Desafíos</h4>
+      </div>
+      <div class="space-y-4">
+        ${buildHitoMCBlock('Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y Humedales)', h3Data, h3Meta, 'emerald')}
+        ${buildHitoMCBlock('Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos Limpios)', h4Data, h4Meta, 'indigo')}
+      </div>
+    `;
+    container.appendChild(mcSection);
+
+    // 3. Preguntas Abiertas
+    const openSection = document.createElement('div');
+    openSection.className = 'space-y-4';
+    openSection.innerHTML = `
+      <div class="flex items-center gap-2 border-b border-slate-200 pb-2">
+        <i data-lucide="message-square" class="w-4 h-4 text-[#00d09c]"></i>
+        <h4 class="font-bold text-slate-900 text-sm">Desglose de Preguntas Abiertas (Cualitativo) - Ambos Desafíos</h4>
+      </div>
+      <div class="space-y-4">
+        ${buildHitoOpenBlock('Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y Ecosistemas)', h3Data, 'emerald')}
+        ${buildHitoOpenBlock('Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos Limpios)', h4Data, 'indigo')}
+      </div>
+    `;
+    container.appendChild(openSection);
+
+  } else if (mode === 'Hito 3') {
+    const dataH = h3Data;
+    if (!dataH) {
+      container.innerHTML = `<div class="p-8 text-center text-slate-400 font-medium">Este participante no registra evaluación en Hito 3.</div>`;
+      return;
+    }
+    const deltaSign = dataH.delta >= 0 ? '+' : '';
+    const kpiH3 = document.createElement('div');
+    kpiH3.className = 'grid grid-cols-4 gap-3 bg-slate-50/80 p-4 rounded-2xl border border-slate-100 text-center';
+    kpiH3.innerHTML = `
+      <div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">Puntaje PRE</div>
+        <div class="text-xl font-extrabold text-slate-800 mt-0.5">${dataH.pre_score} / 5</div>
+      </div>
+      <div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">Puntaje POST</div>
+        <div class="text-xl font-extrabold text-[#00a87e] mt-0.5">${dataH.post_score} / 5</div>
+      </div>
+      <div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">Diferencia</div>
+        <div class="text-xl font-extrabold ${dataH.delta >= 0 ? 'text-[#00a87e]' : 'text-rose-600'} mt-0.5">${deltaSign}${dataH.delta} pts</div>
+      </div>
+      <div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">Condición</div>
+        <span class="mt-1 inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${dataH.status === 'Mejoró' ? 'badge-improved' : (dataH.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${dataH.status}</span>
+      </div>
+    `;
+    container.appendChild(kpiH3);
+
+    const mcSection = document.createElement('div');
+    mcSection.className = 'space-y-3';
+    mcSection.innerHTML = `
+      <h4 class="font-bold text-slate-900 text-sm">Preguntas Cerradas (Alternativas) - Hito 3</h4>
+      ${buildHitoMCBlock('Hito 3: Los otros vecinos de Antofagasta', dataH, h3Meta, 'emerald')}
+    `;
+    container.appendChild(mcSection);
+
+    const openSection = document.createElement('div');
+    openSection.className = 'space-y-3';
+    openSection.innerHTML = `
+      <h4 class="font-bold text-slate-900 text-sm">Preguntas Abiertas (Cualitativo) - Hito 3</h4>
+      ${buildHitoOpenBlock('Hito 3: Los otros vecinos de Antofagasta', dataH, 'emerald')}
+    `;
+    container.appendChild(openSection);
+
+  } else if (mode === 'Hito 4') {
+    const dataH = h4Data;
+    if (!dataH) {
+      container.innerHTML = `<div class="p-8 text-center text-slate-400 font-medium">Este participante no registra evaluación en Hito 4.</div>`;
+      return;
+    }
+    const deltaSign = dataH.delta >= 0 ? '+' : '';
+    const kpiH4 = document.createElement('div');
+    kpiH4.className = 'grid grid-cols-4 gap-3 bg-slate-50/80 p-4 rounded-2xl border border-slate-100 text-center';
+    kpiH4.innerHTML = `
+      <div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">Puntaje PRE</div>
+        <div class="text-xl font-extrabold text-slate-800 mt-0.5">${dataH.pre_score} / 5</div>
+      </div>
+      <div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">Puntaje POST</div>
+        <div class="text-xl font-extrabold text-[#00a87e] mt-0.5">${dataH.post_score} / 5</div>
+      </div>
+      <div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">Diferencia</div>
+        <div class="text-xl font-extrabold ${dataH.delta >= 0 ? 'text-[#00a87e]' : 'text-rose-600'} mt-0.5">${deltaSign}${dataH.delta} pts</div>
+      </div>
+      <div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">Condición</div>
+        <span class="mt-1 inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${dataH.status === 'Mejoró' ? 'badge-improved' : (dataH.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${dataH.status}</span>
+      </div>
+    `;
+    container.appendChild(kpiH4);
+
+    const mcSection = document.createElement('div');
+    mcSection.className = 'space-y-3';
+    mcSection.innerHTML = `
+      <h4 class="font-bold text-slate-900 text-sm">Preguntas Cerradas (Alternativas) - Hito 4</h4>
+      ${buildHitoMCBlock('Hito 4: Proteger nuestro escudo invisible', dataH, h4Meta, 'indigo')}
+    `;
+    container.appendChild(mcSection);
+
+    const openSection = document.createElement('div');
+    openSection.className = 'space-y-3';
+    openSection.innerHTML = `
+      <h4 class="font-bold text-slate-900 text-sm">Preguntas Abiertas (Cualitativo) - Hito 4</h4>
+      ${buildHitoOpenBlock('Hito 4: Proteger nuestro escudo invisible', dataH, 'indigo')}
+    `;
+    container.appendChild(openSection);
+  }
+
+  if (window.lucide) lucide.createIcons();
+}
+
+// Bloque de preguntas cerradas para un hito específico
+function buildHitoMCBlock(title, hData, questionsMeta, theme) {
+  if (!hData || !hData.pre_mc || !hData.post_mc) {
+    return `
+      <div class="p-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 text-slate-400 text-center text-xs">
+        Sin registro de respuestas cerradas para este desafío.
+      </div>
+    `;
+  }
+
+  const qMeta = questionsMeta || [];
+  const key = qMeta.slice(0, 5).map(q => (q.correct_key || '').toLowerCase());
+  const themeBorder = theme === 'indigo' ? 'border-indigo-100 bg-indigo-50/20' : 'border-emerald-100 bg-emerald-50/20';
+  const themeBadge = theme === 'indigo' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800';
+
+  let itemsHtml = '';
+  (hData.q_evo || []).forEach((evo, idx) => {
+    if (idx >= qMeta.length) return;
+    const isCorrectPost = (hData.post_mc[idx] || '').toLowerCase() === key[idx];
+    const isCorrectPre = (hData.pre_mc[idx] || '').toLowerCase() === key[idx];
+
+    let evoBadgeClass = 'bg-slate-100 text-slate-700';
+    if (evo === 'Mejoró') evoBadgeClass = 'bg-[#00d09c]/20 text-[#00a87e] font-bold';
+    else if (evo === 'Retrocedió') evoBadgeClass = 'bg-rose-100 text-rose-800 font-bold';
+    else if (evo === 'Mantuvo Correcto') evoBadgeClass = 'bg-teal-50 text-teal-800 border border-teal-200 font-medium';
+
+    itemsHtml += `
+      <div class="p-3.5 rounded-2xl border ${isCorrectPost ? 'bg-emerald-50/40 border-emerald-200' : 'bg-rose-50/30 border-rose-200'} text-xs flex flex-wrap items-center justify-between gap-2">
+        <div class="space-y-0.5 max-w-[75%]">
+          <span class="font-bold text-slate-800">Q${idx + 1}: ${escapeHtml(qMeta[idx].title)}</span>
+          <div class="text-[11px] text-slate-500 font-medium">
+            PRE: <span class="font-bold ${isCorrectPre ? 'text-[#00a87e]' : 'text-slate-700'}">${(hData.pre_mc[idx] || 'N/A').toUpperCase()}</span> ➔ 
+            POST: <span class="font-bold ${isCorrectPost ? 'text-[#00a87e]' : 'text-rose-600'}">${(hData.post_mc[idx] || 'N/A').toUpperCase()}</span>
+            <span class="text-slate-400 font-normal ml-1">(Correcta: ${(key[idx] || '').toUpperCase()})</span>
+          </div>
+        </div>
+        <div>
+          <span class="text-[10px] px-3 py-1 rounded-full font-bold ${evoBadgeClass}">
+            ${evo}
+          </span>
+        </div>
+      </div>
+    `;
+  });
+
+  return `
+    <div class="p-4 rounded-2xl border ${themeBorder} space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${themeBadge}">${title}</span>
+        <div class="text-xs font-bold text-slate-700">
+          Puntaje: <span class="text-[#00a87e] font-extrabold text-sm">${hData.post_score} / 5</span> 
+          <span class="text-[11px] text-slate-400 font-normal">(PRE: ${hData.pre_score}/5 · ${hData.delta >= 0 ? '+' : ''}${hData.delta} pts)</span>
+        </div>
+      </div>
+      <div class="space-y-2">
+        ${itemsHtml}
+      </div>
+    </div>
+  `;
+}
+
+// Bloque de preguntas abiertas para un hito específico
+function buildHitoOpenBlock(title, hData, theme) {
+  if (!hData || !hData.open_analysis || hData.open_analysis.length === 0) {
+    return `
+      <div class="p-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 text-slate-400 text-center text-xs">
+        Sin registro de respuestas abiertas para este desafío.
+      </div>
+    `;
+  }
+
+  const themeBorder = theme === 'indigo' ? 'border-indigo-100 bg-indigo-50/20' : 'border-emerald-100 bg-emerald-50/20';
+  const themeBadge = theme === 'indigo' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800';
+
+  let itemsHtml = '';
+  hData.open_analysis.forEach((oq, idx) => {
+    let oBadge = 'badge-maintained';
+    let oBadgeText = oq.status;
+
+    if (oq.status === 'Mejoró') {
+      oBadge = 'badge-improved font-bold';
+      oBadgeText = 'Mejora Cualitativa ↗';
+    } else if (oq.status === 'Retrocedió') {
+      oBadge = 'badge-regressed font-bold';
+      oBadgeText = 'Retroceso en Texto ↘';
+    } else if (oq.status === 'Mantuvo') {
+      oBadge = 'bg-blue-50 text-blue-700 border border-blue-200 font-semibold';
+      oBadgeText = 'Mantuvo Respuesta =';
+    } else if (oq.status === 'Sin Evidencia') {
+      oBadge = 'bg-slate-100 text-slate-600 border border-slate-300 font-semibold';
+      oBadgeText = 'Sin Evidencia (Revisar)';
+    }
+
+    const reviewTag = oq.requires_review ? 
+      `<div class="text-[11px] text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200 font-medium flex items-center gap-2">
+        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 shrink-0"></i>
+        <span>Elemento de evaluación no concluyente por falta de respuesta escrita. Se sugiere revisión individual con el profesor/a líder.</span>
+      </div>` : '';
+
+    itemsHtml += `
+      <div class="p-4 rounded-2xl border border-slate-100 bg-white space-y-2.5 card-shadow">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="font-extrabold text-slate-900 text-xs">P${idx + 1}: ${escapeHtml(oq.question)}</span>
+          <span class="text-[10px] px-2.5 py-0.5 rounded-full ${oBadge}">${oBadgeText}</span>
+        </div>
+        <div class="text-[11px] text-slate-500 font-medium">
+          Diagnóstico conceptual: <span class="text-slate-800 font-semibold">${escapeHtml(oq.detail)}</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+            <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wide mb-0.5">PRE (Inicial):</span>
+            <p class="italic text-slate-700">${oq.pre_text && oq.pre_text.trim() ? '"' + escapeHtml(oq.pre_text) + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta o no sabe)</span>'}</p>
+          </div>
+          <div class="bg-emerald-50/40 p-3 rounded-xl border border-emerald-200">
+            <span class="text-[10px] font-bold text-[#00a87e] block uppercase tracking-wide mb-0.5">POST (En terreno):</span>
+            <p class="font-medium text-slate-800">${oq.post_text && oq.post_text.trim() ? '"' + escapeHtml(oq.post_text) + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta o no sabe)</span>'}</p>
+          </div>
+        </div>
+        ${reviewTag}
+      </div>
+    `;
+  });
+
+  return `
+    <div class="p-4 rounded-2xl border ${themeBorder} space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${themeBadge}">${title}</span>
+        <span class="text-[11px] text-slate-400 font-medium">4 preguntas cualitativas</span>
+      </div>
+      <div class="space-y-3">
+        ${itemsHtml}
+      </div>
+    </div>
+  `;
+}
+
 function closeModal() {
   document.getElementById('participant-modal').classList.add('hidden');
+}
+
+// Generación y descarga de la Ficha Individual en formato PDF
+function exportParticipantPDF() {
+  const p = currentModalParticipant;
+  if (!p) return;
+
+  const btn = document.getElementById('btn-modal-pdf');
+  const originalHtml = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.innerHTML = `
+      <svg class="animate-spin -ml-1 mr-2 h-3.5 w-3.5 text-slate-900 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+      </svg>
+      <span>Generando PDF...</span>
+    `;
+    btn.disabled = true;
+  }
+
+  const h3Data = p.h3;
+  const h4Data = p.h4;
+  const h3Meta = (RAW_DATA.hitos['Hito 3'] && RAW_DATA.hitos['Hito 3'].questions) || [];
+  const h4Meta = (RAW_DATA.hitos['Hito 4'] && RAW_DATA.hitos['Hito 4'].questions) || [];
+
+  const printableDoc = document.createElement('div');
+  printableDoc.id = 'pdf-printable-document';
+  printableDoc.innerHTML = buildPDFDocumentHTML(p, h3Data, h4Data, currentModalMode, h3Meta, h4Meta);
+
+  // Ubicar elemento para renderizado fiel
+  printableDoc.style.position = 'fixed';
+  printableDoc.style.left = '-9999px';
+  printableDoc.style.top = '0';
+  printableDoc.style.width = '794px'; // Formato A4 a 96dpi aprox
+  printableDoc.style.backgroundColor = '#ffffff';
+  document.body.appendChild(printableDoc);
+
+  const cleanFileName = `Ficha_PAC_2026_${p.name.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]/g, '_')}.pdf`;
+
+  if (typeof html2pdf !== 'undefined') {
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: cleanFileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(printableDoc).save().then(() => {
+      if (btn) {
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+      }
+      if (document.body.contains(printableDoc)) {
+        document.body.removeChild(printableDoc);
+      }
+    }).catch(err => {
+      console.error('Error al generar PDF con html2pdf:', err);
+      if (btn) {
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+      }
+      if (document.body.contains(printableDoc)) {
+        document.body.removeChild(printableDoc);
+      }
+      alert('Se abrirá la opción de impresión del navegador para guardar en PDF.');
+      window.print();
+    });
+  } else {
+    if (btn) {
+      btn.innerHTML = originalHtml;
+      btn.disabled = false;
+    }
+    if (document.body.contains(printableDoc)) {
+      document.body.removeChild(printableDoc);
+    }
+    window.print();
+  }
+}
+
+// Construye la estructura HTML optimizada para impresión en PDF A4
+function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
+  const h3Pre = h3Data ? h3Data.pre_score : 0;
+  const h3Post = h3Data ? h3Data.post_score : 0;
+  const h4Pre = h4Data ? h4Data.pre_score : 0;
+  const h4Post = h4Data ? h4Data.post_score : 0;
+  const totPre = h3Pre + h4Pre;
+  const totPost = h3Post + h4Post;
+  const totDelta = totPost - totPre;
+  const deltaSign = totDelta >= 0 ? '+' : '';
+
+  let coverageText = 'Evaluación Individual';
+  if (h3Data && h4Data) coverageText = 'Ambos Desafíos: Hito 3 y Hito 4 (Test-Retest Completo)';
+  else if (h3Data) coverageText = 'Hito 3: Los otros vecinos de Antofagasta';
+  else if (h4Data) coverageText = 'Hito 4: Proteger nuestro escudo invisible';
+
+  // Filas para preguntas cerradas H3
+  let h3MCRows = '';
+  if (h3Data && h3Data.pre_mc && h3Data.post_mc) {
+    const key3 = h3Meta.slice(0, 5).map(q => (q.correct_key || '').toUpperCase());
+    h3Data.q_evo.forEach((evo, idx) => {
+      if (idx >= h3Meta.length) return;
+      const isPostCorr = (h3Data.post_mc[idx] || '').toUpperCase() === key3[idx];
+      h3MCRows += `
+        <tr>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; font-weight: bold; text-align: center;">Q${idx + 1}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0;">${escapeHtml(h3Meta[idx].title)}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold;">${(h3Data.pre_mc[idx] || 'N/A').toUpperCase()}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${isPostCorr ? '#00a87e' : '#e11d48'};">${(h3Data.post_mc[idx] || 'N/A').toUpperCase()}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00a87e;">${key3[idx]}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-size: 10px;">${evo}</td>
+        </tr>
+      `;
+    });
+  }
+
+  // Filas para preguntas cerradas H4
+  let h4MCRows = '';
+  if (h4Data && h4Data.pre_mc && h4Data.post_mc) {
+    const key4 = h4Meta.slice(0, 5).map(q => (q.correct_key || '').toUpperCase());
+    h4Data.q_evo.forEach((evo, idx) => {
+      if (idx >= h4Meta.length) return;
+      const isPostCorr = (h4Data.post_mc[idx] || '').toUpperCase() === key4[idx];
+      h4MCRows += `
+        <tr>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; font-weight: bold; text-align: center;">Q${idx + 1}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0;">${escapeHtml(h4Meta[idx].title)}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold;">${(h4Data.pre_mc[idx] || 'N/A').toUpperCase()}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${isPostCorr ? '#00a87e' : '#e11d48'};">${(h4Data.post_mc[idx] || 'N/A').toUpperCase()}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00a87e;">${key4[idx]}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-size: 10px;">${evo}</td>
+        </tr>
+      `;
+    });
+  }
+
+  // Tarjetas para preguntas abiertas H3
+  let h3OpenCards = '';
+  if (h3Data && h3Data.open_analysis) {
+    h3Data.open_analysis.forEach((oq, idx) => {
+      h3OpenCards += `
+        <div style="margin-bottom: 8px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #fafafa; page-break-inside: avoid;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <strong style="font-size: 11px; color: #0f172a;">P${idx + 1}: ${escapeHtml(oq.question)}</strong>
+            <span style="font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 12px; background-color: ${oq.status === 'Mejoró' ? '#e6faf5' : (oq.status === 'Retrocedió' ? '#fff1f2' : '#f1f5f9')}; color: ${oq.status === 'Mejoró' ? '#00a87e' : (oq.status === 'Retrocedió' ? '#e11d48' : '#475569')};">${oq.status}</span>
+          </div>
+          <div style="font-size: 10px; color: #64748b; margin-bottom: 6px;">Diagnóstico: <strong>${escapeHtml(oq.detail)}</strong></div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+            <tr>
+              <td style="width: 50%; padding: 6px; border: 1px solid #e2e8f0; background-color: #ffffff; vertical-align: top;">
+                <span style="font-size: 9px; font-weight: bold; color: #94a3b8; display: block; text-transform: uppercase;">Respuesta PRE (Inicial):</span>
+                <span style="font-style: italic; color: #334155;">${oq.pre_text && oq.pre_text.trim() ? '"' + escapeHtml(oq.pre_text) + '"' : '(Sin respuesta o no sabe)'}</span>
+              </td>
+              <td style="width: 50%; padding: 6px; border: 1px solid #e2e8f0; background-color: #f0fdf4; vertical-align: top;">
+                <span style="font-size: 9px; font-weight: bold; color: #00a87e; display: block; text-transform: uppercase;">Respuesta POST (En terreno):</span>
+                <span style="color: #0f172a; font-weight: 500;">${oq.post_text && oq.post_text.trim() ? '"' + escapeHtml(oq.post_text) + '"' : '(Sin respuesta o no sabe)'}</span>
+              </td>
+            </tr>
+          </table>
+          ${oq.requires_review ? `<div style="margin-top: 4px; font-size: 9px; color: #92400e; background-color: #fef3c7; padding: 4px 6px; border-radius: 4px;">⚠️ Elemento de evaluación no concluyente por falta de respuesta escrita. Se sugiere revisión individual con el profesor/a líder.</div>` : ''}
+        </div>
+      `;
+    });
+  }
+
+  // Tarjetas para preguntas abiertas H4
+  let h4OpenCards = '';
+  if (h4Data && h4Data.open_analysis) {
+    h4Data.open_analysis.forEach((oq, idx) => {
+      h4OpenCards += `
+        <div style="margin-bottom: 8px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #fafafa; page-break-inside: avoid;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <strong style="font-size: 11px; color: #0f172a;">P${idx + 1}: ${escapeHtml(oq.question)}</strong>
+            <span style="font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 12px; background-color: ${oq.status === 'Mejoró' ? '#e6faf5' : (oq.status === 'Retrocedió' ? '#fff1f2' : '#f1f5f9')}; color: ${oq.status === 'Mejoró' ? '#00a87e' : (oq.status === 'Retrocedió' ? '#e11d48' : '#475569')};">${oq.status}</span>
+          </div>
+          <div style="font-size: 10px; color: #64748b; margin-bottom: 6px;">Diagnóstico: <strong>${escapeHtml(oq.detail)}</strong></div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+            <tr>
+              <td style="width: 50%; padding: 6px; border: 1px solid #e2e8f0; background-color: #ffffff; vertical-align: top;">
+                <span style="font-size: 9px; font-weight: bold; color: #94a3b8; display: block; text-transform: uppercase;">Respuesta PRE (Inicial):</span>
+                <span style="font-style: italic; color: #334155;">${oq.pre_text && oq.pre_text.trim() ? '"' + escapeHtml(oq.pre_text) + '"' : '(Sin respuesta o no sabe)'}</span>
+              </td>
+              <td style="width: 50%; padding: 6px; border: 1px solid #e2e8f0; background-color: #f0fdf4; vertical-align: top;">
+                <span style="font-size: 9px; font-weight: bold; color: #00a87e; display: block; text-transform: uppercase;">Respuesta POST (En terreno):</span>
+                <span style="color: #0f172a; font-weight: 500;">${oq.post_text && oq.post_text.trim() ? '"' + escapeHtml(oq.post_text) + '"' : '(Sin respuesta o no sabe)'}</span>
+              </td>
+            </tr>
+          </table>
+          ${oq.requires_review ? `<div style="margin-top: 4px; font-size: 9px; color: #92400e; background-color: #fef3c7; padding: 4px 6px; border-radius: 4px;">⚠️ Elemento de evaluación no concluyente por falta de respuesta escrita. Se sugiere revisión individual con el profesor/a líder.</div>` : ''}
+        </div>
+      `;
+    });
+  }
+
+  return `
+    <div style="font-family: Arial, Helvetica, sans-serif; color: #1e293b; padding: 20px; line-height: 1.4; background-color: #ffffff;">
+      
+      <!-- Encabezado con Logos Oficiales -->
+      <table style="width: 100%; border-bottom: 2px solid #00d09c; padding-bottom: 12px; margin-bottom: 16px;">
+        <tr>
+          <td style="width: 70px; vertical-align: middle;">
+            <img src="logo.png" style="height: 48px; width: auto; object-fit: contain;" alt="PAC 2026">
+          </td>
+          <td style="vertical-align: middle; padding-left: 10px;">
+            <div style="font-size: 13px; font-weight: bold; text-transform: uppercase; color: #0f172a; letter-spacing: 0.5px;">Programa de Acción Climática 2026 · Línea Verde</div>
+            <div style="font-size: 17px; font-weight: 900; color: #00a87e; margin-top: 2px;">FICHA INDIVIDUAL DE EVALUACIÓN TEST-RETEST</div>
+            <div style="font-size: 10px; color: #64748b;">Antofagasta: Laboratorio Vivo hacia el 2050 · Reporte de Aprendizajes</div>
+          </td>
+          <td style="width: 120px; text-align: right; vertical-align: middle;">
+            <img src="logo_verdical.png" style="height: 38px; width: auto; object-fit: contain;" alt="Grupo Verdical">
+          </td>
+        </tr>
+      </table>
+
+      <!-- Ficha de Identificación del Participante -->
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <tr>
+          <td style="padding: 8px 12px; width: 50%; vertical-align: top;">
+            <div style="font-size: 9px; text-transform: uppercase; font-weight: bold; color: #94a3b8;">Participante:</div>
+            <div style="font-size: 15px; font-weight: 900; color: #0f172a;">${escapeHtml(p.name)}</div>
+            <div style="font-size: 11px; color: #475569; margin-top: 2px;">Establecimiento: <strong>${escapeHtml(p.school)}</strong></div>
+          </td>
+          <td style="padding: 8px 12px; width: 50%; vertical-align: top; border-left: 1px solid #e2e8f0;">
+            <div style="font-size: 9px; text-transform: uppercase; font-weight: bold; color: #94a3b8;">Detalles de Participación:</div>
+            <div style="font-size: 11px; color: #334155; margin-top: 2px;">Género: <strong>${escapeHtml(p.gender)}</strong> · Rol: <strong>${escapeHtml(p.role || 'Estudiante')}</strong></div>
+            <div style="font-size: 11px; color: #00a87e; font-weight: bold; margin-top: 2px;">${coverageText}</div>
+            <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Diagnóstico: <strong style="color: #0f172a;">${escapeHtml(p.real_status || p.status)}</strong></div>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Tabla de Rendimiento Cuantitativo -->
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 6px; border-left: 3px solid #00d09c; padding-left: 6px;">1. Resumen Cuantitativo de Rendimiento (Puntajes PRE vs. POST)</div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+          <thead>
+            <tr style="background-color: #f1f5f9; text-align: left;">
+              <th style="padding: 6px 8px; border: 1px solid #cbd5e1;">Desafío / Hito Evaluado</th>
+              <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center;">Puntaje PRE</th>
+              <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center;">Puntaje POST</th>
+              <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center;">Diferencia (Delta)</th>
+              <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center;">Condición de Aprendizaje</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${h3Data ? `
+              <tr>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: bold;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad)</td>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">${h3Data.pre_score} / 5</td>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00a87e;">${h3Data.post_score} / 5</td>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${h3Data.delta >= 0 ? '#00a87e' : '#e11d48'};">${h3Data.delta >= 0 ? '+' : ''}${h3Data.delta} pts</td>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">${h3Data.status}</td>
+              </tr>
+            ` : ''}
+            ${h4Data ? `
+              <tr>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: bold;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos)</td>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">${h4Data.pre_score} / 5</td>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00a87e;">${h4Data.post_score} / 5</td>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${h4Data.delta >= 0 ? '#00a87e' : '#e11d48'};">${h4Data.delta >= 0 ? '+' : ''}${h4Data.delta} pts</td>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">${h4Data.status}</td>
+              </tr>
+            ` : ''}
+            ${h3Data && h4Data ? `
+              <tr style="background-color: #ecfdf5; font-weight: bold;">
+                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; color: #065f46;">Consolidado Combinado (10 preguntas cerradas)</td>
+                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center;">${totPre} / 10 pts</td>
+                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; color: #00a87e;">${totPost} / 10 pts</td>
+                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; color: ${totDelta >= 0 ? '#00a87e' : '#e11d48'};">${deltaSign}${totDelta} pts</td>
+                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; color: #065f46;">${p.status}</td>
+              </tr>
+            ` : ''}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Sección 2: Desglose Preguntas Cerradas -->
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 6px; border-left: 3px solid #00d09c; padding-left: 6px;">2. Desglose de Preguntas Cerradas (Alternativas)</div>
+        
+        ${h3Data ? `
+          <div style="margin-bottom: 10px;">
+            <div style="font-size: 11px; font-weight: bold; color: #065f46; margin-bottom: 4px;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y Humedales) · Puntaje: ${h3Data.post_score} / 5</div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+              <thead>
+                <tr style="background-color: #f8fafc;">
+                  <th style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 30px; text-align: center;">#</th>
+                  <th style="padding: 4px 6px; border: 1px solid #cbd5e1;">Pregunta Evaluada</th>
+                  <th style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 45px; text-align: center;">PRE</th>
+                  <th style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 45px; text-align: center;">POST</th>
+                  <th style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 50px; text-align: center;">Correcta</th>
+                  <th style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 85px; text-align: center;">Evolución</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${h3MCRows}
+              </tbody>
+            </table>
+          </div>
+        ` : ''}
+
+        ${h4Data ? `
+          <div style="margin-bottom: 10px;">
+            <div style="font-size: 11px; font-weight: bold; color: #3730a3; margin-bottom: 4px;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos Limpios) · Puntaje: ${h4Data.post_score} / 5</div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+              <thead>
+                <tr style="background-color: #f8fafc;">
+                  <th style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 30px; text-align: center;">#</th>
+                  <th style="padding: 4px 6px; border: 1px solid #cbd5e1;">Pregunta Evaluada</th>
+                  <th style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 45px; text-align: center;">PRE</th>
+                  <th style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 45px; text-align: center;">POST</th>
+                  <th style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 50px; text-align: center;">Correcta</th>
+                  <th style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 85px; text-align: center;">Evolución</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${h4MCRows}
+              </tbody>
+            </table>
+          </div>
+        ` : ''}
+      </div>
+
+      <!-- Sección 3: Desglose Preguntas Abiertas (Cualitativo) -->
+      <div style="margin-bottom: 16px;">
+        <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 6px; border-left: 3px solid #00d09c; padding-left: 6px;">3. Desglose de Preguntas Abiertas (Análisis Cualitativo de Apropiación)</div>
+        
+        ${h3Data ? `
+          <div style="margin-bottom: 12px;">
+            <div style="font-size: 11px; font-weight: bold; color: #065f46; margin-bottom: 6px;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y Ecosistemas)</div>
+            ${h3OpenCards}
+          </div>
+        ` : ''}
+
+        ${h4Data ? `
+          <div style="margin-bottom: 12px;">
+            <div style="font-size: 11px; font-weight: bold; color: #3730a3; margin-bottom: 6px;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos Limpios)</div>
+            ${h4OpenCards}
+          </div>
+        ` : ''}
+      </div>
+
+      <!-- Sección 4: Orientaciones Pedagógicas -->
+      <div style="margin-bottom: 20px; padding: 10px 12px; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; page-break-inside: avoid;">
+        <div style="font-size: 11px; font-weight: bold; color: #166534; margin-bottom: 4px;">Orientación para el Profesor/a Líder:</div>
+        <p style="font-size: 10px; color: #14532d; margin: 0; line-height: 1.45;">
+          ${p.status === 'Mejoró' ? 
+            'El participante evidenció un avance significativo en la apropiación de conceptos y terminología científica tanto en preguntas de selección múltiple como en sus explicaciones escritas. Se recomienda canalizar esta motivación hacia la fase de ideación de soluciones climáticas escolares.' : 
+            (p.status === 'Mantuvo' ? 
+              'El participante sostuvo un nivel de respuesta coherente y estructurado entre el PRE y POST test. Se sugiere afianzar los conceptos clave en un plenario grupal de 15 minutos previo a la formulación del proyecto de acción climática.' : 
+              'Se observaron elementos no concluyentes o respuestas breves asociadas a la aplicación inmediata en terreno. Se recomienda una breve conversación formativa con el docente líder para verificar la asimilación del contenido.')}
+        </p>
+      </div>
+
+      <!-- Pie de Página Institucional -->
+      <table style="width: 100%; border-top: 1px solid #e2e8f0; padding-top: 8px; font-size: 9px; color: #94a3b8;">
+        <tr>
+          <td>Herramienta desarrollada por <strong>rodolfo.tapia@verdical.cl</strong> para <strong>Grupo Verdical SPA</strong></td>
+          <td style="text-align: right;">Programa de Acción Climática (PAC 2026) · Metodología VERDICAL · Antofagasta, Chile</td>
+        </tr>
+      </table>
+
+    </div>
+  `;
 }
 
 // Exportar tabla a CSV
