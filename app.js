@@ -745,16 +745,14 @@ function switchTab(tabId) {
   ACTIVE_TAB = tabId;
   document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
   document.querySelectorAll('.nav-tab').forEach(el => {
-    el.classList.remove('border-emerald-600', 'text-emerald-700', 'font-semibold');
-    el.classList.add('border-transparent', 'text-slate-600', 'font-medium');
+    el.className = 'nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition';
   });
 
   const targetView = document.getElementById(`view-${tabId}`);
   const targetBtn = document.getElementById(`tab-btn-${tabId}`);
   if (targetView) targetView.classList.remove('hidden');
   if (targetBtn) {
-    targetBtn.classList.remove('border-transparent', 'text-slate-600', 'font-medium');
-    targetBtn.classList.add('border-emerald-600', 'text-emerald-700', 'font-semibold');
+    targetBtn.className = 'nav-tab active-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-[#00d09c] text-slate-950 shadow-md shadow-teal-500/20 whitespace-nowrap transition';
   }
 
   updateUI();
@@ -770,15 +768,12 @@ function setHito(hito) {
   const btnGlobal = document.getElementById('btn-hito-global') || document.getElementById('btn-hito-ambos');
 
   [btn4, btn3, btnGlobal].forEach(btn => {
-    if (btn) btn.className = 'px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition';
+    if (btn) btn.className = 'px-4 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:text-white transition';
   });
 
-  if (hito === 'Hito 4') {
-    if (btn4) btn4.className = 'px-3 py-1.5 rounded-lg font-semibold bg-white text-emerald-800 shadow-sm transition';
-  } else if (hito === 'Hito 3') {
-    if (btn3) btn3.className = 'px-3 py-1.5 rounded-lg font-semibold bg-white text-emerald-800 shadow-sm transition';
-  } else {
-    if (btnGlobal) btnGlobal.className = 'px-3 py-1.5 rounded-lg font-semibold bg-white text-emerald-800 shadow-sm transition';
+  const activeBtn = hito === 'Hito 4' ? btn4 : (hito === 'Hito 3' ? btn3 : btnGlobal);
+  if (activeBtn) {
+    activeBtn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-[#00d09c] text-slate-950 shadow-md shadow-teal-500/20 transition';
   }
 
   updateUI();
@@ -903,7 +898,7 @@ function updateKPIs() {
   preEl.innerHTML = `${avgPre.toFixed(2)} <span class="text-xs font-normal text-slate-400">/ 5</span>`;
   postEl.innerHTML = `${avgPost.toFixed(2)} <span class="text-xs font-normal text-slate-400">/ 5</span>`;
   deltaEl.innerText = `${avgDelta >= 0 ? '+' : ''}${avgDelta.toFixed(2)}`;
-  deltaEl.className = avgDelta >= 0 ? 'text-2xl font-bold text-emerald-600 mt-1' : 'text-2xl font-bold text-rose-600 mt-1';
+  deltaEl.className = avgDelta >= 0 ? 'text-3xl font-extrabold text-[#00a87e] tracking-tight mt-1.5' : 'text-3xl font-extrabold text-rose-600 tracking-tight mt-1.5';
 
   pctMejoraEl.innerText = `${pctMejora}%`;
   countMejoraEl.innerText = `${nMejora} participantes subieron`;
@@ -912,7 +907,7 @@ function updateKPIs() {
   countEstancadosEl.innerText = `${nMantuvo} mantuvieron, ${nRetrocedio} bajaron`;
 }
 
-// RENDER CHARTS CON CHART.JS
+// RENDER CHARTS CON CHART.JS (Estilo moderno y gradientes inspirados en diseño de referencia)
 function renderCharts() {
   const filtered = getFilteredParticipants();
   const N = filtered.length;
@@ -931,8 +926,8 @@ function renderCharts() {
       labels: ['Mejoró (+pts)', 'Mantuvo (0 pts)', 'Retrocedió (-pts)'],
       datasets: [{
         data: [nMejora, nMantuvo, nRetrocedio],
-        backgroundColor: ['#10b981', '#94a3b8', '#f43f5e'],
-        borderWidth: 2,
+        backgroundColor: ['#00d09c', '#6366f1', '#ff5b5b'],
+        borderWidth: 3,
         borderColor: '#ffffff',
         hoverOffset: 6
       }]
@@ -943,26 +938,32 @@ function renderCharts() {
       plugins: {
         legend: { display: false }
       },
-      cutout: '70%'
+      cutout: '72%'
     }
   });
 
   const legendEl = document.getElementById('legend-status');
   legendEl.innerHTML = `
-    <div>
-      <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1"></span>
-      <span class="font-semibold text-slate-700">${nMejora}</span>
-      <div class="text-[10px] text-slate-400">Mejoró (${N ? ((nMejora/N)*100).toFixed(0) : 0}%)</div>
+    <div class="bg-slate-50/80 p-2.5 rounded-2xl border border-slate-100">
+      <div class="flex items-center justify-center gap-1.5">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#00d09c]"></span>
+        <span class="font-bold text-slate-800">${nMejora}</span>
+      </div>
+      <div class="text-[10px] text-slate-400 font-medium mt-0.5">Mejoró (${N ? ((nMejora/N)*100).toFixed(0) : 0}%)</div>
     </div>
-    <div>
-      <span class="inline-block w-2.5 h-2.5 rounded-full bg-slate-400 mr-1"></span>
-      <span class="font-semibold text-slate-700">${nMantuvo}</span>
-      <div class="text-[10px] text-slate-400">Mantuvo (${N ? ((nMantuvo/N)*100).toFixed(0) : 0}%)</div>
+    <div class="bg-slate-50/80 p-2.5 rounded-2xl border border-slate-100">
+      <div class="flex items-center justify-center gap-1.5">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#6366f1]"></span>
+        <span class="font-bold text-slate-800">${nMantuvo}</span>
+      </div>
+      <div class="text-[10px] text-slate-400 font-medium mt-0.5">Mantuvo (${N ? ((nMantuvo/N)*100).toFixed(0) : 0}%)</div>
     </div>
-    <div>
-      <span class="inline-block w-2.5 h-2.5 rounded-full bg-rose-500 mr-1"></span>
-      <span class="font-semibold text-slate-700">${nRetrocedio}</span>
-      <div class="text-[10px] text-slate-400">Retrocedió (${N ? ((nRetrocedio/N)*100).toFixed(0) : 0}%)</div>
+    <div class="bg-slate-50/80 p-2.5 rounded-2xl border border-slate-100">
+      <div class="flex items-center justify-center gap-1.5">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#ff5b5b]"></span>
+        <span class="font-bold text-slate-800">${nRetrocedio}</span>
+      </div>
+      <div class="text-[10px] text-slate-400 font-medium mt-0.5">Retrocedió (${N ? ((nRetrocedio/N)*100).toFixed(0) : 0}%)</div>
     </div>
   `;
 
@@ -1004,22 +1005,34 @@ function renderCharts() {
   const ctxQuestions = document.getElementById('chart-questions-bar').getContext('2d');
   if (CHARTS['questions']) CHARTS['questions'].destroy();
 
+  // Create smooth gradients matching the reference image (Purple to Cyan to Mint)
+  const gradPost = ctxQuestions.createLinearGradient(0, 220, 0, 10);
+  gradPost.addColorStop(0, '#6366f1');   // Royal Purple/Indigo
+  gradPost.addColorStop(0.5, '#00c5cb'); // Cyan
+  gradPost.addColorStop(1, '#00d09c');   // Mint Green
+
+  const gradPre = ctxQuestions.createLinearGradient(0, 220, 0, 10);
+  gradPre.addColorStop(0, '#94a3b8');    // Slate
+  gradPre.addColorStop(1, '#cbd5e1');    // Light Slate
+
   CHARTS['questions'] = new Chart(ctxQuestions, {
     type: 'bar',
     data: {
       labels: labels,
       datasets: [
         {
-          label: '% Aciertos PRE',
+          label: '% Aciertos PRE (Basal)',
           data: prePcts,
-          backgroundColor: '#94a3b8',
-          borderRadius: 6
+          backgroundColor: gradPre,
+          borderRadius: 8,
+          borderSkipped: false
         },
         {
-          label: '% Aciertos POST',
+          label: '% Aciertos POST (Terreno)',
           data: postPcts,
-          backgroundColor: '#059669',
-          borderRadius: 6
+          backgroundColor: gradPost,
+          borderRadius: 8,
+          borderSkipped: false
         }
       ]
     },
@@ -1030,11 +1043,25 @@ function renderCharts() {
         y: {
           beginAtZero: true,
           max: 100,
-          ticks: { callback: v => v + '%' }
+          grid: { color: '#f8fafc' },
+          ticks: { callback: v => v + '%', font: { size: 10 } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 11, weight: '600' } }
         }
       },
       plugins: {
-        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+        legend: {
+          position: 'top',
+          labels: {
+            boxWidth: 12,
+            boxHeight: 12,
+            useBorderRadius: true,
+            borderRadius: 4,
+            font: { size: 11, weight: '600' }
+          }
+        }
       }
     }
   });
@@ -1048,6 +1075,16 @@ function renderCharts() {
   const ctxSchools = document.getElementById('chart-schools-delta').getContext('2d');
   if (CHARTS['schools']) CHARTS['schools'].destroy();
 
+  const gradSchoolPos = ctxSchools.createLinearGradient(0, 220, 0, 10);
+  gradSchoolPos.addColorStop(0, '#00c5cb'); // Cyan
+  gradSchoolPos.addColorStop(1, '#00d09c'); // Mint
+
+  const gradSchoolNeg = ctxSchools.createLinearGradient(0, 220, 0, 10);
+  gradSchoolNeg.addColorStop(0, '#f43f5e'); // Rose
+  gradSchoolNeg.addColorStop(1, '#ff5b5b'); // Coral
+
+  const schoolColors = schoolDeltas.map(d => d >= 0 ? gradSchoolPos : gradSchoolNeg);
+
   CHARTS['schools'] = new Chart(ctxSchools, {
     type: 'bar',
     data: {
@@ -1055,8 +1092,9 @@ function renderCharts() {
       datasets: [{
         label: 'Delta Promedio (Puntos)',
         data: schoolDeltas,
-        backgroundColor: schoolDeltas.map(d => d >= 0 ? '#10b981' : '#f43f5e'),
-        borderRadius: 6
+        backgroundColor: schoolColors,
+        borderRadius: 8,
+        borderSkipped: false
       }]
     },
     options: {
@@ -1067,7 +1105,12 @@ function renderCharts() {
       },
       scales: {
         y: {
-          ticks: { callback: v => (v >= 0 ? '+' : '') + v }
+          grid: { color: '#f8fafc' },
+          ticks: { callback: v => (v >= 0 ? '+' : '') + v, font: { size: 10 } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 11, weight: '600' } }
         }
       }
     }
@@ -1082,6 +1125,15 @@ function renderCharts() {
   const gPre = gLabels.map(g => genderData[g].pre_avg);
   const gPost = gLabels.map(g => genderData[g].post_avg);
 
+  const gradGenderPost = ctxGender.createLinearGradient(0, 220, 0, 10);
+  gradGenderPost.addColorStop(0, '#6366f1');
+  gradGenderPost.addColorStop(0.5, '#00c5cb');
+  gradGenderPost.addColorStop(1, '#00d09c');
+
+  const gradGenderPre = ctxGender.createLinearGradient(0, 220, 0, 10);
+  gradGenderPre.addColorStop(0, '#94a3b8');
+  gradGenderPre.addColorStop(1, '#cbd5e1');
+
   CHARTS['gender'] = new Chart(ctxGender, {
     type: 'bar',
     data: {
@@ -1090,14 +1142,16 @@ function renderCharts() {
         {
           label: 'Puntaje PRE',
           data: gPre,
-          backgroundColor: '#cbd5e1',
-          borderRadius: 6
+          backgroundColor: gradGenderPre,
+          borderRadius: 8,
+          borderSkipped: false
         },
         {
           label: 'Puntaje POST',
           data: gPost,
-          backgroundColor: '#0d9488',
-          borderRadius: 6
+          backgroundColor: gradGenderPost,
+          borderRadius: 8,
+          borderSkipped: false
         }
       ]
     },
@@ -1105,10 +1159,28 @@ function renderCharts() {
       responsive: true,
       maintainAspectRatio: false,
       scales: {
-        y: { beginAtZero: true, max: 5 }
+        y: {
+          beginAtZero: true,
+          max: 5,
+          grid: { color: '#f8fafc' },
+          ticks: { font: { size: 10 } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { size: 11, weight: '600' } }
+        }
       },
       plugins: {
-        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+        legend: {
+          position: 'top',
+          labels: {
+            boxWidth: 12,
+            boxHeight: 12,
+            useBorderRadius: true,
+            borderRadius: 4,
+            font: { size: 11, weight: '600' }
+          }
+        }
       }
     }
   });
@@ -1123,55 +1195,59 @@ function renderSchoolsTab() {
 
   schools.forEach(s => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-slate-50/80 transition';
+    tr.className = 'hover:bg-slate-50/70 transition';
 
     if (s.has_data === false || s.n === 0) {
       tr.innerHTML = `
-        <td class="py-3 px-4 font-semibold text-slate-800">${s.school}</td>
-        <td class="py-3 px-3">
-          <span class="px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-700 font-medium">${s.dependencia}</span>
+        <td class="py-3.5 px-4 font-semibold text-slate-800">${s.school}</td>
+        <td class="py-3.5 px-3">
+          <span class="px-2.5 py-1 rounded-full text-[11px] bg-slate-100 text-slate-700 font-medium">${s.dependencia}</span>
         </td>
-        <td class="py-3 px-3 text-center text-slate-400 italic font-semibold">0 (Sin datos)</td>
-        <td class="py-3 px-3 text-center text-slate-400">-</td>
-        <td class="py-3 px-3 text-center text-slate-400">-</td>
-        <td class="py-3 px-3 text-center">
-          <span class="px-2 py-0.5 rounded text-[10px] bg-amber-50 text-amber-800 border border-amber-200 font-medium">Sin datos en este hito</span>
+        <td class="py-3.5 px-3 text-center text-slate-400 italic font-semibold">0 (Sin datos)</td>
+        <td class="py-3.5 px-3 text-center text-slate-400">-</td>
+        <td class="py-3.5 px-3 text-center text-slate-400">-</td>
+        <td class="py-3.5 px-3 text-center">
+          <span class="px-2.5 py-1 rounded-full text-[10px] bg-amber-50 text-amber-800 border border-amber-200 font-medium">Sin datos en este hito</span>
         </td>
-        <td class="py-3 px-3 text-center text-slate-400">-</td>
-        <td class="py-3 px-3 text-center text-slate-400 text-[10px]">No evaluado</td>
-        <td class="py-3 px-4">
+        <td class="py-3.5 px-3 text-center text-slate-400">-</td>
+        <td class="py-3.5 px-3 text-center text-slate-400 text-[10px]">No evaluado</td>
+        <td class="py-3.5 px-4">
           <div class="text-slate-800 font-medium">${s.lider1 || 'Coordinador del equipo'}</div>
           <div class="text-[10px] text-slate-400">${s.email1 || ''} ${s.tel1 ? '· Tel: ' + s.tel1 : ''}</div>
         </td>
       `;
     } else {
       const deltaSign = s.delta_avg >= 0 ? '+' : '';
-      const deltaColor = s.delta_avg > 0 ? 'text-emerald-700 font-bold' : (s.delta_avg === 0 ? 'text-slate-600' : 'text-rose-600 font-bold');
+      const deltaBadge = s.delta_avg > 0 ? 
+        `<span class="px-3 py-1 rounded-full text-xs font-bold bg-[#00d09c]/15 text-[#00a87e] border border-[#00d09c]/25">+${s.delta_avg.toFixed(2)}</span>` : 
+        (s.delta_avg === 0 ? 
+          `<span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">0.00</span>` : 
+          `<span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">${s.delta_avg.toFixed(2)}</span>`);
 
       tr.innerHTML = `
-        <td class="py-3 px-4 font-semibold text-slate-800">${s.school}</td>
-        <td class="py-3 px-3">
-          <span class="px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-700 font-medium">${s.dependencia}</span>
+        <td class="py-3.5 px-4 font-bold text-slate-800">${s.school}</td>
+        <td class="py-3.5 px-3">
+          <span class="px-2.5 py-1 rounded-full text-[11px] bg-slate-100 text-slate-700 font-medium">${s.dependencia}</span>
         </td>
-        <td class="py-3 px-3 text-center font-bold text-slate-800">${s.n}</td>
-        <td class="py-3 px-3 text-center text-slate-600">${s.pre_avg !== null ? s.pre_avg.toFixed(2) : '-'}</td>
-        <td class="py-3 px-3 text-center text-emerald-700 font-semibold">${s.post_avg !== null ? s.post_avg.toFixed(2) : '-'}</td>
-        <td class="py-3 px-3 text-center ${deltaColor}">${deltaSign}${s.delta_avg.toFixed(2)}</td>
-        <td class="py-3 px-3 text-center">
-          <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${s.pct_mejora >= 50 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'}">
+        <td class="py-3.5 px-3 text-center font-bold text-slate-800">${s.n}</td>
+        <td class="py-3.5 px-3 text-center text-slate-600 font-medium">${s.pre_avg !== null ? s.pre_avg.toFixed(2) : '-'}</td>
+        <td class="py-3.5 px-3 text-center text-[#00a87e] font-bold">${s.post_avg !== null ? s.post_avg.toFixed(2) : '-'}</td>
+        <td class="py-3.5 px-3 text-center">${deltaBadge}</td>
+        <td class="py-3.5 px-3 text-center">
+          <span class="px-3 py-1 rounded-full text-xs font-bold ${s.pct_mejora >= 50 ? 'bg-[#00d09c]/20 text-[#00a87e]' : 'bg-slate-100 text-slate-700'}">
             ${s.pct_mejora}%
           </span>
         </td>
-        <td class="py-3 px-3">
-          <div class="flex items-center gap-1 text-[10px]">
-            <span class="text-emerald-700 font-medium" title="Mejoró">${s.status_counts['Mejoró'] || 0}↗</span>
-            <span class="text-slate-400">·</span>
-            <span class="text-slate-600" title="Mantuvo">${s.status_counts['Mantuvo'] || 0}=</span>
-            <span class="text-slate-400">·</span>
-            <span class="text-rose-600 font-medium" title="Retrocedió">${s.status_counts['Retrocedió'] || 0}↘</span>
+        <td class="py-3.5 px-3">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-100 text-[11px]">
+            <span class="text-[#00a87e] font-bold" title="Mejoró">${s.status_counts['Mejoró'] || 0}↗</span>
+            <span class="text-slate-300">·</span>
+            <span class="text-slate-500 font-semibold" title="Mantuvo">${s.status_counts['Mantuvo'] || 0}=</span>
+            <span class="text-slate-300">·</span>
+            <span class="text-rose-600 font-bold" title="Retrocedió">${s.status_counts['Retrocedió'] || 0}↘</span>
           </div>
         </td>
-        <td class="py-3 px-4">
+        <td class="py-3.5 px-4">
           <div class="text-slate-800 font-medium">${s.lider1 || 'Coordinador del equipo'}</div>
           <div class="text-[10px] text-slate-400">${s.email1 || ''} ${s.tel1 ? '· Tel: ' + s.tel1 : ''}</div>
         </td>
@@ -1198,8 +1274,8 @@ function renderQuestionsTab() {
         currentSectionHito = qHito;
         const sectionHeader = document.createElement('div');
         sectionHeader.className = qHito === 'Hito 3' ? 
-          'p-3.5 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 font-bold text-xs flex items-center gap-2 mt-2 mb-1' :
-          'p-3.5 bg-teal-50 rounded-xl border border-teal-200 text-teal-900 font-bold text-xs flex items-center gap-2 mt-6 mb-1';
+          'p-4 bg-emerald-50 rounded-2xl border border-emerald-200 text-emerald-950 font-bold text-xs flex items-center gap-2 mt-2 mb-1 shadow-sm' :
+          'p-4 bg-teal-50 rounded-2xl border border-teal-200 text-teal-950 font-bold text-xs flex items-center gap-2 mt-6 mb-1 shadow-sm';
         sectionHeader.innerHTML = `
           <i data-lucide="${qHito === 'Hito 3' ? 'leaf' : 'shield'}" class="w-4 h-4"></i>
           <span>${qHito === 'Hito 3' ? 'Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y tramas tróficas)' : 'Hito 4: Proteger nuestro escudo invisible (Atmósfera y cielos oscuros)'}</span>
@@ -1209,49 +1285,49 @@ function renderQuestionsTab() {
     }
 
     const card = document.createElement('div');
-    card.className = 'border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:bg-white transition space-y-3';
+    card.className = 'border border-slate-100 rounded-2xl p-5 bg-white card-shadow hover:border-slate-200 transition space-y-3.5';
 
     const distractorPills = Object.entries(q.post_distractors)
-      .map(([opt, count]) => `<span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-medium text-[11px]">Opción ${opt}: ${count} veces</span>`)
+      .map(([opt, count]) => `<span class="px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-semibold text-[11px]">Opción ${opt}: ${count} veces</span>`)
       .join(' ') || '<span class="text-slate-400 text-xs">Sin errores registrados</span>';
 
     const diffBadge = q.diff >= 0 ? 
-      `<span class="badge-improved text-xs px-2.5 py-0.5 rounded-full font-bold">+${q.diff} aciertos (+${(q.post_pct - q.pre_pct).toFixed(1)}%)</span>` :
-      `<span class="badge-regressed text-xs px-2.5 py-0.5 rounded-full font-bold">${q.diff} aciertos (${(q.post_pct - q.pre_pct).toFixed(1)}%)</span>`;
+      `<span class="badge-improved text-xs px-3 py-1 rounded-full font-bold">+${q.diff} aciertos (+${(q.post_pct - q.pre_pct).toFixed(1)}%)</span>` :
+      `<span class="badge-regressed text-xs px-3 py-1 rounded-full font-bold">${q.diff} aciertos (${(q.post_pct - q.pre_pct).toFixed(1)}%)</span>`;
 
     card.innerHTML = `
       <div class="flex flex-wrap items-start justify-between gap-2">
         <div class="space-y-1">
-          <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center">${q.num}</span>
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Alternativa Correcta: [ ${q.correct_key} ]</span>
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-full bg-[#00d09c] text-slate-950 font-extrabold text-xs flex items-center justify-center shadow-sm">${q.num}</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Alternativa Correcta: [ ${q.correct_key} ]</span>
           </div>
-          <h4 class="text-sm font-bold text-slate-800 pl-8">${q.title}</h4>
+          <h4 class="text-sm font-bold text-slate-800 pl-9.5">${q.title}</h4>
         </div>
         <div>${diffBadge}</div>
       </div>
 
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white p-3 rounded-lg border border-slate-200 text-xs pl-8">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50/70 p-3.5 rounded-xl border border-slate-100 text-xs pl-9">
         <div>
-          <span class="text-slate-400 text-[10px] block">Aciertos PRE</span>
-          <span class="font-bold text-slate-700 text-sm">${q.pre_correct} (${q.pre_pct}%)</span>
+          <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Aciertos PRE</span>
+          <span class="font-extrabold text-slate-700 text-sm mt-0.5 block">${q.pre_correct} (${q.pre_pct}%)</span>
         </div>
         <div>
-          <span class="text-slate-400 text-[10px] block">Aciertos POST</span>
-          <span class="font-bold text-emerald-700 text-sm">${q.post_correct} (${q.post_pct}%)</span>
+          <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Aciertos POST</span>
+          <span class="font-extrabold text-[#00a87e] text-sm mt-0.5 block">${q.post_correct} (${q.post_pct}%)</span>
         </div>
         <div>
-          <span class="text-slate-400 text-[10px] block">Mantuvieron Correcto</span>
-          <span class="font-bold text-slate-700 text-sm">${q.transitions['Mantuvo Correcto'] || 0}</span>
+          <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Mantuvieron Correcto</span>
+          <span class="font-extrabold text-slate-700 text-sm mt-0.5 block">${q.transitions['Mantuvo Correcto'] || 0}</span>
         </div>
         <div>
-          <span class="text-slate-400 text-[10px] block">Retrocedieron (de correcta a errada)</span>
-          <span class="font-bold text-rose-600 text-sm">${q.transitions['Retrocedió'] || 0}</span>
+          <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Retrocedieron</span>
+          <span class="font-extrabold text-rose-600 text-sm mt-0.5 block">${q.transitions['Retrocedió'] || 0}</span>
         </div>
       </div>
 
-      <div class="pl-8 pt-1 text-xs">
-        <span class="font-medium text-slate-600 mr-2">Distractores más seleccionados en el POST:</span>
+      <div class="pl-9 pt-1 text-xs">
+        <span class="font-semibold text-slate-500 mr-2">Distractores más seleccionados en el POST:</span>
         ${distractorPills}
       </div>
     `;
@@ -1299,7 +1375,7 @@ function renderQualitativeTab() {
     if (!qData) return;
 
     const item = document.createElement('div');
-    item.className = 'bg-white p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition text-xs space-y-2.5';
+    item.className = 'bg-white p-5 rounded-2xl border border-slate-100 card-shadow hover:border-slate-200 transition text-xs space-y-3';
 
     let badgeClass = 'bg-slate-100 text-slate-700 border border-slate-300';
     let badgeText = qData.status;
@@ -1319,34 +1395,34 @@ function renderQualitativeTab() {
     }
 
     const reviewAlert = qData.requires_review ? 
-      `<div class="mt-2 text-[11px] font-semibold text-amber-800 bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-200 flex items-center gap-1.5">
-        <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-600 shrink-0"></i>
+      `<div class="mt-2 text-[11px] font-semibold text-amber-800 bg-amber-50 px-3 py-2 rounded-xl border border-amber-200 flex items-center gap-2">
+        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 shrink-0"></i>
         <span>Elemento de evaluación no concluyente por falta de respuesta escrita. Se sugiere revisión individual con el profesor/a líder.</span>
       </div>` : '';
 
     item.innerHTML = `
-      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
         <div>
-          <span class="font-bold text-slate-900 text-sm">${p.name}</span>
-          <span class="text-slate-500 ml-1.5">· ${p.school}</span>
-          ${isGlobal ? `<span class="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-semibold ${p.hito === 'Hito 4' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800'}">${p.hito}</span>` : ''}
+          <span class="font-extrabold text-slate-900 text-sm">${p.name}</span>
+          <span class="text-slate-400 ml-1.5 font-medium">· ${p.school}</span>
+          ${isGlobal ? `<span class="ml-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${p.hito === 'Hito 4' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800'}">${p.hito}</span>` : ''}
         </div>
         <div class="flex items-center gap-2">
-          <span class="px-2.5 py-0.5 rounded text-[11px] font-semibold ${badgeClass}">${badgeText}</span>
+          <span class="px-3 py-1 rounded-full text-[11px] font-bold ${badgeClass}">${badgeText}</span>
         </div>
       </div>
 
       <div class="text-[11px] text-slate-500 font-medium">
-        Diagnóstico conceptual: <span class="text-slate-700">${qData.detail}</span>
+        Diagnóstico conceptual: <span class="text-slate-800 font-semibold">${qData.detail}</span>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200/80">
-          <span class="text-[10px] font-bold text-slate-500 block uppercase tracking-wide mb-1">Respuesta PRE (Inicial):</span>
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+          <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wide mb-1">Respuesta PRE (Inicial):</span>
           <p class="text-slate-700 italic">${qData.pre_text && qData.pre_text.trim() ? '"' + qData.pre_text + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta o no sabe)</span>'}</p>
         </div>
-        <div class="bg-emerald-50/30 p-3 rounded-lg border border-emerald-100">
-          <span class="text-[10px] font-bold text-emerald-800 block uppercase tracking-wide mb-1">Respuesta POST (Final en terreno):</span>
+        <div class="bg-emerald-50/40 p-3.5 rounded-xl border border-emerald-100">
+          <span class="text-[10px] font-bold text-[#00a87e] block uppercase tracking-wide mb-1">Respuesta POST (Final en terreno):</span>
           <p class="text-slate-800 font-medium">${qData.post_text && qData.post_text.trim() ? '"' + qData.post_text + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta o no sabe)</span>'}</p>
         </div>
       </div>
@@ -1366,42 +1442,42 @@ function renderPedagogicalTab() {
 
   schools.forEach(s => {
     const card = document.createElement('div');
-    card.className = 'border border-slate-200 rounded-xl p-4 bg-white shadow-sm space-y-3';
+    card.className = 'border border-slate-100 rounded-2xl p-5 bg-white card-shadow space-y-3.5';
 
     let recomendacion = '';
-    let statusClass = 'bg-emerald-50 border-emerald-200 text-emerald-800';
+    let statusClass = 'bg-emerald-50 border-emerald-200 text-emerald-900';
 
     if (s.has_data === false || s.n === 0) {
       recomendacion = `<strong>Sin evaluaciones registradas en este hito:</strong> Este establecimiento no registra respuestas PRE ni POST para este desafío. Se sugiere coordinar directamente con el profesor/a líder (<strong>${s.lider1 || 'Coordinador'}</strong>) para verificar la ejecución de la actividad en terreno o aplicar la evaluación de manera diferida.`;
-      statusClass = 'bg-amber-50 border-amber-200 text-amber-900';
+      statusClass = 'bg-amber-50 border-amber-200 text-amber-950';
     } else if (s.delta_avg > 0.7) {
       recomendacion = `<strong>Consolidación e Ideación:</strong> Este equipo demostró una comprensión sobresaliente de los conceptos de la intervención (+${s.delta_avg} pts). Se sugiere a la líder <strong>${s.lider1 || 'Docente Líder'}</strong> canalizar este entusiasmo directamente hacia la etapa de ideación (ej. iniciativas escolares de protección de cielos oscuros o conservación de la biodiversidad local).`;
-      statusClass = 'bg-emerald-50 border-emerald-200 text-emerald-800';
+      statusClass = 'bg-emerald-50 border-emerald-200 text-emerald-950';
     } else if (s.delta_avg >= 0.2) {
       recomendacion = `<strong>Refuerzo de conceptos intermedios:</strong> El equipo tiene una asimilación positiva pero heterogénea (+${s.delta_avg} pts). Se recomienda a la líder <strong>${s.lider1 || 'Docente Líder'}</strong> realizar un plenario corto de 15 minutos repasando las diferencias conceptuales clave, antes de pasar a la etapa de ideación.`;
-      statusClass = 'bg-amber-50 border-amber-200 text-amber-800';
+      statusClass = 'bg-amber-50 border-amber-200 text-amber-950';
     } else {
       recomendacion = `<strong>Atención a 'Efecto Techo' y Distractores:</strong> El puntaje basal fue muy elevado o se registraron confusiones sutiles en las opciones cerradas (${s.delta_avg} pts). No interpretar esto como falta de aprendizaje: cualitativamente los estudiantes manejan la terminología. Se aconseja pedirles que expliquen con sus propias palabras el impacto en la fauna local para afianzar la seguridad en sus conocimientos antes de la etapa de ideación.`;
       statusClass = 'bg-slate-50 border-slate-200 text-slate-800';
     }
 
     card.innerHTML = `
-      <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
         <div>
-          <h4 class="font-bold text-slate-900 text-sm">${s.school}</h4>
-          <span class="text-[11px] text-slate-600 font-medium">Líder: ${s.lider1 || 'Coordinador del equipo'} ${s.lider2 ? '/ ' + s.lider2 : ''}</span>
+          <h4 class="font-extrabold text-slate-900 text-sm">${s.school}</h4>
+          <span class="text-[11px] text-slate-500 font-medium">Líder: ${s.lider1 || 'Coordinador del equipo'} ${s.lider2 ? '/ ' + s.lider2 : ''}</span>
         </div>
         <div class="text-right">
           ${s.has_data !== false ? `
-            <span class="text-xs font-bold ${s.delta_avg >= 0 ? 'text-emerald-600' : 'text-rose-600'}">Delta: ${s.delta_avg >= 0 ? '+' : ''}${s.delta_avg}</span>
-            <div class="text-[10px] text-slate-400">${s.pct_mejora}% mejoró</div>
+            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${s.delta_avg >= 0 ? 'bg-[#00d09c]/15 text-[#00a87e]' : 'bg-rose-50 text-rose-600'}">Delta: ${s.delta_avg >= 0 ? '+' : ''}${s.delta_avg}</span>
+            <div class="text-[10px] text-slate-400 font-medium mt-0.5">${s.pct_mejora}% mejoró</div>
           ` : `
-            <span class="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">Sin datos</span>
+            <span class="text-xs font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full">Sin datos</span>
           `}
         </div>
       </div>
 
-      <div class="p-3 rounded-lg border text-xs leading-relaxed ${statusClass}">
+      <div class="p-3.5 rounded-xl border text-xs leading-relaxed ${statusClass}">
         ${recomendacion}
       </div>
 
@@ -1425,31 +1501,31 @@ function renderParticipantsTab() {
 
   filtered.forEach((p, idx) => {
     const tr = document.createElement('tr');
-    tr.className = 'hover:bg-slate-50/80 transition cursor-pointer';
+    tr.className = 'hover:bg-slate-50/70 transition cursor-pointer';
     tr.onclick = () => openModal(p);
 
     const deltaSign = p.delta >= 0 ? '+' : '';
     const badgeClass = p.status === 'Mejoró' ? 'badge-improved' : (p.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained');
 
     const hitoBadge = isGlobal ? 
-      `<span class="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-semibold ${p.hito === 'Hito 4' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800'}">${p.hito}</span>` : '';
+      `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold ${p.hito === 'Hito 4' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800'}">${p.hito}</span>` : '';
 
     tr.innerHTML = `
-      <td class="py-3 px-4 font-semibold text-slate-900 flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full ${p.gender === 'Femenino' ? 'bg-pink-400' : 'bg-blue-400'}"></span>
+      <td class="py-3.5 px-4 font-bold text-slate-900 flex items-center gap-2.5">
+        <span class="w-2.5 h-2.5 rounded-full ${p.gender === 'Femenino' ? 'bg-pink-400' : 'bg-blue-400'}"></span>
         ${p.name}
       </td>
-      <td class="py-3 px-3 text-slate-600">${p.school} ${hitoBadge}</td>
-      <td class="py-3 px-3 text-slate-500 text-[11px]">${p.gender}</td>
-      <td class="py-3 px-3 text-center text-slate-600 font-medium">${p.pre_score} / 5</td>
-      <td class="py-3 px-3 text-center text-emerald-700 font-bold">${p.post_score} / 5</td>
-      <td class="py-3 px-3 text-center font-bold ${p.delta >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${deltaSign}${p.delta}</td>
-      <td class="py-3 px-3 text-center">
-        <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${badgeClass}">${p.status}</span>
-        <div class="text-[10px] text-slate-500 mt-0.5 font-medium">${p.real_status || ''}</div>
+      <td class="py-3.5 px-3 text-slate-600 font-medium">${p.school} ${hitoBadge}</td>
+      <td class="py-3.5 px-3 text-slate-500 text-[11px]">${p.gender}</td>
+      <td class="py-3.5 px-3 text-center text-slate-600 font-medium">${p.pre_score} / 5</td>
+      <td class="py-3.5 px-3 text-center text-[#00a87e] font-bold">${p.post_score} / 5</td>
+      <td class="py-3.5 px-3 text-center font-bold ${p.delta >= 0 ? 'text-[#00a87e]' : 'text-rose-600'}">${deltaSign}${p.delta}</td>
+      <td class="py-3.5 px-3 text-center">
+        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${badgeClass}">${p.status}</span>
+        <div class="text-[10px] text-slate-400 mt-0.5 font-medium">${p.real_status || ''}</div>
       </td>
-      <td class="py-3 px-4 text-center">
-        <button onclick="event.stopPropagation(); openModal(window.currentFiltered[${idx}])" class="px-2.5 py-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-md border border-emerald-200 transition">
+      <td class="py-3.5 px-4 text-center">
+        <button onclick="event.stopPropagation(); openModal(window.currentFiltered[${idx}])" class="px-3.5 py-1 text-xs font-bold text-slate-900 bg-[#00d09c] hover:bg-[#00bfa5] rounded-full transition shadow-sm">
           Ver Ficha
         </button>
       </td>
@@ -1479,7 +1555,7 @@ function openModal(p) {
 
   const badgeEl = document.getElementById('modal-status-badge');
   badgeEl.innerText = p.status;
-  badgeEl.className = `mt-1 inline-block font-semibold px-2 py-0.5 rounded text-[11px] ${p.status === 'Mejoró' ? 'badge-improved' : (p.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}`;
+  badgeEl.className = `mt-1 inline-block font-bold px-3 py-0.5 rounded-full text-[11px] ${p.status === 'Mejoró' ? 'badge-improved' : (p.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}`;
 
   // Multiple choice questions list
   const mcList = document.getElementById('modal-mc-list');
@@ -1491,19 +1567,19 @@ function openModal(p) {
     const isCorrectPost = p.post_mc[idx] === key[idx].toLowerCase();
     const isCorrectPre = p.pre_mc[idx] === key[idx].toLowerCase();
 
-    qRow.className = `p-2.5 rounded-lg border text-xs flex items-center justify-between ${isCorrectPost ? 'bg-emerald-50/60 border-emerald-200' : 'bg-rose-50/40 border-rose-200'}`;
+    qRow.className = `p-3.5 rounded-2xl border text-xs flex items-center justify-between ${isCorrectPost ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/40 border-rose-200'}`;
 
     qRow.innerHTML = `
       <div class="space-y-0.5 max-w-[70%]">
         <span class="font-bold text-slate-800">Q${idx + 1}: ${questionsMeta[idx].title}</span>
         <div class="text-[11px] text-slate-500">
-          Respuesta PRE: <span class="font-bold ${isCorrectPre ? 'text-emerald-700' : 'text-slate-700'}">${p.pre_mc[idx].toUpperCase() || 'N/A'}</span> ➔ 
-          Respuesta POST: <span class="font-bold ${isCorrectPost ? 'text-emerald-700' : 'text-rose-600'}">${p.post_mc[idx].toUpperCase() || 'N/A'}</span>
-          <span class="text-slate-400">(Correcta: ${key[idx]})</span>
+          Respuesta PRE: <span class="font-bold ${isCorrectPre ? 'text-[#00a87e]' : 'text-slate-700'}">${p.pre_mc[idx].toUpperCase() || 'N/A'}</span> ➔ 
+          Respuesta POST: <span class="font-bold ${isCorrectPost ? 'text-[#00a87e]' : 'text-rose-600'}">${p.post_mc[idx].toUpperCase() || 'N/A'}</span>
+          <span class="text-slate-400 font-medium">(Correcta: ${key[idx]})</span>
         </div>
       </div>
       <div>
-        <span class="text-[10px] font-bold px-2 py-0.5 rounded ${evo === 'Mejoró' ? 'bg-emerald-100 text-emerald-800' : (evo === 'Retrocedió' ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700')}">
+        <span class="text-[10px] font-bold px-3 py-1 rounded-full ${evo === 'Mejoró' ? 'bg-[#00d09c]/20 text-[#00a87e]' : (evo === 'Retrocedió' ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700')}">
           ${evo}
         </span>
       </div>
@@ -1517,7 +1593,7 @@ function openModal(p) {
 
   p.open_analysis.forEach((oq) => {
     const oRow = document.createElement('div');
-    oRow.className = 'p-3 rounded-lg border border-slate-200 bg-slate-50 space-y-2';
+    oRow.className = 'p-4 rounded-2xl border border-slate-100 bg-slate-50/70 space-y-2.5';
 
     let oBadge = 'badge-maintained';
     if (oq.status === 'Mejoró') oBadge = 'badge-improved';
@@ -1525,21 +1601,21 @@ function openModal(p) {
     else if (oq.status === 'Sin Evidencia') oBadge = 'bg-slate-100 text-slate-600 border border-slate-300';
 
     const reviewTag = oq.requires_review ? 
-      `<div class="text-[10px] text-amber-800 bg-amber-50 p-1.5 rounded border border-amber-200 font-medium">⚠️ Sin evidencia en texto: Requiere revisión individual con el profesor/a líder.</div>` : '';
+      `<div class="text-[10px] text-amber-800 bg-amber-50 p-2 rounded-xl border border-amber-200 font-medium">⚠️ Sin evidencia en texto: Requiere revisión individual con el profesor/a líder.</div>` : '';
 
     oRow.innerHTML = `
       <div class="flex items-center justify-between">
         <span class="font-bold text-slate-800 text-xs">${oq.question}</span>
-        <span class="text-[10px] font-semibold px-2 py-0.5 rounded ${oBadge}">${oq.status}</span>
+        <span class="text-[10px] font-bold px-3 py-0.5 rounded-full ${oBadge}">${oq.status}</span>
       </div>
       <div class="text-[10px] text-slate-500 font-medium">${oq.detail}</div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-        <div class="bg-white p-2.5 rounded border border-slate-200">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+        <div class="bg-white p-3 rounded-xl border border-slate-200">
           <span class="text-[10px] font-bold text-slate-400 block uppercase">PRE:</span>
           <p class="italic text-slate-700">${oq.pre_text && oq.pre_text.trim() ? '"' + oq.pre_text + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta)</span>'}</p>
         </div>
-        <div class="bg-white p-2.5 rounded border border-emerald-200">
-          <span class="text-[10px] font-bold text-emerald-700 block uppercase">POST:</span>
+        <div class="bg-white p-3 rounded-xl border border-emerald-200">
+          <span class="text-[10px] font-bold text-[#00a87e] block uppercase">POST:</span>
           <p class="font-medium text-slate-800">${oq.post_text && oq.post_text.trim() ? '"' + oq.post_text + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta)</span>'}</p>
         </div>
       </div>

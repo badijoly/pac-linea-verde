@@ -26,64 +26,72 @@
       background-color: #cbd5e1;
       border-radius: 4px;
     }
-    .badge-improved { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .badge-improved { background-color: #e6faf5; color: #00a87e; border: 1px solid #a7f3d0; }
     .badge-maintained { background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
-    .badge-regressed { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+    .badge-regressed { background-color: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; }
+    .card-shadow {
+      box-shadow: 0 12px 30px -6px rgba(10, 22, 34, 0.15), 0 4px 10px -3px rgba(10, 22, 34, 0.08);
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="bg-[#112231] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#193248] via-[#112231] to-[#0a1622] text-slate-800 min-h-screen flex flex-col antialiased">
 
   <!-- TOP NAVBAR -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-4">
+  <header class="bg-[#0c1824]/90 backdrop-blur-md border-b border-white/10 sticky top-0 z-40 shadow-xl shadow-black/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <!-- Logo oficial del Programa de Acción Climática -->
-        <img src="logo.png" alt="Programa de Acción Climática" class="h-12 w-auto object-contain py-0.5">
-        <div class="border-l border-slate-200 pl-3">
+        <div class="bg-white/95 p-1 rounded-2xl shadow-md border border-white/20">
+          <img src="logo.png" alt="Programa de Acción Climática" class="h-10 w-auto object-contain">
+        </div>
+        <div class="border-l border-white/15 pl-3">
           <div class="flex items-center gap-2">
-            <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Evaluación de Aprendizajes · Línea Verde</h1>
-            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">PAC 2026</span>
+            <h1 class="text-base sm:text-lg font-bold text-white tracking-tight">Evaluación de Aprendizajes · Línea Verde</h1>
+            <span class="text-xs font-bold px-3 py-0.5 rounded-full bg-[#00d09c]/20 text-[#00d09c] border border-[#00d09c]/30 shadow-sm">PAC 2026</span>
           </div>
         </div>
       </div>
 
       <!-- Action buttons y File Sync Status -->
       <div class="flex items-center gap-2.5 flex-wrap">
-        <div id="sync-status" class="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <div id="sync-status" class="flex items-center gap-2 text-xs text-slate-300 bg-white/5 px-3.5 py-1.5 rounded-full border border-white/10">
+          <span class="w-2 h-2 rounded-full bg-[#00d09c] animate-pulse"></span>
           <span id="sync-text">Cargando datos...</span>
         </div>
 
-        <button id="btn-reload" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 active:bg-slate-100 transition shadow-sm" title="Recargar datos">
+        <button id="btn-reload" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium text-white bg-white/10 border border-white/15 rounded-full hover:bg-white/20 active:bg-white/25 transition shadow-sm" title="Recargar datos">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
           <span>Actualizar</span>
         </button>
       </div>
     </div>
 
-    <!-- MAIN TABS NAVIGATION -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-100 flex gap-1 overflow-x-auto custom-scrollbar">
-      <button onclick="switchTab('resumen')" class="nav-tab active-tab flex items-center gap-2 py-3 px-3.5 text-sm font-semibold border-b-2 border-emerald-600 text-emerald-700 whitespace-nowrap" id="tab-btn-resumen">
+    <!-- MAIN TABS NAVIGATION (Pill Style) -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-white/10 py-2.5 flex gap-2 overflow-x-auto custom-scrollbar">
+      <button onclick="switchTab('resumen')" class="nav-tab active-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-[#00d09c] text-slate-950 shadow-md shadow-teal-500/20 whitespace-nowrap transition" id="tab-btn-resumen">
         <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
         <span>Resumen Ejecutivo</span>
       </button>
-      <button onclick="switchTab('establecimientos')" class="nav-tab flex items-center gap-2 py-3 px-3.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap" id="tab-btn-establecimientos">
+      <button onclick="switchTab('establecimientos')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition" id="tab-btn-establecimientos">
         <i data-lucide="school" class="w-4 h-4"></i>
         <span>Por Establecimiento</span>
       </button>
-      <button onclick="switchTab('preguntas')" class="nav-tab flex items-center gap-2 py-3 px-3.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap" id="tab-btn-preguntas">
+      <button onclick="switchTab('preguntas')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition" id="tab-btn-preguntas">
         <i data-lucide="help-circle" class="w-4 h-4"></i>
         <span>Preguntas y Distractores</span>
       </button>
-      <button onclick="switchTab('cualitativo')" class="nav-tab flex items-center gap-2 py-3 px-3.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap" id="tab-btn-cualitativo">
+      <button onclick="switchTab('cualitativo')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition" id="tab-btn-cualitativo">
         <i data-lucide="message-square-text" class="w-4 h-4"></i>
         <span>Análisis Cualitativo</span>
       </button>
-      <button onclick="switchTab('pedagogico')" class="nav-tab flex items-center gap-2 py-3 px-3.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap" id="tab-btn-pedagogico">
+      <button onclick="switchTab('pedagogico')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition" id="tab-btn-pedagogico">
         <i data-lucide="lightbulb" class="w-4 h-4"></i>
         <span>Casos Críticos y Orientaciones</span>
       </button>
-      <button onclick="switchTab('participantes')" class="nav-tab flex items-center gap-2 py-3 px-3.5 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-900 whitespace-nowrap" id="tab-btn-participantes">
+      <button onclick="switchTab('participantes')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition" id="tab-btn-participantes">
         <i data-lucide="users" class="w-4 h-4"></i>
         <span>Fichas Individuales</span>
       </button>
@@ -91,36 +99,36 @@
   </header>
 
   <!-- FILTER CONTROLS BAR -->
-  <div class="bg-white border-b border-slate-200 py-3 px-4 sm:px-6 lg:px-8 shadow-sm">
+  <div class="bg-[#0e1d2c]/85 backdrop-blur-md border-b border-white/10 py-3 px-4 sm:px-6 lg:px-8 shadow-md">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
       
       <!-- Hito selection pills -->
-      <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
-        <button onclick="setHito('Hito 4')" id="btn-hito-4" class="px-3 py-1.5 rounded-lg font-semibold bg-white text-emerald-800 shadow-sm transition">
+      <div class="flex items-center gap-1 bg-[#07131e] p-1 rounded-full border border-white/10">
+        <button onclick="setHito('Hito 4')" id="btn-hito-4" class="px-4 py-1.5 rounded-full text-xs font-bold bg-[#00d09c] text-slate-950 shadow-md shadow-teal-500/20 transition">
           Hito 4: Escudo Invisible
         </button>
-        <button onclick="setHito('Hito 3')" id="btn-hito-3" class="px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition">
+        <button onclick="setHito('Hito 3')" id="btn-hito-3" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:text-white transition">
           Hito 3: Otros Vecinos
         </button>
-        <button onclick="setHito('Global')" id="btn-hito-global" class="px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition">
+        <button onclick="setHito('Global')" id="btn-hito-global" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:text-white transition">
           Resumen Global
         </button>
       </div>
 
-      <!-- Filters: School, Gender, Status -->
+      <!-- Filters: School, Gender, Status, Search -->
       <div class="flex items-center gap-2 flex-wrap">
         <!-- School Select -->
         <div class="flex items-center gap-1.5">
-          <label class="text-slate-500 font-medium">Colegio:</label>
-          <select id="filter-school" onchange="applyFilters()" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500">
+          <label class="text-slate-400 font-medium">Colegio:</label>
+          <select id="filter-school" onchange="applyFilters()" class="bg-[#152739] border border-white/15 rounded-full px-3.5 py-1.5 text-xs text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#00d09c]">
             <option value="ALL">Todos los Establecimientos</option>
           </select>
         </div>
 
         <!-- Gender Select -->
         <div class="flex items-center gap-1.5">
-          <label class="text-slate-500 font-medium">Género:</label>
-          <select id="filter-gender" onchange="applyFilters()" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500">
+          <label class="text-slate-400 font-medium">Género:</label>
+          <select id="filter-gender" onchange="applyFilters()" class="bg-[#152739] border border-white/15 rounded-full px-3.5 py-1.5 text-xs text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#00d09c]">
             <option value="ALL">Todos los Géneros</option>
             <option value="Femenino">Femenino</option>
             <option value="Masculino">Masculino</option>
@@ -129,8 +137,8 @@
 
         <!-- Status Select -->
         <div class="flex items-center gap-1.5">
-          <label class="text-slate-500 font-medium">Evolución:</label>
-          <select id="filter-status" onchange="applyFilters()" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500">
+          <label class="text-slate-400 font-medium">Evolución:</label>
+          <select id="filter-status" onchange="applyFilters()" class="bg-[#152739] border border-white/15 rounded-full px-3.5 py-1.5 text-xs text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#00d09c]">
             <option value="ALL">Todos los estados</option>
             <option value="Mejoró">Mejoró (+pts)</option>
             <option value="Mantuvo">Mantuvo (0 pts)</option>
@@ -140,8 +148,8 @@
 
         <!-- Search Input -->
         <div class="relative">
-          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400"></i>
-          <input type="text" id="filter-search" oninput="applyFilters()" placeholder="Buscar participante..." class="pl-8 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 w-44">
+          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-2 text-slate-400"></i>
+          <input type="text" id="filter-search" oninput="applyFilters()" placeholder="Buscar participante..." class="pl-8 pr-3.5 py-1.5 bg-[#152739] border border-white/15 rounded-full text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00d09c] w-48">
         </div>
       </div>
 
@@ -149,71 +157,115 @@
   </div>
 
   <!-- MAIN CONTENT AREA -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
 
     <!-- 1. TAB: RESUMEN EJECUTIVO -->
     <section id="view-resumen" class="tab-view space-y-6">
+      
       <!-- Challenge banner -->
-      <div id="banner-desafio" class="p-4 rounded-2xl bg-gradient-to-r from-emerald-800 to-teal-900 text-white shadow-md flex items-center justify-between">
+      <div id="banner-desafio" class="p-6 rounded-3xl bg-gradient-to-r from-[#152a3d] via-[#103042] to-[#0c2434] border border-teal-500/25 text-white card-shadow flex flex-wrap items-center justify-between gap-4">
         <div>
-          <span class="text-xs uppercase tracking-wider text-emerald-300 font-semibold">Desafío Territorial Seleccionado</span>
-          <h2 id="banner-title" class="text-xl font-bold mt-0.5">Proteger nuestro escudo invisible (Hito 4)</h2>
-          <p id="banner-desc" class="text-xs text-emerald-100/90 mt-1 max-w-3xl">
+          <span class="text-xs uppercase tracking-wider text-[#00d09c] font-bold">Desafío Territorial Seleccionado</span>
+          <h2 id="banner-title" class="text-xl sm:text-2xl font-extrabold text-white mt-1">Proteger nuestro escudo invisible (Hito 4)</h2>
+          <p id="banner-desc" class="text-xs text-slate-300 mt-1.5 max-w-3xl leading-relaxed">
             Evaluación del aprendizaje sobre la atmósfera como regulador climático, la contaminación lumínica en Antofagasta, la protección del cielo oscuro para la astronomía mundial y la fauna costera.
           </p>
         </div>
-        <div class="hidden md:flex items-center gap-2 bg-white/10 px-4 py-2.5 rounded-xl backdrop-blur-sm border border-white/10">
-          <i data-lucide="award" class="w-6 h-6 text-emerald-300"></i>
+        <div class="flex items-center gap-3 bg-[#00d09c]/10 border border-[#00d09c]/30 px-5 py-3 rounded-2xl backdrop-blur-sm">
+          <i data-lucide="award" class="w-7 h-7 text-[#00d09c]"></i>
           <div>
-            <div class="text-[10px] uppercase text-emerald-200 font-medium">Ganancia Normalizada (Hake)</div>
-            <div id="kpi-hake-val" class="text-lg font-extrabold text-white">g = +0.255</div>
+            <div class="text-[10px] uppercase text-emerald-200 font-semibold tracking-wider">Ganancia Normalizada (Hake)</div>
+            <div id="kpi-hake-val" class="text-xl font-extrabold text-white">g = +0.255</div>
           </div>
         </div>
       </div>
 
       <!-- KPI METRIC CARDS -->
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Muestra Evaluada</div>
-          <div id="kpi-n" class="text-2xl font-bold text-slate-900 mt-1">61</div>
-          <div class="text-[11px] text-slate-500 mt-1">Participantes con PRE y POST</div>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <!-- KPI 1 -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between hover:translate-y-[-2px] transition duration-200">
+          <div>
+            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Muestra Evaluada</div>
+            <div id="kpi-n" class="text-3xl font-extrabold text-slate-900 tracking-tight mt-1.5">61</div>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <span>PRE y POST pareados</span>
+            <span class="w-2 h-2 rounded-full bg-[#00d09c]"></span>
+          </div>
         </div>
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Promedio PRE</div>
-          <div id="kpi-pre" class="text-2xl font-bold text-slate-700 mt-1">2.82 <span class="text-xs font-normal text-slate-400">/ 5</span></div>
-          <div class="text-[11px] text-slate-500 mt-1">Nivel basal (56.4%)</div>
+
+        <!-- KPI 2 -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between hover:translate-y-[-2px] transition duration-200">
+          <div>
+            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Promedio PRE</div>
+            <div id="kpi-pre" class="text-3xl font-extrabold text-slate-700 tracking-tight mt-1.5">2.82 <span class="text-xs font-normal text-slate-400">/ 5</span></div>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <span>Basal (56.4%)</span>
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div class="w-[56%] h-full bg-slate-400 rounded-full"></div>
+            </div>
+          </div>
         </div>
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Promedio POST</div>
-          <div id="kpi-post" class="text-2xl font-bold text-emerald-600 mt-1">3.51 <span class="text-xs font-normal text-slate-400">/ 5</span></div>
-          <div class="text-[11px] text-emerald-700 font-medium mt-1">Nivel final (70.2%)</div>
+
+        <!-- KPI 3 -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between hover:translate-y-[-2px] transition duration-200">
+          <div>
+            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Promedio POST</div>
+            <div id="kpi-post" class="text-3xl font-extrabold text-[#00a87e] tracking-tight mt-1.5">3.51 <span class="text-xs font-normal text-slate-400">/ 5</span></div>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-[#00a87e] font-semibold">
+            <span>Final (70.2%)</span>
+            <div class="w-12 h-1.5 bg-emerald-100 rounded-full overflow-hidden">
+              <div class="w-[70%] h-full bg-[#00d09c] rounded-full"></div>
+            </div>
+          </div>
         </div>
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Variación Neta</div>
-          <div id="kpi-delta" class="text-2xl font-bold text-emerald-600 mt-1">+0.69</div>
-          <div class="text-[11px] text-emerald-700 font-medium mt-1">+24.5% incremento relativo</div>
+
+        <!-- KPI 4 -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between hover:translate-y-[-2px] transition duration-200">
+          <div>
+            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Variación Neta</div>
+            <div id="kpi-delta" class="text-3xl font-extrabold text-[#00a87e] tracking-tight mt-1.5">+0.69</div>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-[#00a87e] font-semibold">
+            <span>+24.5% incremento</span>
+            <span class="text-xs">↗</span>
+          </div>
         </div>
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Tasa de Mejora</div>
-          <div id="kpi-pct-mejora" class="text-2xl font-bold text-emerald-700 mt-1">54.1%</div>
-          <div id="kpi-count-mejora" class="text-[11px] text-slate-500 mt-1">33 participantes subieron</div>
+
+        <!-- KPI 5 -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between hover:translate-y-[-2px] transition duration-200">
+          <div>
+            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tasa de Mejora</div>
+            <div id="kpi-pct-mejora" class="text-3xl font-extrabold text-[#00a87e] tracking-tight mt-1.5">54.1%</div>
+          </div>
+          <div id="kpi-count-mejora" class="mt-3 pt-2.5 border-t border-slate-100 text-[11px] text-slate-500">
+            33 participantes subieron
+          </div>
         </div>
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Estancados / Menor</div>
-          <div id="kpi-pct-estancados" class="text-2xl font-bold text-amber-600 mt-1">45.9%</div>
-          <div id="kpi-count-estancados" class="text-[11px] text-slate-500 mt-1">15 mantuvieron, 13 bajaron</div>
+
+        <!-- KPI 6 -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between hover:translate-y-[-2px] transition duration-200">
+          <div>
+            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Estancados / Menor</div>
+            <div id="kpi-pct-estancados" class="text-3xl font-extrabold text-amber-600 tracking-tight mt-1.5">45.9%</div>
+          </div>
+          <div id="kpi-count-estancados" class="mt-3 pt-2.5 border-t border-slate-100 text-[11px] text-slate-500">
+            15 mantuvieron, 13 bajaron
+          </div>
         </div>
       </div>
 
       <!-- CHARTS ROW 1 -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Distribution Donut Chart -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between">
           <div>
-            <h3 class="font-bold text-slate-900 text-sm">Distribución de Resultados de Aprendizaje</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Clasificación según variación de puntaje PRE vs POST</p>
+            <h3 class="font-bold text-slate-900 text-base">Distribución de Resultados</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Clasificación según variación de puntaje PRE vs POST</p>
           </div>
-          <div class="h-64 my-auto flex items-center justify-center">
+          <div class="h-64 my-auto flex items-center justify-center relative">
             <canvas id="chart-status-donut"></canvas>
           </div>
           <div id="legend-status" class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 text-center text-xs">
@@ -222,18 +274,18 @@
         </div>
 
         <!-- Question Accuracy Comparison Bar Chart -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col justify-between">
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow lg:col-span-2 flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="font-bold text-slate-900 text-sm">Evolución de Aciertos por Pregunta (% Correctas)</h3>
-              <p class="text-xs text-slate-500 mt-0.5">Comparativa directa antes (PRE) y después (POST) de la actividad en terreno</p>
+              <h3 class="font-bold text-slate-900 text-base">Evolución de Aciertos por Pregunta (% Correctas)</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Comparativa directa antes (PRE) y después (POST) de la actividad en terreno</p>
             </div>
-            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">5 Ítems Evaluados</span>
+            <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-[#00a87e] border border-emerald-200">5 Ítems Evaluados</span>
           </div>
           <div class="h-64 my-auto">
             <canvas id="chart-questions-bar"></canvas>
           </div>
-          <div class="text-[11px] text-slate-500 pt-2 border-t border-slate-100 flex items-center justify-between">
+          <div class="text-[11px] text-slate-500 pt-3 border-t border-slate-100 flex items-center justify-between">
             <span>* Mayores saltos conceptuales: Q3 (Oscuridad natural +27.8%) y Q4 (Luz hacia el cielo +26.2%)</span>
           </div>
         </div>
@@ -242,12 +294,10 @@
       <!-- CHARTS ROW 2: Por Escuela y Por Género -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Schools Delta Bar Chart -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <h3 class="font-bold text-slate-900 text-sm">Impacto Pedagógico por Establecimiento (Delta Promedio)</h3>
-              <p class="text-xs text-slate-500 mt-0.5">Ganancia neta en puntos obtenida por cada colegio participante</p>
-            </div>
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between">
+          <div class="mb-4">
+            <h3 class="font-bold text-slate-900 text-base">Impacto Pedagógico por Establecimiento (Delta Promedio)</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Ganancia neta en puntos obtenida por cada colegio participante</p>
           </div>
           <div class="h-64">
             <canvas id="chart-schools-delta"></canvas>
@@ -255,12 +305,10 @@
         </div>
 
         <!-- Gender Comparison -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <h3 class="font-bold text-slate-900 text-sm">Evolución Diferenciada por Género</h3>
-              <p class="text-xs text-slate-500 mt-0.5">Puntajes basales y finales según género de los participantes</p>
-            </div>
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between">
+          <div class="mb-4">
+            <h3 class="font-bold text-slate-900 text-base">Evolución Diferenciada por Género</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Puntajes basales y finales según género de los participantes</p>
           </div>
           <div class="h-64">
             <canvas id="chart-gender-comparison"></canvas>
@@ -271,14 +319,14 @@
 
     <!-- 2. TAB: POR ESTABLECIMIENTO -->
     <section id="view-establecimientos" class="tab-view hidden space-y-6">
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+      <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
           <div>
-            <h3 class="font-bold text-slate-900 text-base">Desempeño y Directorio de Establecimientos Educacionales</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Resultados desagregados, dependencia institucional y profesores líderes a cargo</p>
+            <h3 class="font-bold text-slate-900 text-lg">Desempeño y Directorio de Establecimientos Educacionales</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Resultados desagregados, dependencia institucional y profesores líderes a cargo</p>
           </div>
           <div class="flex items-center gap-2">
-            <button onclick="exportSchoolsTable()" class="px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center gap-1.5 transition">
+            <button onclick="exportSchoolsTable()" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center gap-1.5 transition shadow-sm">
               <i data-lucide="download" class="w-3.5 h-3.5"></i>
               <span>Exportar CSV</span>
             </button>
@@ -287,17 +335,17 @@
 
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs">
-            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b border-slate-200">
+            <thead class="bg-slate-50 text-slate-500 uppercase font-bold text-[11px] tracking-wider border-b border-slate-100">
               <tr>
-                <th class="py-3 px-4">Establecimiento</th>
-                <th class="py-3 px-3">Dependencia</th>
-                <th class="py-3 px-3 text-center">N° Eval.</th>
-                <th class="py-3 px-3 text-center">Puntaje PRE</th>
-                <th class="py-3 px-3 text-center">Puntaje POST</th>
-                <th class="py-3 px-3 text-center">Variación (Delta)</th>
-                <th class="py-3 px-3 text-center">% Mejora</th>
-                <th class="py-3 px-3">Distribución</th>
-                <th class="py-3 px-4">Profesor/a Líder</th>
+                <th class="py-3.5 px-4 rounded-l-xl">Establecimiento</th>
+                <th class="py-3.5 px-3">Dependencia</th>
+                <th class="py-3.5 px-3 text-center">N° Eval.</th>
+                <th class="py-3.5 px-3 text-center">Puntaje PRE</th>
+                <th class="py-3.5 px-3 text-center">Puntaje POST</th>
+                <th class="py-3.5 px-3 text-center">Variación (Delta)</th>
+                <th class="py-3.5 px-3 text-center">% Mejora</th>
+                <th class="py-3.5 px-3">Distribución</th>
+                <th class="py-3.5 px-4 rounded-r-xl">Profesor/a Líder</th>
               </tr>
             </thead>
             <tbody id="schools-table-body" class="divide-y divide-slate-100">
@@ -310,10 +358,10 @@
 
     <!-- 3. TAB: PREGUNTAS Y DISTRACTORES -->
     <section id="view-preguntas" class="tab-view hidden space-y-6">
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <div class="mb-4">
-          <h3 class="font-bold text-slate-900 text-base">Matriz de Preguntas Cerradas y Análisis de Distractores</h3>
-          <p class="text-xs text-slate-500 mt-0.5">Evaluación detallada de la asimilación conceptual y alternativas erróneas más frecuentes</p>
+      <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow">
+        <div class="mb-5">
+          <h3 class="font-bold text-slate-900 text-lg">Matriz de Preguntas Cerradas y Análisis de Distractores</h3>
+          <p class="text-xs text-slate-400 mt-0.5">Evaluación detallada de la asimilación conceptual y alternativas erróneas más frecuentes</p>
         </div>
 
         <div id="questions-detail-container" class="space-y-4">
@@ -325,7 +373,7 @@
     <!-- 4. TAB: ANÁLISIS CUALITATIVO -->
     <section id="view-cualitativo" class="tab-view hidden space-y-6">
       <!-- Overview qualitative insight -->
-      <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-3">
+      <div class="p-5 rounded-3xl bg-amber-50 border border-amber-200/80 text-amber-950 text-xs flex items-start gap-3.5 card-shadow">
         <i data-lucide="info" class="w-5 h-5 text-amber-700 shrink-0 mt-0.5"></i>
         <div>
           <span class="font-bold text-sm block mb-1">Hallazgo Clave del Análisis Cualitativo de Discurso:</span>
@@ -333,14 +381,14 @@
         </div>
       </div>
 
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+      <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
           <div>
-            <h3 class="font-bold text-slate-900 text-base">Explorador de Respuestas Abiertas: PRE vs POST</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Comparativa directa de expresiones verbales de los participantes por pregunta temática</p>
+            <h3 class="font-bold text-slate-900 text-lg">Explorador de Respuestas Abiertas: PRE vs POST</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Comparativa directa de expresiones verbales de los participantes por pregunta temática</p>
           </div>
           <div class="flex items-center gap-2">
-            <select id="select-open-q" onchange="renderQualitativeTab()" class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-700 font-medium">
+            <select id="select-open-q" onchange="renderQualitativeTab()" class="bg-white border border-slate-200 rounded-full px-4 py-2 text-xs text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-[#00d09c] shadow-sm">
               <!-- Dynamically populated with open questions -->
             </select>
           </div>
@@ -355,20 +403,20 @@
     <!-- 5. TAB: CASOS CRÍTICOS Y ORIENTACIONES -->
     <section id="view-pedagogico" class="tab-view hidden space-y-6">
       <!-- Diagnostic header -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-white p-5 rounded-2xl border border-rose-200 bg-rose-50/30 shadow-sm">
-          <div class="flex items-center gap-2 text-rose-700 font-bold text-sm mb-2">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="bg-white p-6 rounded-3xl border border-rose-100 bg-rose-50/20 card-shadow">
+          <div class="flex items-center gap-2 text-rose-700 font-bold text-sm mb-2.5">
             <i data-lucide="alert-triangle" class="w-4 h-4"></i>
             <span>¿Por qué ocurren retrocesos?</span>
           </div>
-          <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside">
+          <ul class="text-xs text-slate-600 space-y-2 list-disc list-inside leading-relaxed">
             <li><strong>Efecto distractor atractivo:</strong> En el post-test, opciones con términos técnicos nuevos pero incorrectos atraen respuestas intuitivas.</li>
             <li><strong>Falso positivo en el pre-test:</strong> Estudiantes que acertaron al azar en el PRE y eligieron otra opción en el POST.</li>
           </ul>
         </div>
 
-        <div class="bg-white p-5 rounded-2xl border border-emerald-200 bg-emerald-50/30 shadow-sm">
-          <div class="flex items-center gap-2 text-emerald-800 font-bold text-sm mb-2">
+        <div class="bg-white p-6 rounded-3xl border border-emerald-100 bg-emerald-50/20 card-shadow">
+          <div class="flex items-center gap-2 text-[#00a87e] font-bold text-sm mb-2.5">
             <i data-lucide="check-circle-2" class="w-4 h-4"></i>
             <span>El valor del avance cualitativo</span>
           </div>
@@ -377,8 +425,8 @@
           </p>
         </div>
 
-        <div class="bg-white p-5 rounded-2xl border border-indigo-200 bg-indigo-50/30 shadow-sm">
-          <div class="flex items-center gap-2 text-indigo-800 font-bold text-sm mb-2">
+        <div class="bg-white p-6 rounded-3xl border border-indigo-100 bg-indigo-50/20 card-shadow">
+          <div class="flex items-center gap-2 text-indigo-800 font-bold text-sm mb-2.5">
             <i data-lucide="compass" class="w-4 h-4"></i>
             <span>Acción para Profesores Líderes</span>
           </div>
@@ -389,9 +437,9 @@
       </div>
 
       <!-- Specific Recommendations for Leaders Table -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <h3 class="font-bold text-slate-900 text-base mb-1">Recomendaciones Pedagógicas Personalizadas por Establecimiento</h3>
-        <p class="text-xs text-slate-500 mb-4">Pautas concretas para el profesor líder de cada escuela según los resultados de su equipo</p>
+      <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow">
+        <h3 class="font-bold text-slate-900 text-lg mb-1">Recomendaciones Pedagógicas Personalizadas por Establecimiento</h3>
+        <p class="text-xs text-slate-400 mb-5">Pautas concretas para el profesor líder de cada escuela según los resultados de su equipo</p>
 
         <div id="pedagogical-cards" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Dynamically populated via JS -->
@@ -401,11 +449,11 @@
 
     <!-- 6. TAB: FICHAS INDIVIDUALES DE PARTICIPANTES -->
     <section id="view-participantes" class="tab-view hidden space-y-6">
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+      <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
           <div>
-            <h3 class="font-bold text-slate-900 text-base">Fichas Individuales de Participantes</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Explora el rendimiento detallado de cada estudiante y haz clic para ver su expediente completo</p>
+            <h3 class="font-bold text-slate-900 text-lg">Fichas Individuales de Participantes</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Explora el rendimiento detallado de cada estudiante y haz clic para ver su expediente completo</p>
           </div>
           <div class="text-xs text-slate-500 font-medium">
             Mostrando <span id="participants-count-filtered" class="font-bold text-slate-800">0</span> participantes
@@ -414,16 +462,16 @@
 
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs">
-            <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b border-slate-200">
+            <thead class="bg-slate-50 text-slate-500 uppercase font-bold text-[11px] tracking-wider border-b border-slate-100">
               <tr>
-                <th class="py-3 px-4">Participante</th>
-                <th class="py-3 px-3">Establecimiento</th>
-                <th class="py-3 px-3">Género</th>
-                <th class="py-3 px-3 text-center">PRE</th>
-                <th class="py-3 px-3 text-center">POST</th>
-                <th class="py-3 px-3 text-center">Variación</th>
-                <th class="py-3 px-3 text-center">Estado</th>
-                <th class="py-3 px-4 text-center">Acción</th>
+                <th class="py-3.5 px-4 rounded-l-xl">Participante</th>
+                <th class="py-3.5 px-3">Establecimiento</th>
+                <th class="py-3.5 px-3">Género</th>
+                <th class="py-3.5 px-3 text-center">PRE</th>
+                <th class="py-3.5 px-3 text-center">POST</th>
+                <th class="py-3.5 px-3 text-center">Variación</th>
+                <th class="py-3.5 px-3 text-center">Estado</th>
+                <th class="py-3.5 px-4 text-center rounded-r-xl">Acción</th>
               </tr>
             </thead>
             <tbody id="participants-table-body" class="divide-y divide-slate-100">
@@ -437,13 +485,13 @@
   </main>
 
   <!-- MODAL: DETALLE INDIVIDUAL DE PARTICIPANTE -->
-  <div id="participant-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+  <div id="participant-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col card-shadow border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
       
       <!-- Modal Header -->
-      <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+      <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
         <div>
-          <span id="modal-role" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">Estudiante</span>
+          <span id="modal-role" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#00d09c]/15 text-[#00a87e] border border-[#00d09c]/30">Estudiante</span>
           <h3 id="modal-name" class="text-lg font-bold text-slate-900 mt-1">Nombre Participante</h3>
           <p id="modal-school" class="text-xs text-slate-500">Establecimiento Educacional</p>
         </div>
@@ -455,22 +503,22 @@
       <!-- Modal Body -->
       <div class="p-6 overflow-y-auto custom-scrollbar space-y-6 flex-1 text-xs">
         <!-- Scores summary -->
-        <div class="grid grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+        <div class="grid grid-cols-4 gap-3 bg-slate-50/80 p-4 rounded-2xl border border-slate-100 text-center">
           <div>
-            <div class="text-[10px] text-slate-500 font-semibold uppercase">Puntaje PRE</div>
-            <div id="modal-pre-score" class="text-xl font-bold text-slate-800 mt-0.5">3 / 5</div>
+            <div class="text-[10px] text-slate-400 font-bold uppercase">Puntaje PRE</div>
+            <div id="modal-pre-score" class="text-xl font-extrabold text-slate-800 mt-0.5">3 / 5</div>
           </div>
           <div>
-            <div class="text-[10px] text-slate-500 font-semibold uppercase">Puntaje POST</div>
-            <div id="modal-post-score" class="text-xl font-bold text-emerald-600 mt-0.5">4 / 5</div>
+            <div class="text-[10px] text-slate-400 font-bold uppercase">Puntaje POST</div>
+            <div id="modal-post-score" class="text-xl font-extrabold text-[#00a87e] mt-0.5">4 / 5</div>
           </div>
           <div>
-            <div class="text-[10px] text-slate-500 font-semibold uppercase">Diferencia</div>
-            <div id="modal-delta-score" class="text-xl font-bold text-emerald-600 mt-0.5">+1 pt</div>
+            <div class="text-[10px] text-slate-400 font-bold uppercase">Diferencia</div>
+            <div id="modal-delta-score" class="text-xl font-extrabold text-[#00a87e] mt-0.5">+1 pt</div>
           </div>
           <div>
-            <div class="text-[10px] text-slate-500 font-semibold uppercase">Condición</div>
-            <div id="modal-status-badge" class="mt-1 inline-block font-semibold px-2 py-0.5 rounded text-[11px] badge-improved">Mejoró</div>
+            <div class="text-[10px] text-slate-400 font-bold uppercase">Condición</div>
+            <div id="modal-status-badge" class="mt-1 inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] badge-improved">Mejoró</div>
           </div>
         </div>
 
@@ -493,7 +541,7 @@
 
       <!-- Modal Footer -->
       <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
-        <button onclick="closeModal()" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition shadow-sm">
+        <button onclick="closeModal()" class="px-5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-full hover:bg-slate-100 transition shadow-sm">
           Cerrar
         </button>
       </div>
@@ -502,15 +550,15 @@
   </div>
 
   <!-- FOOTER -->
-  <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col items-center justify-center space-y-2.5">
-      <div class="flex items-center justify-center">
-        <img src="logo_verdical.png" alt="Grupo Verdical" class="h-10 w-auto object-contain">
+  <footer class="bg-[#0a1622] border-t border-white/10 py-8 text-center text-xs text-slate-400 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col items-center justify-center space-y-3">
+      <div class="flex items-center justify-center bg-white/95 px-4 py-2 rounded-2xl shadow-md border border-white/20">
+        <img src="logo_verdical.png" alt="Grupo Verdical" class="h-9 w-auto object-contain">
       </div>
-      <div class="font-medium text-slate-600">
-        Herramienta desarrollada por <a href="mailto:rodolfo.tapia@verdical.cl" class="text-emerald-700 font-semibold hover:underline">rodolfo.tapia@verdical.cl</a> para <strong class="font-bold text-slate-800">Grupo Verdical SPA</strong>
+      <div class="font-medium text-slate-300">
+        Herramienta desarrollada por <a href="mailto:rodolfo.tapia@verdical.cl" class="text-[#00d09c] font-bold hover:underline">rodolfo.tapia@verdical.cl</a> para <strong class="font-bold text-white">Grupo Verdical SPA</strong>
       </div>
-      <div class="text-[11px] text-slate-400">
+      <div class="text-[11px] text-slate-500">
         Programa de Acción Climática (PAC) 2026 · Habilidades Verdes · Antofagasta, Chile
       </div>
     </div>
