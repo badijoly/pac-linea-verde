@@ -879,7 +879,7 @@ function switchTab(tabId) {
   const targetBtn = document.getElementById(`tab-btn-${tabId}`);
   if (targetView) targetView.classList.remove('hidden');
   if (targetBtn) {
-    targetBtn.className = 'nav-tab active-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-[#00d09c] text-slate-950 shadow-md shadow-teal-500/20 whitespace-nowrap transition';
+    targetBtn.className = 'nav-tab active-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-md shadow-lime-500/25 whitespace-nowrap transition';
   }
 
   updateUI();
@@ -900,7 +900,13 @@ function setHito(hito) {
 
   const activeBtn = hito === 'Hito 4' ? btn4 : (hito === 'Hito 3' ? btn3 : btnGlobal);
   if (activeBtn) {
-    activeBtn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-[#00d09c] text-slate-950 shadow-md shadow-teal-500/20 transition';
+    if (hito === 'Hito 4') {
+      activeBtn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-[#00ADBB] text-white shadow-md shadow-cyan-500/25 transition';
+    } else if (hito === 'Hito 3') {
+      activeBtn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-md shadow-lime-500/25 transition';
+    } else {
+      activeBtn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#88C23F] to-[#00ADBB] text-slate-950 shadow-md shadow-teal-500/25 transition';
+    }
   }
 
   updateUI();
@@ -963,6 +969,8 @@ function updateUI() {
 }
 
 function updateBanner() {
+  const bannerEl = document.getElementById('banner-desafio');
+  const tagEl = bannerEl ? bannerEl.querySelector('span') : null;
   const titleEl = document.getElementById('banner-title');
   const descEl = document.getElementById('banner-desc');
   const hakeEl = document.getElementById('kpi-hake-val');
@@ -970,16 +978,34 @@ function updateBanner() {
   if (CURRENT_HITO === 'Hito 4') {
     titleEl.innerText = 'Proteger nuestro escudo invisible (Hito 4)';
     descEl.innerText = 'Evaluación del aprendizaje sobre la atmósfera como regulador climático, la contaminación lumínica en Antofagasta, la protección del cielo oscuro para la astronomía mundial y la fauna costera.';
+    if (tagEl) {
+      tagEl.className = 'text-xs uppercase tracking-wider text-[#00ADBB] font-bold';
+    }
+    if (bannerEl) {
+      bannerEl.className = 'p-6 rounded-3xl bg-gradient-to-r from-[#152a3d] via-[#103042] to-[#0c2434] border border-[#00ADBB]/35 text-white card-shadow flex flex-wrap items-center justify-between gap-4';
+    }
     const h4 = RAW_DATA.hitos['Hito 4'];
     if (h4) hakeEl.innerText = `g = +${h4.hake_gain}`;
   } else if (CURRENT_HITO === 'Hito 3') {
     titleEl.innerText = 'Los otros vecinos de Antofagasta (Hito 3)';
     descEl.innerText = 'Evaluación del aprendizaje sobre biodiversidad del desierto costero, tramas tróficas, fauna y flora aledaña a la ciudad de Antofagasta (Gaviotín Chico, descomponedores) y el humedal La Chimba.';
+    if (tagEl) {
+      tagEl.className = 'text-xs uppercase tracking-wider text-[#88C23F] font-bold';
+    }
+    if (bannerEl) {
+      bannerEl.className = 'p-6 rounded-3xl bg-gradient-to-r from-[#173024] via-[#112d2c] to-[#0c1f24] border border-[#88C23F]/35 text-white card-shadow flex flex-wrap items-center justify-between gap-4';
+    }
     const h3 = RAW_DATA.hitos['Hito 3'];
     if (h3) hakeEl.innerText = `g = +${h3.hake_gain}`;
   } else {
     titleEl.innerText = 'Resumen Global del Programa (Hito 3 y Hito 4)';
     descEl.innerText = 'Consolidado general de aprendizajes en la Línea Verde del Programa de Acción Climática (PAC 2026), integrando tramas tróficas, biodiversidad aledaña a Antofagasta, atmósfera y preservación de cielos limpios.';
+    if (tagEl) {
+      tagEl.className = 'text-xs uppercase tracking-wider bg-gradient-to-r from-[#88C23F] to-[#00ADBB] bg-clip-text text-transparent font-extrabold';
+    }
+    if (bannerEl) {
+      bannerEl.className = 'p-6 rounded-3xl bg-gradient-to-r from-[#162f2c] via-[#112433] to-[#0c1a27] border border-[#00ADBB]/30 text-white card-shadow flex flex-wrap items-center justify-between gap-4';
+    }
     const glob = RAW_DATA.hitos['Global'];
     if (glob) hakeEl.innerText = `g = +${glob.hake_gain}`;
     else hakeEl.innerText = 'Global PAC';
@@ -1026,7 +1052,7 @@ function updateKPIs() {
   preEl.innerHTML = `${avgPre.toFixed(2)} <span class="text-xs font-normal text-slate-400">/ 5</span>`;
   postEl.innerHTML = `${avgPost.toFixed(2)} <span class="text-xs font-normal text-slate-400">/ 5</span>`;
   deltaEl.innerText = `${avgDelta >= 0 ? '+' : ''}${avgDelta.toFixed(2)}`;
-  deltaEl.className = avgDelta >= 0 ? 'text-3xl font-extrabold text-[#00a87e] tracking-tight mt-1.5' : 'text-3xl font-extrabold text-rose-600 tracking-tight mt-1.5';
+  deltaEl.className = avgDelta >= 0 ? 'text-3xl font-extrabold text-[#52801b] tracking-tight mt-1.5' : 'text-3xl font-extrabold text-rose-600 tracking-tight mt-1.5';
 
   pctMejoraEl.innerText = `${pctMejora}%`;
   countMejoraEl.innerText = `${nMejora} participantes subieron`;
@@ -1035,12 +1061,12 @@ function updateKPIs() {
   countEstancadosEl.innerText = `${nMantuvo} mantuvieron, ${nRetrocedio} bajaron`;
 }
 
-// RENDER CHARTS CON CHART.JS (Estilo moderno y gradientes inspirados en diseño de referencia)
+// RENDER CHARTS CON CHART.JS (Estilo moderno y paleta oficial del logo PAC)
 function renderCharts() {
   const filtered = getFilteredParticipants();
   const N = filtered.length;
 
-  // 1. Status Donut Chart
+  // 1. Status Donut Chart (Verde Lima #88C23F, Turquesa #00ADBB y Ámbar #F8B04C del logo PAC)
   const nMejora = filtered.filter(p => p.status === 'Mejoró').length;
   const nMantuvo = filtered.filter(p => p.status === 'Mantuvo').length;
   const nRetrocedio = filtered.filter(p => p.status === 'Retrocedió').length;
@@ -1054,7 +1080,7 @@ function renderCharts() {
       labels: ['Mejoró (+pts)', 'Mantuvo (0 pts)', 'Retrocedió (-pts)'],
       datasets: [{
         data: [nMejora, nMantuvo, nRetrocedio],
-        backgroundColor: ['#00d09c', '#6366f1', '#ff5b5b'],
+        backgroundColor: ['#88C23F', '#00ADBB', '#F8B04C'],
         borderWidth: 3,
         borderColor: '#ffffff',
         hoverOffset: 6
@@ -1074,21 +1100,21 @@ function renderCharts() {
   legendEl.innerHTML = `
     <div class="bg-slate-50/80 p-2.5 rounded-2xl border border-slate-100">
       <div class="flex items-center justify-center gap-1.5">
-        <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#00d09c]"></span>
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#88C23F]"></span>
         <span class="font-bold text-slate-800">${nMejora}</span>
       </div>
       <div class="text-[10px] text-slate-400 font-medium mt-0.5">Mejoró (${N ? ((nMejora/N)*100).toFixed(0) : 0}%)</div>
     </div>
     <div class="bg-slate-50/80 p-2.5 rounded-2xl border border-slate-100">
       <div class="flex items-center justify-center gap-1.5">
-        <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#6366f1]"></span>
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#00ADBB]"></span>
         <span class="font-bold text-slate-800">${nMantuvo}</span>
       </div>
       <div class="text-[10px] text-slate-400 font-medium mt-0.5">Mantuvo (${N ? ((nMantuvo/N)*100).toFixed(0) : 0}%)</div>
     </div>
     <div class="bg-slate-50/80 p-2.5 rounded-2xl border border-slate-100">
       <div class="flex items-center justify-center gap-1.5">
-        <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#ff5b5b]"></span>
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#F8B04C]"></span>
         <span class="font-bold text-slate-800">${nRetrocedio}</span>
       </div>
       <div class="text-[10px] text-slate-400 font-medium mt-0.5">Retrocedió (${N ? ((nRetrocedio/N)*100).toFixed(0) : 0}%)</div>
@@ -1133,11 +1159,10 @@ function renderCharts() {
   const ctxQuestions = document.getElementById('chart-questions-bar').getContext('2d');
   if (CHARTS['questions']) CHARTS['questions'].destroy();
 
-  // Create smooth gradients matching the reference image (Purple to Cyan to Mint)
+  // Create smooth gradients matching the official PAC logo (Turquesa #00ADBB to Verde Lima #88C23F)
   const gradPost = ctxQuestions.createLinearGradient(0, 220, 0, 10);
-  gradPost.addColorStop(0, '#6366f1');   // Royal Purple/Indigo
-  gradPost.addColorStop(0.5, '#00c5cb'); // Cyan
-  gradPost.addColorStop(1, '#00d09c');   // Mint Green
+  gradPost.addColorStop(0, '#00ADBB');   // Turquesa PAC
+  gradPost.addColorStop(1, '#88C23F');   // Verde Lima PAC
 
   const gradPre = ctxQuestions.createLinearGradient(0, 220, 0, 10);
   gradPre.addColorStop(0, '#94a3b8');    // Slate
@@ -1204,12 +1229,12 @@ function renderCharts() {
   if (CHARTS['schools']) CHARTS['schools'].destroy();
 
   const gradSchoolPos = ctxSchools.createLinearGradient(0, 220, 0, 10);
-  gradSchoolPos.addColorStop(0, '#00c5cb'); // Cyan
-  gradSchoolPos.addColorStop(1, '#00d09c'); // Mint
+  gradSchoolPos.addColorStop(0, '#00ADBB'); // Turquesa PAC
+  gradSchoolPos.addColorStop(1, '#88C23F'); // Verde Lima PAC
 
   const gradSchoolNeg = ctxSchools.createLinearGradient(0, 220, 0, 10);
-  gradSchoolNeg.addColorStop(0, '#f43f5e'); // Rose
-  gradSchoolNeg.addColorStop(1, '#ff5b5b'); // Coral
+  gradSchoolNeg.addColorStop(0, '#F8B04C'); // Ámbar Solar PAC
+  gradSchoolNeg.addColorStop(1, '#e11d48'); // Warm Rose
 
   const schoolColors = schoolDeltas.map(d => d >= 0 ? gradSchoolPos : gradSchoolNeg);
 
@@ -1254,9 +1279,8 @@ function renderCharts() {
   const gPost = gLabels.map(g => genderData[g].post_avg);
 
   const gradGenderPost = ctxGender.createLinearGradient(0, 220, 0, 10);
-  gradGenderPost.addColorStop(0, '#6366f1');
-  gradGenderPost.addColorStop(0.5, '#00c5cb');
-  gradGenderPost.addColorStop(1, '#00d09c');
+  gradGenderPost.addColorStop(0, '#00ADBB'); // Turquesa PAC
+  gradGenderPost.addColorStop(1, '#88C23F'); // Verde Lima PAC
 
   const gradGenderPre = ctxGender.createLinearGradient(0, 220, 0, 10);
   gradGenderPre.addColorStop(0, '#94a3b8');
@@ -1448,7 +1472,7 @@ function createClimatonCardHTML(idea, schoolName, desafioCodigo, desafioNombre, 
   for (let i = 1; i <= 5; i++) {
     if (i === idea.numero) {
       indicatorsHtml += `
-        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#526f18] text-white font-extrabold text-[10px] shadow-xs">
+        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full ${isV1 ? 'bg-[#74ab2e]' : 'bg-[#008f9b]'} text-white font-extrabold text-[10px] shadow-xs">
           ${i}
         </span>
       `;
@@ -1463,7 +1487,7 @@ function createClimatonCardHTML(idea, schoolName, desafioCodigo, desafioNombre, 
 
   return `
     <div class="climaton-card flex flex-col justify-between">
-      <!-- Header verde oliva fiel a la tarjeta física -->
+      <!-- Header con gradiente oficial PAC fiel a la tarjeta física -->
       <div class="${headerClass} px-4 py-3 flex items-center justify-between text-white">
         <div class="flex items-center gap-2">
           <span class="px-2 py-0.5 rounded bg-white/20 text-white font-black text-xs tracking-wider border border-white/20">${desafioCodigo}</span>
@@ -1478,7 +1502,7 @@ function createClimatonCardHTML(idea, schoolName, desafioCodigo, desafioNombre, 
       <div class="climaton-body-ruled p-5 flex-1 flex flex-col justify-between space-y-3 min-h-[145px]">
         <div>
           <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#688a24]"></span>
+            <span class="w-1.5 h-1.5 rounded-full ${isV1 ? 'bg-[#88C23F]' : 'bg-[#00ADBB]'}"></span>
             <span>NUESTRA IDEA</span>
           </div>
           <p class="text-slate-900 font-bold text-xs sm:text-[13px] leading-relaxed tracking-tight">
@@ -1513,12 +1537,11 @@ function filterClimatonByDesafio(codigo) {
   const btnV1 = document.getElementById('btn-climaton-filter-v1');
   const btnV2 = document.getElementById('btn-climaton-filter-v2');
 
-  const activeClasses = 'px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#00d09c] text-slate-950 shadow-sm transition';
   const inactiveClasses = 'px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 transition';
 
-  if (btnAll) btnAll.className = codigo === 'ALL' ? activeClasses : inactiveClasses;
-  if (btnV1) btnV1.className = codigo === 'V1' ? activeClasses : inactiveClasses;
-  if (btnV2) btnV2.className = codigo === 'V2' ? activeClasses : inactiveClasses;
+  if (btnAll) btnAll.className = codigo === 'ALL' ? 'px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm transition' : inactiveClasses;
+  if (btnV1) btnV1.className = codigo === 'V1' ? 'px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm transition' : inactiveClasses;
+  if (btnV2) btnV2.className = codigo === 'V2' ? 'px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#00ADBB] text-white shadow-sm transition' : inactiveClasses;
 
   renderClimatonCards();
 }
@@ -1636,14 +1659,14 @@ function renderSchoolsTab() {
       tr.className = 'hover:bg-slate-50/70 transition';
 
       const eqBadge = eqNum ? 
-        `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#00d09c]/15 text-[#00a87e] border border-[#00d09c]/30 mr-1.5 shrink-0">Eq. ${parseInt(eqNum)}</span>` : '';
+        `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#88C23F]/15 text-[#52801b] border border-[#88C23F]/35 mr-1.5 shrink-0">Eq. ${parseInt(eqNum)}</span>` : '';
       
       const certBadge = cert.toLowerCase() === 'si' ? 
-        `<span class="ml-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">SNCAE</span>` : '';
+        `<span class="ml-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#f1f9e9] text-[#52801b] border border-[#cbe99c]">SNCAE</span>` : '';
 
       const climatonBtn = climData ? 
-        `<button onclick="openSchoolInClimaton('${escapeHtml(s.school)}')" class="px-3 py-1 rounded-full text-xs font-bold bg-[#688a24]/15 text-[#4e6b17] border border-[#688a24]/30 hover:bg-[#688a24]/25 transition inline-flex items-center gap-1.5 shadow-xs" title="Ver las 5 ideas formuladas por este colegio en el Climatón">
-          <i data-lucide="sparkles" class="w-3 h-3 text-[#688a24]"></i>
+        `<button onclick="openSchoolInClimaton('${escapeHtml(s.school)}')" class="px-3 py-1 rounded-full text-xs font-bold bg-[#88C23F]/15 text-[#52801b] border border-[#88C23F]/35 hover:bg-[#88C23F]/25 transition inline-flex items-center gap-1.5 shadow-xs" title="Ver las 5 ideas formuladas por este colegio en el Climatón">
+          <i data-lucide="sparkles" class="w-3 h-3 text-[#88C23F]"></i>
           <span>5 Ideas</span>
         </button>` : 
         `<span class="text-slate-300 text-[10px]">-</span>`;
@@ -1671,7 +1694,7 @@ function renderSchoolsTab() {
       } else {
         const deltaSign = s.delta_avg >= 0 ? '+' : '';
         const deltaBadge = s.delta_avg > 0 ? 
-          `<span class="px-3 py-1 rounded-full text-xs font-bold bg-[#00d09c]/15 text-[#00a87e] border border-[#00d09c]/25">+${s.delta_avg.toFixed(2)}</span>` : 
+          `<span class="px-3 py-1 rounded-full text-xs font-bold bg-[#f1f9e9] text-[#52801b] border border-[#cbe99c]">+${s.delta_avg.toFixed(2)}</span>` : 
           (s.delta_avg === 0 ? 
             `<span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">0.00</span>` : 
             `<span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">${s.delta_avg.toFixed(2)}</span>`);
@@ -1683,16 +1706,16 @@ function renderSchoolsTab() {
           </td>
           <td class="py-3.5 px-3 text-center font-bold text-slate-800">${s.n}</td>
           <td class="py-3.5 px-3 text-center text-slate-600 font-medium">${s.pre_avg !== null ? s.pre_avg.toFixed(2) : '-'}</td>
-          <td class="py-3.5 px-3 text-center text-[#00a87e] font-bold">${s.post_avg !== null ? s.post_avg.toFixed(2) : '-'}</td>
+          <td class="py-3.5 px-3 text-center text-[#52801b] font-bold">${s.post_avg !== null ? s.post_avg.toFixed(2) : '-'}</td>
           <td class="py-3.5 px-3 text-center">${deltaBadge}</td>
           <td class="py-3.5 px-3 text-center">
-            <span class="px-3 py-1 rounded-full text-xs font-bold ${s.pct_mejora >= 50 ? 'bg-[#00d09c]/20 text-[#00a87e]' : 'bg-slate-100 text-slate-700'}">
+            <span class="px-3 py-1 rounded-full text-xs font-bold ${s.pct_mejora >= 50 ? 'bg-[#f1f9e9] text-[#52801b]' : 'bg-slate-100 text-slate-700'}">
               ${s.pct_mejora}%
             </span>
           </td>
           <td class="py-3.5 px-3">
             <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-100 text-[11px]">
-              <span class="text-[#00a87e] font-bold" title="Mejoró">${s.status_counts['Mejoró'] || 0}↗</span>
+              <span class="text-[#52801b] font-bold" title="Mejoró">${s.status_counts['Mejoró'] || 0}↗</span>
               <span class="text-slate-300">·</span>
               <span class="text-slate-500 font-semibold" title="Mantuvo">${s.status_counts['Mantuvo'] || 0}=</span>
               <span class="text-slate-300">·</span>
@@ -1717,11 +1740,11 @@ function renderSchoolsTab() {
       let climatonSectionHTML = '';
       if (climData && climData.ideas) {
         const miniCards = climData.ideas.map(id => `
-          <div class="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-200/70 hover:border-[#688a24] transition space-y-1.5 flex flex-col justify-between">
+          <div class="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-200/70 hover:border-[#88C23F] transition space-y-1.5 flex flex-col justify-between">
             <div>
               <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
                 <span>Idea ${id.numero}</span>
-                <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold ${climData.desafio_codigo === 'V1' ? 'bg-emerald-100 text-emerald-800' : 'bg-teal-100 text-teal-800'}">${climData.desafio_codigo}</span>
+                <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold ${climData.desafio_codigo === 'V1' ? 'bg-[#f1f9e9] text-[#52801b]' : 'bg-[#e6f9fa] text-[#00737d]'}">${climData.desafio_codigo}</span>
               </div>
               <p class="text-xs font-bold text-slate-800 leading-snug">"${escapeHtml(id.titulo)}"</p>
             </div>
@@ -1732,10 +1755,10 @@ function renderSchoolsTab() {
           <div class="pt-4 border-t border-slate-100 space-y-3">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <i data-lucide="sparkles" class="w-4 h-4 text-[#688a24]"></i>
+                <i data-lucide="sparkles" class="w-4 h-4 text-[#88C23F]"></i>
                 <h5 class="text-xs font-bold uppercase tracking-wider text-slate-800">Propuestas Climatón 2026 (${climData.desafio_codigo} · ${climData.desafio_nombre})</h5>
               </div>
-              <button onclick="openSchoolInClimaton('${escapeHtml(s.school)}')" class="text-[11px] font-bold text-[#537318] hover:underline inline-flex items-center gap-1">
+              <button onclick="openSchoolInClimaton('${escapeHtml(s.school)}')" class="text-[11px] font-bold text-[#52801b] hover:underline inline-flex items-center gap-1">
                 <span>Ver en Muro Digital</span>
                 <i data-lucide="arrow-right" class="w-3 h-3"></i>
               </button>
@@ -1750,21 +1773,21 @@ function renderSchoolsTab() {
       card.innerHTML = `
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3.5">
           <div class="flex items-center gap-2.5">
-            ${eqNum ? `<span class="px-3 py-1 rounded-full text-xs font-extrabold bg-[#00d09c]/15 text-[#00a87e] border border-[#00d09c]/30">Equipo ${parseInt(eqNum)}</span>` : ''}
+            ${eqNum ? `<span class="px-3 py-1 rounded-full text-xs font-extrabold bg-[#88C23F]/15 text-[#52801b] border border-[#88C23F]/35">Equipo ${parseInt(eqNum)}</span>` : ''}
             <div>
               <h4 class="text-base font-extrabold text-slate-900">${escapeHtml(s.school)}</h4>
               <p class="text-xs text-slate-400 font-medium">${meta.direccion ? meta.direccion + ' · ' : ''}Dependencia: <strong>${s.dependencia}</strong></p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-xs px-2.5 py-1 rounded-full font-bold ${cert.toLowerCase() === 'si' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-500'}">
+            <span class="text-xs px-2.5 py-1 rounded-full font-bold ${cert.toLowerCase() === 'si' ? 'bg-[#f1f9e9] text-[#52801b] border border-[#cbe99c]' : 'bg-slate-100 text-slate-500'}">
               SNCAE: ${cert}
             </span>
             <span class="text-xs px-2.5 py-1 rounded-full font-bold bg-slate-100 text-slate-600">
               PAC Previo: ${meta.participacion_previa || 'No'}
             </span>
             ${hasData ? `
-              <span class="text-xs px-3 py-1 rounded-full font-bold bg-[#00d09c]/20 text-[#00a87e]">
+              <span class="text-xs px-3 py-1 rounded-full font-bold bg-[#f1f9e9] text-[#52801b]">
                 Delta: ${s.delta_avg >= 0 ? '+' : ''}${s.delta_avg.toFixed(2)} pts (${s.pct_mejora}%)
               </span>
             ` : `<span class="text-xs px-2.5 py-1 rounded-full font-bold bg-amber-100 text-amber-800">Sin datos en ${hitoKey}</span>`}
@@ -1810,8 +1833,8 @@ function renderQuestionsTab() {
         currentSectionHito = qHito;
         const sectionHeader = document.createElement('div');
         sectionHeader.className = qHito === 'Hito 3' ? 
-          'p-4 bg-emerald-50 rounded-2xl border border-emerald-200 text-emerald-950 font-bold text-xs flex items-center gap-2 mt-2 mb-1 shadow-sm' :
-          'p-4 bg-teal-50 rounded-2xl border border-teal-200 text-teal-950 font-bold text-xs flex items-center gap-2 mt-6 mb-1 shadow-sm';
+          'p-4 bg-[#f1f9e9] rounded-2xl border border-[#cbe99c] text-[#3f6515] font-bold text-xs flex items-center gap-2 mt-2 mb-1 shadow-sm' :
+          'p-4 bg-[#e6f9fa] rounded-2xl border border-[#99e1e7] text-[#005b63] font-bold text-xs flex items-center gap-2 mt-6 mb-1 shadow-sm';
         sectionHeader.innerHTML = `
           <i data-lucide="${qHito === 'Hito 3' ? 'leaf' : 'shield'}" class="w-4 h-4"></i>
           <span>${qHito === 'Hito 3' ? 'Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y tramas tróficas)' : 'Hito 4: Proteger nuestro escudo invisible (Atmósfera y cielos oscuros)'}</span>
@@ -1835,7 +1858,7 @@ function renderQuestionsTab() {
       <div class="flex flex-wrap items-start justify-between gap-2">
         <div class="space-y-1">
           <div class="flex items-center gap-2.5">
-            <span class="w-7 h-7 rounded-full bg-[#00d09c] text-slate-950 font-extrabold text-xs flex items-center justify-center shadow-sm">${q.num}</span>
+            <span class="w-7 h-7 rounded-full bg-[#88C23F] text-slate-950 font-extrabold text-xs flex items-center justify-center shadow-sm">${q.num}</span>
             <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Alternativa Correcta: [ ${q.correct_key} ]</span>
           </div>
           <h4 class="text-sm font-bold text-slate-800 pl-9.5">${q.title}</h4>
@@ -1850,7 +1873,7 @@ function renderQuestionsTab() {
         </div>
         <div>
           <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Aciertos POST</span>
-          <span class="font-extrabold text-[#00a87e] text-sm mt-0.5 block">${q.post_correct} (${q.post_pct}%)</span>
+          <span class="font-extrabold text-[#52801b] text-sm mt-0.5 block">${q.post_correct} (${q.post_pct}%)</span>
         </div>
         <div>
           <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Mantuvieron Correcto</span>
@@ -1946,7 +1969,7 @@ function renderQualitativeTab() {
         <div>
           <span class="font-extrabold text-slate-900 text-sm">${p.name}</span>
           <span class="text-slate-400 ml-1.5 font-medium">· ${p.school}</span>
-          ${isGlobal ? `<span class="ml-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${originHito === 'Hito 4' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800'}">${originHito}</span>` : ''}
+          ${isGlobal ? `<span class="ml-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${originHito === 'Hito 4' ? 'bg-[#e6f9fa] text-[#00737d] border border-[#99e1e7]' : 'bg-[#f1f9e9] text-[#52801b] border border-[#cbe99c]'}">${originHito}</span>` : ''}
         </div>
         <div class="flex items-center gap-2">
           <span class="px-3 py-1 rounded-full text-[11px] font-bold ${badgeClass}">${badgeText}</span>
@@ -1962,8 +1985,8 @@ function renderQualitativeTab() {
           <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wide mb-1">Respuesta PRE (Inicial):</span>
           <p class="text-slate-700 italic">${qData.pre_text && qData.pre_text.trim() ? '"' + qData.pre_text + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta o no sabe)</span>'}</p>
         </div>
-        <div class="bg-emerald-50/40 p-3.5 rounded-xl border border-emerald-100">
-          <span class="text-[10px] font-bold text-[#00a87e] block uppercase tracking-wide mb-1">Respuesta POST (Final en terreno):</span>
+        <div class="bg-[#f1f9e9]/50 p-3.5 rounded-xl border border-[#cbe99c]">
+          <span class="text-[10px] font-bold text-[#52801b] block uppercase tracking-wide mb-1">Respuesta POST (Final en terreno):</span>
           <p class="text-slate-800 font-medium">${qData.post_text && qData.post_text.trim() ? '"' + qData.post_text + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta o no sabe)</span>'}</p>
         </div>
       </div>
@@ -1986,17 +2009,17 @@ function renderPedagogicalTab() {
     card.className = 'border border-slate-100 rounded-2xl p-5 bg-white card-shadow space-y-3.5';
 
     let recomendacion = '';
-    let statusClass = 'bg-emerald-50 border-emerald-200 text-emerald-900';
+    let statusClass = 'bg-[#f1f9e9] border-[#cbe99c] text-[#3f6515]';
 
     if (s.has_data === false || s.n === 0) {
       recomendacion = `<strong>Sin evaluaciones registradas en este hito:</strong> Este establecimiento no registra respuestas PRE ni POST para este desafío. Se sugiere coordinar directamente con el profesor/a líder (<strong>${s.lider1 || 'Coordinador'}</strong>) para verificar la ejecución de la actividad en terreno o aplicar la evaluación de manera diferida.`;
-      statusClass = 'bg-amber-50 border-amber-200 text-amber-950';
+      statusClass = 'bg-[#fef7ed] border-[#fcd397] text-[#944f00]';
     } else if (s.delta_avg > 0.7) {
       recomendacion = `<strong>Consolidación e Ideación:</strong> Este equipo demostró una comprensión sobresaliente de los conceptos de la intervención (+${s.delta_avg} pts). Se sugiere a la líder <strong>${s.lider1 || 'Docente Líder'}</strong> canalizar este entusiasmo directamente hacia la etapa de ideación (ej. iniciativas escolares de protección de cielos oscuros o conservación de la biodiversidad local).`;
-      statusClass = 'bg-emerald-50 border-emerald-200 text-emerald-950';
+      statusClass = 'bg-[#f1f9e9] border-[#cbe99c] text-[#3f6515]';
     } else if (s.delta_avg >= 0.2) {
       recomendacion = `<strong>Refuerzo de conceptos intermedios:</strong> El equipo tiene una asimilación positiva pero heterogénea (+${s.delta_avg} pts). Se recomienda a la líder <strong>${s.lider1 || 'Docente Líder'}</strong> realizar un plenario corto de 15 minutos repasando las diferencias conceptuales clave, antes de pasar a la etapa de ideación.`;
-      statusClass = 'bg-amber-50 border-amber-200 text-amber-950';
+      statusClass = 'bg-[#fef7ed] border-[#fcd397] text-[#944f00]';
     } else {
       recomendacion = `<strong>Atención a 'Efecto Techo' y Distractores:</strong> El puntaje basal fue muy elevado o se registraron confusiones sutiles en las opciones cerradas (${s.delta_avg} pts). No interpretar esto como falta de aprendizaje: cualitativamente los estudiantes manejan la terminología. Se aconseja pedirles que expliquen con sus propias palabras el impacto en la fauna local para afianzar la seguridad en sus conocimientos antes de la etapa de ideación.`;
       statusClass = 'bg-slate-50 border-slate-200 text-slate-800';
@@ -2010,7 +2033,7 @@ function renderPedagogicalTab() {
         </div>
         <div class="text-right">
           ${s.has_data !== false ? `
-            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${s.delta_avg >= 0 ? 'bg-[#00d09c]/15 text-[#00a87e]' : 'bg-rose-50 text-rose-600'}">Delta: ${s.delta_avg >= 0 ? '+' : ''}${s.delta_avg}</span>
+            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${s.delta_avg >= 0 ? 'bg-[#f1f9e9] text-[#52801b] border border-[#cbe99c]' : 'bg-rose-50 text-rose-600'}">Delta: ${s.delta_avg >= 0 ? '+' : ''}${s.delta_avg}</span>
             <div class="text-[10px] text-slate-400 font-medium mt-0.5">${s.pct_mejora}% mejoró</div>
           ` : `
             <span class="text-xs font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full">Sin datos</span>
@@ -2062,11 +2085,11 @@ function renderParticipantsTab() {
     let hitoBadge = '';
     if (isGlobal) {
       if (p.hitos_completados && p.hitos_completados.length > 1) {
-        hitoBadge = `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#00d09c]/15 text-[#00a87e] border border-[#00d09c]/30">Ambos Hitos (H3 + H4)</span>`;
+        hitoBadge = `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#f1f9e9] text-[#52801b] border border-[#cbe99c]">Ambos Hitos (H3 + H4)</span>`;
       } else if (p.hito === 'Hito 3') {
-        hitoBadge = `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Solo Hito 3</span>`;
+        hitoBadge = `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#f1f9e9] text-[#52801b] border border-[#cbe99c]">Solo Hito 3</span>`;
       } else if (p.hito === 'Hito 4') {
-        hitoBadge = `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800">Solo Hito 4</span>`;
+        hitoBadge = `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#e6f9fa] text-[#00737d] border border-[#99e1e7]">Solo Hito 4</span>`;
       }
     }
 
@@ -2075,8 +2098,8 @@ function renderParticipantsTab() {
       `<span class="font-bold text-slate-800">${p.pre_score}</span> <span class="text-[10px] text-slate-400">/ 5</span>`;
 
     const postDisplay = isGlobal && p.h3 && p.h4 ? 
-      `<div class="font-bold text-[#00a87e]">${p.post_score} <span class="text-[10px] text-emerald-600 font-normal">/ 5</span></div><div class="text-[10px] text-emerald-600 font-normal">(${p.post_score_raw} / 10 pts)</div>` : 
-      `<span class="font-bold text-[#00a87e]">${p.post_score}</span> <span class="text-[10px] text-slate-400">/ 5</span>`;
+      `<div class="font-bold text-[#52801b]">${p.post_score} <span class="text-[10px] text-emerald-600 font-normal">/ 5</span></div><div class="text-[10px] text-emerald-600 font-normal">(${p.post_score_raw} / 10 pts)</div>` : 
+      `<span class="font-bold text-[#52801b]">${p.post_score}</span> <span class="text-[10px] text-slate-400">/ 5</span>`;
 
     tr.innerHTML = `
       <td class="py-3.5 px-4 font-bold text-slate-900 flex items-center gap-2.5">
@@ -2087,13 +2110,13 @@ function renderParticipantsTab() {
       <td class="py-3.5 px-3 text-slate-500 text-[11px]">${escapeHtml(p.gender)}</td>
       <td class="py-3.5 px-3 text-center">${preDisplay}</td>
       <td class="py-3.5 px-3 text-center">${postDisplay}</td>
-      <td class="py-3.5 px-3 text-center font-bold ${p.delta >= 0 ? 'text-[#00a87e]' : 'text-rose-600'}">${deltaSign}${p.delta}</td>
+      <td class="py-3.5 px-3 text-center font-bold ${p.delta >= 0 ? 'text-[#52801b]' : 'text-rose-600'}">${deltaSign}${p.delta}</td>
       <td class="py-3.5 px-3 text-center">
         <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${badgeClass}">${p.status}</span>
         <div class="text-[10px] text-slate-400 mt-0.5 font-medium">${escapeHtml(p.real_status || '')}</div>
       </td>
       <td class="py-3.5 px-4 text-center">
-        <button onclick="event.stopPropagation(); openModal(window.currentFiltered[${idx}])" class="px-3.5 py-1 text-xs font-bold text-slate-900 bg-[#00d09c] hover:bg-[#00bfa5] rounded-full transition shadow-sm">
+        <button onclick="event.stopPropagation(); openModal(window.currentFiltered[${idx}])" class="px-3.5 py-1 text-xs font-bold text-slate-900 bg-[#88C23F] hover:bg-[#78ad35] rounded-full transition shadow-sm">
           Ver Ficha
         </button>
       </td>
@@ -2127,11 +2150,11 @@ function openModal(p) {
   // Badge de cobertura de evaluación
   const badgeContainer = document.getElementById('modal-attendance-badge');
   if (h3Data && h4Data) {
-    badgeContainer.innerHTML = `<span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">Test-Retest Completo (Hito 3 y Hito 4)</span>`;
+    badgeContainer.innerHTML = `<span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#e6f9fa] text-[#00737d] border border-[#99e1e7]">Test-Retest Completo (Hito 3 y Hito 4)</span>`;
   } else if (h3Data) {
-    badgeContainer.innerHTML = `<span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Evaluado en Hito 3</span>`;
+    badgeContainer.innerHTML = `<span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#f1f9e9] text-[#52801b] border border-[#cbe99c]">Evaluado en Hito 3</span>`;
   } else if (h4Data) {
-    badgeContainer.innerHTML = `<span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">Evaluado en Hito 4</span>`;
+    badgeContainer.innerHTML = `<span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#e6f9fa] text-[#00737d] border border-[#99e1e7]">Evaluado en Hito 4</span>`;
   } else {
     badgeContainer.innerHTML = '';
   }
@@ -2180,12 +2203,11 @@ function setModalViewMode(mode) {
   const btnH4 = document.getElementById('btn-modal-mode-h4');
   const caption = document.getElementById('modal-mode-caption');
 
-  const activeClasses = 'px-3.5 py-1 rounded-full text-xs font-bold bg-[#00d09c] text-slate-950 shadow-sm transition';
   const inactiveClasses = 'px-3.5 py-1 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 transition';
 
-  if (btnConsolidado) btnConsolidado.className = mode === 'consolidado' ? activeClasses : inactiveClasses;
-  if (btnH3) btnH3.className = mode === 'Hito 3' ? activeClasses : inactiveClasses;
-  if (btnH4) btnH4.className = mode === 'Hito 4' ? activeClasses : inactiveClasses;
+  if (btnConsolidado) btnConsolidado.className = mode === 'consolidado' ? 'px-3.5 py-1 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm transition' : inactiveClasses;
+  if (btnH3) btnH3.className = mode === 'Hito 3' ? 'px-3.5 py-1 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm transition' : inactiveClasses;
+  if (btnH4) btnH4.className = mode === 'Hito 4' ? 'px-3.5 py-1 rounded-full text-xs font-bold bg-[#00ADBB] text-white shadow-sm transition' : inactiveClasses;
 
   if (caption) {
     if (mode === 'consolidado') {
@@ -2232,14 +2254,14 @@ function renderModalContent(mode) {
         <div class="text-xl font-extrabold text-slate-900 mt-1">${totPost} <span class="text-xs text-slate-400 font-medium">/ 10 pts</span></div>
         <div class="text-[11px] text-slate-500 font-medium mt-0.5">PRE: ${totPre} / 10 · ${deltaSign}${totDelta} pts</div>
       </div>
-      <div class="p-2.5 bg-emerald-50/40 rounded-xl border border-emerald-100 shadow-sm">
-        <div class="text-[10px] text-emerald-800 font-bold uppercase tracking-wider">Hito 3 (Biodiversidad)</div>
-        <div class="text-xl font-extrabold text-[#00a87e] mt-1">${h3Data ? h3Data.post_score : '-'} <span class="text-xs text-slate-400 font-medium">/ 5 pts</span></div>
+      <div class="p-2.5 bg-[#f1f9e9]/60 rounded-xl border border-[#cbe99c] shadow-sm">
+        <div class="text-[10px] text-[#52801b] font-bold uppercase tracking-wider">Hito 3 (Biodiversidad)</div>
+        <div class="text-xl font-extrabold text-[#52801b] mt-1">${h3Data ? h3Data.post_score : '-'} <span class="text-xs text-slate-400 font-medium">/ 5 pts</span></div>
         <div class="text-[11px] text-slate-500 font-medium mt-0.5">${h3Data ? `PRE: ${h3Data.pre_score} · ${h3Data.delta >= 0 ? '+' : ''}${h3Data.delta} pts` : 'No registrado'}</div>
       </div>
-      <div class="p-2.5 bg-indigo-50/40 rounded-xl border border-indigo-100 shadow-sm">
-        <div class="text-[10px] text-indigo-800 font-bold uppercase tracking-wider">Hito 4 (Atmósfera)</div>
-        <div class="text-xl font-extrabold text-indigo-700 mt-1">${h4Data ? h4Data.post_score : '-'} <span class="text-xs text-slate-400 font-medium">/ 5 pts</span></div>
+      <div class="p-2.5 bg-[#e6f9fa]/60 rounded-xl border border-[#99e1e7] shadow-sm">
+        <div class="text-[10px] text-[#00737d] font-bold uppercase tracking-wider">Hito 4 (Atmósfera)</div>
+        <div class="text-xl font-extrabold text-[#00737d] mt-1">${h4Data ? h4Data.post_score : '-'} <span class="text-xs text-slate-400 font-medium">/ 5 pts</span></div>
         <div class="text-[11px] text-slate-500 font-medium mt-0.5">${h4Data ? `PRE: ${h4Data.pre_score} · ${h4Data.delta >= 0 ? '+' : ''}${h4Data.delta} pts` : 'No registrado'}</div>
       </div>
       <div class="p-2.5 bg-white rounded-xl border border-slate-100 shadow-sm">
@@ -2257,7 +2279,7 @@ function renderModalContent(mode) {
     mcSection.className = 'space-y-4';
     mcSection.innerHTML = `
       <div class="flex items-center gap-2 border-b border-slate-200 pb-2">
-        <i data-lucide="check-circle-2" class="w-4 h-4 text-[#00d09c]"></i>
+        <i data-lucide="check-circle-2" class="w-4 h-4 text-[#88C23F]"></i>
         <h4 class="font-bold text-slate-900 text-sm">Desglose de Preguntas Cerradas (Alternativas) - Ambos Desafíos</h4>
       </div>
       <div class="space-y-4">
@@ -2272,7 +2294,7 @@ function renderModalContent(mode) {
     openSection.className = 'space-y-4';
     openSection.innerHTML = `
       <div class="flex items-center gap-2 border-b border-slate-200 pb-2">
-        <i data-lucide="message-square" class="w-4 h-4 text-[#00d09c]"></i>
+        <i data-lucide="message-square" class="w-4 h-4 text-[#88C23F]"></i>
         <h4 class="font-bold text-slate-900 text-sm">Desglose de Preguntas Abiertas (Cualitativo) - Ambos Desafíos</h4>
       </div>
       <div class="space-y-4">
@@ -2298,11 +2320,11 @@ function renderModalContent(mode) {
       </div>
       <div>
         <div class="text-[10px] text-slate-400 font-bold uppercase">Puntaje POST</div>
-        <div class="text-xl font-extrabold text-[#00a87e] mt-0.5">${dataH.post_score} / 5</div>
+        <div class="text-xl font-extrabold text-[#52801b] mt-0.5">${dataH.post_score} / 5</div>
       </div>
       <div>
         <div class="text-[10px] text-slate-400 font-bold uppercase">Diferencia</div>
-        <div class="text-xl font-extrabold ${dataH.delta >= 0 ? 'text-[#00a87e]' : 'text-rose-600'} mt-0.5">${deltaSign}${dataH.delta} pts</div>
+        <div class="text-xl font-extrabold ${dataH.delta >= 0 ? 'text-[#52801b]' : 'text-rose-600'} mt-0.5">${deltaSign}${dataH.delta} pts</div>
       </div>
       <div>
         <div class="text-[10px] text-slate-400 font-bold uppercase">Condición</div>
@@ -2343,11 +2365,11 @@ function renderModalContent(mode) {
       </div>
       <div>
         <div class="text-[10px] text-slate-400 font-bold uppercase">Puntaje POST</div>
-        <div class="text-xl font-extrabold text-[#00a87e] mt-0.5">${dataH.post_score} / 5</div>
+        <div class="text-xl font-extrabold text-[#00737d] mt-0.5">${dataH.post_score} / 5</div>
       </div>
       <div>
         <div class="text-[10px] text-slate-400 font-bold uppercase">Diferencia</div>
-        <div class="text-xl font-extrabold ${dataH.delta >= 0 ? 'text-[#00a87e]' : 'text-rose-600'} mt-0.5">${deltaSign}${dataH.delta} pts</div>
+        <div class="text-xl font-extrabold ${dataH.delta >= 0 ? 'text-[#00737d]' : 'text-rose-600'} mt-0.5">${deltaSign}${dataH.delta} pts</div>
       </div>
       <div>
         <div class="text-[10px] text-slate-400 font-bold uppercase">Condición</div>
@@ -2388,8 +2410,8 @@ function buildHitoMCBlock(title, hData, questionsMeta, theme) {
 
   const qMeta = questionsMeta || [];
   const key = qMeta.slice(0, 5).map(q => (q.correct_key || '').toLowerCase());
-  const themeBorder = theme === 'indigo' ? 'border-indigo-100 bg-indigo-50/20' : 'border-emerald-100 bg-emerald-50/20';
-  const themeBadge = theme === 'indigo' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800';
+  const themeBorder = theme === 'indigo' ? 'border-[#99e1e7] bg-[#e6f9fa]/20' : 'border-[#cbe99c] bg-[#f1f9e9]/20';
+  const themeBadge = theme === 'indigo' ? 'bg-[#e6f9fa] text-[#00737d]' : 'bg-[#f1f9e9] text-[#52801b]';
 
   let itemsHtml = '';
   (hData.q_evo || []).forEach((evo, idx) => {
@@ -2398,17 +2420,17 @@ function buildHitoMCBlock(title, hData, questionsMeta, theme) {
     const isCorrectPre = (hData.pre_mc[idx] || '').toLowerCase() === key[idx];
 
     let evoBadgeClass = 'bg-slate-100 text-slate-700';
-    if (evo === 'Mejoró') evoBadgeClass = 'bg-[#00d09c]/20 text-[#00a87e] font-bold';
+    if (evo === 'Mejoró') evoBadgeClass = 'badge-improved font-bold';
     else if (evo === 'Retrocedió') evoBadgeClass = 'bg-rose-100 text-rose-800 font-bold';
-    else if (evo === 'Mantuvo Correcto') evoBadgeClass = 'bg-teal-50 text-teal-800 border border-teal-200 font-medium';
+    else if (evo === 'Mantuvo Correcto') evoBadgeClass = 'badge-maintained font-medium';
 
     itemsHtml += `
-      <div class="p-3.5 rounded-2xl border ${isCorrectPost ? 'bg-emerald-50/40 border-emerald-200' : 'bg-rose-50/30 border-rose-200'} text-xs flex flex-wrap items-center justify-between gap-2">
+      <div class="p-3.5 rounded-2xl border ${isCorrectPost ? 'bg-[#f1f9e9]/40 border-[#cbe99c]' : 'bg-rose-50/30 border-rose-200'} text-xs flex flex-wrap items-center justify-between gap-2">
         <div class="space-y-0.5 max-w-[75%]">
           <span class="font-bold text-slate-800">Q${idx + 1}: ${escapeHtml(qMeta[idx].title)}</span>
           <div class="text-[11px] text-slate-500 font-medium">
-            PRE: <span class="font-bold ${isCorrectPre ? 'text-[#00a87e]' : 'text-slate-700'}">${(hData.pre_mc[idx] || 'N/A').toUpperCase()}</span> ➔ 
-            POST: <span class="font-bold ${isCorrectPost ? 'text-[#00a87e]' : 'text-rose-600'}">${(hData.post_mc[idx] || 'N/A').toUpperCase()}</span>
+            PRE: <span class="font-bold ${isCorrectPre ? 'text-[#52801b]' : 'text-slate-700'}">${(hData.pre_mc[idx] || 'N/A').toUpperCase()}</span> ➔ 
+            POST: <span class="font-bold ${isCorrectPost ? 'text-[#52801b]' : 'text-rose-600'}">${(hData.post_mc[idx] || 'N/A').toUpperCase()}</span>
             <span class="text-slate-400 font-normal ml-1">(Correcta: ${(key[idx] || '').toUpperCase()})</span>
           </div>
         </div>
@@ -2426,7 +2448,7 @@ function buildHitoMCBlock(title, hData, questionsMeta, theme) {
       <div class="flex items-center justify-between border-b border-slate-100 pb-2">
         <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${themeBadge}">${title}</span>
         <div class="text-xs font-bold text-slate-700">
-          Puntaje: <span class="text-[#00a87e] font-extrabold text-sm">${hData.post_score} / 5</span> 
+          Puntaje: <span class="${theme === 'indigo' ? 'text-[#00737d]' : 'text-[#52801b]'} font-extrabold text-sm">${hData.post_score} / 5</span> 
           <span class="text-[11px] text-slate-400 font-normal">(PRE: ${hData.pre_score}/5 · ${hData.delta >= 0 ? '+' : ''}${hData.delta} pts)</span>
         </div>
       </div>
@@ -2447,8 +2469,8 @@ function buildHitoOpenBlock(title, hData, theme) {
     `;
   }
 
-  const themeBorder = theme === 'indigo' ? 'border-indigo-100 bg-indigo-50/20' : 'border-emerald-100 bg-emerald-50/20';
-  const themeBadge = theme === 'indigo' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800';
+  const themeBorder = theme === 'indigo' ? 'border-[#99e1e7] bg-[#e6f9fa]/20' : 'border-[#cbe99c] bg-[#f1f9e9]/20';
+  const themeBadge = theme === 'indigo' ? 'bg-[#e6f9fa] text-[#00737d]' : 'bg-[#f1f9e9] text-[#52801b]';
 
   let itemsHtml = '';
   hData.open_analysis.forEach((oq, idx) => {
@@ -2489,8 +2511,8 @@ function buildHitoOpenBlock(title, hData, theme) {
             <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wide mb-0.5">PRE (Inicial):</span>
             <p class="italic text-slate-700">${oq.pre_text && oq.pre_text.trim() ? '"' + escapeHtml(oq.pre_text) + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta o no sabe)</span>'}</p>
           </div>
-          <div class="bg-emerald-50/40 p-3 rounded-xl border border-emerald-200">
-            <span class="text-[10px] font-bold text-[#00a87e] block uppercase tracking-wide mb-0.5">POST (En terreno):</span>
+          <div class="bg-[#f1f9e9]/40 p-3 rounded-xl border border-[#cbe99c]">
+            <span class="text-[10px] font-bold text-[#52801b] block uppercase tracking-wide mb-0.5">POST (En terreno):</span>
             <p class="font-medium text-slate-800">${oq.post_text && oq.post_text.trim() ? '"' + escapeHtml(oq.post_text) + '"' : '<span class="text-slate-400 font-normal italic">(Sin respuesta o no sabe)</span>'}</p>
           </div>
         </div>
@@ -2622,8 +2644,8 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
           <td style="padding: 5px 6px; border: 1px solid #e2e8f0; font-weight: bold; text-align: center;">Q${idx + 1}</td>
           <td style="padding: 5px 6px; border: 1px solid #e2e8f0;">${escapeHtml(h3Meta[idx].title)}</td>
           <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold;">${(h3Data.pre_mc[idx] || 'N/A').toUpperCase()}</td>
-          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${isPostCorr ? '#00a87e' : '#e11d48'};">${(h3Data.post_mc[idx] || 'N/A').toUpperCase()}</td>
-          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00a87e;">${key3[idx]}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${isPostCorr ? '#52801b' : '#e11d48'};">${(h3Data.post_mc[idx] || 'N/A').toUpperCase()}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #52801b;">${key3[idx]}</td>
           <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-size: 10px;">${evo}</td>
         </tr>
       `;
@@ -2642,8 +2664,8 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
           <td style="padding: 5px 6px; border: 1px solid #e2e8f0; font-weight: bold; text-align: center;">Q${idx + 1}</td>
           <td style="padding: 5px 6px; border: 1px solid #e2e8f0;">${escapeHtml(h4Meta[idx].title)}</td>
           <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold;">${(h4Data.pre_mc[idx] || 'N/A').toUpperCase()}</td>
-          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${isPostCorr ? '#00a87e' : '#e11d48'};">${(h4Data.post_mc[idx] || 'N/A').toUpperCase()}</td>
-          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00a87e;">${key4[idx]}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${isPostCorr ? '#00737d' : '#e11d48'};">${(h4Data.post_mc[idx] || 'N/A').toUpperCase()}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00737d;">${key4[idx]}</td>
           <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-size: 10px;">${evo}</td>
         </tr>
       `;
@@ -2658,7 +2680,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
         <div style="margin-bottom: 8px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #fafafa; page-break-inside: avoid;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <strong style="font-size: 11px; color: #0f172a;">P${idx + 1}: ${escapeHtml(oq.question)}</strong>
-            <span style="font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 12px; background-color: ${oq.status === 'Mejoró' ? '#e6faf5' : (oq.status === 'Retrocedió' ? '#fff1f2' : '#f1f5f9')}; color: ${oq.status === 'Mejoró' ? '#00a87e' : (oq.status === 'Retrocedió' ? '#e11d48' : '#475569')};">${oq.status}</span>
+            <span style="font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 12px; background-color: ${oq.status === 'Mejoró' ? '#f1f9e9' : (oq.status === 'Retrocedió' ? '#fff1f2' : '#f1f5f9')}; color: ${oq.status === 'Mejoró' ? '#52801b' : (oq.status === 'Retrocedió' ? '#e11d48' : '#475569')};">${oq.status}</span>
           </div>
           <div style="font-size: 10px; color: #64748b; margin-bottom: 6px;">Diagnóstico: <strong>${escapeHtml(oq.detail)}</strong></div>
           <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
@@ -2667,8 +2689,8 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
                 <span style="font-size: 9px; font-weight: bold; color: #94a3b8; display: block; text-transform: uppercase;">Respuesta PRE (Inicial):</span>
                 <span style="font-style: italic; color: #334155;">${oq.pre_text && oq.pre_text.trim() ? '"' + escapeHtml(oq.pre_text) + '"' : '(Sin respuesta o no sabe)'}</span>
               </td>
-              <td style="width: 50%; padding: 6px; border: 1px solid #e2e8f0; background-color: #f0fdf4; vertical-align: top;">
-                <span style="font-size: 9px; font-weight: bold; color: #00a87e; display: block; text-transform: uppercase;">Respuesta POST (En terreno):</span>
+              <td style="width: 50%; padding: 6px; border: 1px solid #e2e8f0; background-color: #f1f9e9; vertical-align: top;">
+                <span style="font-size: 9px; font-weight: bold; color: #52801b; display: block; text-transform: uppercase;">Respuesta POST (En terreno):</span>
                 <span style="color: #0f172a; font-weight: 500;">${oq.post_text && oq.post_text.trim() ? '"' + escapeHtml(oq.post_text) + '"' : '(Sin respuesta o no sabe)'}</span>
               </td>
             </tr>
@@ -2687,7 +2709,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
         <div style="margin-bottom: 8px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #fafafa; page-break-inside: avoid;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <strong style="font-size: 11px; color: #0f172a;">P${idx + 1}: ${escapeHtml(oq.question)}</strong>
-            <span style="font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 12px; background-color: ${oq.status === 'Mejoró' ? '#e6faf5' : (oq.status === 'Retrocedió' ? '#fff1f2' : '#f1f5f9')}; color: ${oq.status === 'Mejoró' ? '#00a87e' : (oq.status === 'Retrocedió' ? '#e11d48' : '#475569')};">${oq.status}</span>
+            <span style="font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 12px; background-color: ${oq.status === 'Mejoró' ? '#e6f9fa' : (oq.status === 'Retrocedió' ? '#fff1f2' : '#f1f5f9')}; color: ${oq.status === 'Mejoró' ? '#00737d' : (oq.status === 'Retrocedió' ? '#e11d48' : '#475569')};">${oq.status}</span>
           </div>
           <div style="font-size: 10px; color: #64748b; margin-bottom: 6px;">Diagnóstico: <strong>${escapeHtml(oq.detail)}</strong></div>
           <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
@@ -2696,8 +2718,8 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
                 <span style="font-size: 9px; font-weight: bold; color: #94a3b8; display: block; text-transform: uppercase;">Respuesta PRE (Inicial):</span>
                 <span style="font-style: italic; color: #334155;">${oq.pre_text && oq.pre_text.trim() ? '"' + escapeHtml(oq.pre_text) + '"' : '(Sin respuesta o no sabe)'}</span>
               </td>
-              <td style="width: 50%; padding: 6px; border: 1px solid #e2e8f0; background-color: #f0fdf4; vertical-align: top;">
-                <span style="font-size: 9px; font-weight: bold; color: #00a87e; display: block; text-transform: uppercase;">Respuesta POST (En terreno):</span>
+              <td style="width: 50%; padding: 6px; border: 1px solid #e2e8f0; background-color: #e6f9fa; vertical-align: top;">
+                <span style="font-size: 9px; font-weight: bold; color: #00737d; display: block; text-transform: uppercase;">Respuesta POST (En terreno):</span>
                 <span style="color: #0f172a; font-weight: 500;">${oq.post_text && oq.post_text.trim() ? '"' + escapeHtml(oq.post_text) + '"' : '(Sin respuesta o no sabe)'}</span>
               </td>
             </tr>
@@ -2712,14 +2734,14 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
     <div style="font-family: Arial, Helvetica, sans-serif; color: #1e293b; padding: 20px; line-height: 1.4; background-color: #ffffff;">
       
       <!-- Encabezado con Logos Oficiales -->
-      <table style="width: 100%; border-bottom: 2px solid #00d09c; padding-bottom: 12px; margin-bottom: 16px;">
+      <table style="width: 100%; border-bottom: 2px solid #88C23F; padding-bottom: 12px; margin-bottom: 16px;">
         <tr>
           <td style="width: 70px; vertical-align: middle;">
             <img src="logo.png" style="height: 48px; width: auto; object-fit: contain;" alt="PAC 2026">
           </td>
           <td style="vertical-align: middle; padding-left: 10px;">
             <div style="font-size: 13px; font-weight: bold; text-transform: uppercase; color: #0f172a; letter-spacing: 0.5px;">Programa de Acción Climática 2026 · Línea Verde</div>
-            <div style="font-size: 17px; font-weight: 900; color: #00a87e; margin-top: 2px;">FICHA INDIVIDUAL DE EVALUACIÓN TEST-RETEST</div>
+            <div style="font-size: 17px; font-weight: 900; color: #52801b; margin-top: 2px;">FICHA INDIVIDUAL DE EVALUACIÓN TEST-RETEST</div>
             <div style="font-size: 10px; color: #64748b;">Antofagasta: Laboratorio Vivo hacia el 2050 · Reporte de Aprendizajes</div>
           </td>
           <td style="width: 120px; text-align: right; vertical-align: middle;">
@@ -2739,7 +2761,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
           <td style="padding: 8px 12px; width: 50%; vertical-align: top; border-left: 1px solid #e2e8f0;">
             <div style="font-size: 9px; text-transform: uppercase; font-weight: bold; color: #94a3b8;">Detalles de Participación:</div>
             <div style="font-size: 11px; color: #334155; margin-top: 2px;">Género: <strong>${escapeHtml(p.gender)}</strong> · Rol: <strong>${escapeHtml(p.role || 'Estudiante')}</strong></div>
-            <div style="font-size: 11px; color: #00a87e; font-weight: bold; margin-top: 2px;">${coverageText}</div>
+            <div style="font-size: 11px; color: #52801b; font-weight: bold; margin-top: 2px;">${coverageText}</div>
             <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Diagnóstico: <strong style="color: #0f172a;">${escapeHtml(p.real_status || p.status)}</strong></div>
           </td>
         </tr>
@@ -2747,7 +2769,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
 
       <!-- Tabla de Rendimiento Cuantitativo -->
       <div style="margin-bottom: 16px;">
-        <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 6px; border-left: 3px solid #00d09c; padding-left: 6px;">1. Resumen Cuantitativo de Rendimiento (Puntajes PRE vs. POST)</div>
+        <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 6px; border-left: 3px solid #88C23F; padding-left: 6px;">1. Resumen Cuantitativo de Rendimiento (Puntajes PRE vs. POST)</div>
         <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
           <thead>
             <tr style="background-color: #f1f5f9; text-align: left;">
@@ -2763,8 +2785,8 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
               <tr>
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: bold;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad)</td>
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">${h3Data.pre_score} / 5</td>
-                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00a87e;">${h3Data.post_score} / 5</td>
-                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${h3Data.delta >= 0 ? '#00a87e' : '#e11d48'};">${h3Data.delta >= 0 ? '+' : ''}${h3Data.delta} pts</td>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #52801b;">${h3Data.post_score} / 5</td>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${h3Data.delta >= 0 ? '#52801b' : '#e11d48'};">${h3Data.delta >= 0 ? '+' : ''}${h3Data.delta} pts</td>
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">${h3Data.status}</td>
               </tr>
             ` : ''}
@@ -2772,18 +2794,18 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
               <tr>
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: bold;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos)</td>
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">${h4Data.pre_score} / 5</td>
-                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00a87e;">${h4Data.post_score} / 5</td>
-                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${h4Data.delta >= 0 ? '#00a87e' : '#e11d48'};">${h4Data.delta >= 0 ? '+' : ''}${h4Data.delta} pts</td>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00737d;">${h4Data.post_score} / 5</td>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${h4Data.delta >= 0 ? '#00737d' : '#e11d48'};">${h4Data.delta >= 0 ? '+' : ''}${h4Data.delta} pts</td>
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">${h4Data.status}</td>
               </tr>
             ` : ''}
             ${h3Data && h4Data ? `
-              <tr style="background-color: #ecfdf5; font-weight: bold;">
-                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; color: #065f46;">Consolidado Combinado (10 preguntas cerradas)</td>
+              <tr style="background-color: #f1f9e9; font-weight: bold;">
+                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; color: #3f6515;">Consolidado Combinado (10 preguntas cerradas)</td>
                 <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center;">${totPre} / 10 pts</td>
-                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; color: #00a87e;">${totPost} / 10 pts</td>
-                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; color: ${totDelta >= 0 ? '#00a87e' : '#e11d48'};">${deltaSign}${totDelta} pts</td>
-                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; color: #065f46;">${p.status}</td>
+                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; color: #52801b;">${totPost} / 10 pts</td>
+                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; color: ${totDelta >= 0 ? '#52801b' : '#e11d48'};">${deltaSign}${totDelta} pts</td>
+                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; color: #3f6515;">${p.status}</td>
               </tr>
             ` : ''}
           </tbody>
@@ -2792,11 +2814,11 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
 
       <!-- Sección 2: Desglose Preguntas Cerradas -->
       <div style="margin-bottom: 16px;">
-        <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 6px; border-left: 3px solid #00d09c; padding-left: 6px;">2. Desglose de Preguntas Cerradas (Alternativas)</div>
+        <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 6px; border-left: 3px solid #88C23F; padding-left: 6px;">2. Desglose de Preguntas Cerradas (Alternativas)</div>
         
         ${h3Data ? `
           <div style="margin-bottom: 10px;">
-            <div style="font-size: 11px; font-weight: bold; color: #065f46; margin-bottom: 4px;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y Humedales) · Puntaje: ${h3Data.post_score} / 5</div>
+            <div style="font-size: 11px; font-weight: bold; color: #52801b; margin-bottom: 4px;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y Humedales) · Puntaje: ${h3Data.post_score} / 5</div>
             <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
               <thead>
                 <tr style="background-color: #f8fafc;">
@@ -2817,7 +2839,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
 
         ${h4Data ? `
           <div style="margin-bottom: 10px;">
-            <div style="font-size: 11px; font-weight: bold; color: #3730a3; margin-bottom: 4px;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos Limpios) · Puntaje: ${h4Data.post_score} / 5</div>
+            <div style="font-size: 11px; font-weight: bold; color: #00737d; margin-bottom: 4px;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos Limpios) · Puntaje: ${h4Data.post_score} / 5</div>
             <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
               <thead>
                 <tr style="background-color: #f8fafc;">
@@ -2839,26 +2861,26 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
 
       <!-- Sección 3: Desglose Preguntas Abiertas (Cualitativo) -->
       <div style="margin-bottom: 16px;">
-        <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 6px; border-left: 3px solid #00d09c; padding-left: 6px;">3. Desglose de Preguntas Abiertas (Análisis Cualitativo de Apropiación)</div>
+        <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 6px; border-left: 3px solid #88C23F; padding-left: 6px;">3. Desglose de Preguntas Abiertas (Análisis Cualitativo de Apropiación)</div>
         
         ${h3Data ? `
           <div style="margin-bottom: 12px;">
-            <div style="font-size: 11px; font-weight: bold; color: #065f46; margin-bottom: 6px;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y Ecosistemas)</div>
+            <div style="font-size: 11px; font-weight: bold; color: #52801b; margin-bottom: 6px;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y Ecosistemas)</div>
             ${h3OpenCards}
           </div>
         ` : ''}
 
         ${h4Data ? `
           <div style="margin-bottom: 12px;">
-            <div style="font-size: 11px; font-weight: bold; color: #3730a3; margin-bottom: 6px;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos Limpios)</div>
+            <div style="font-size: 11px; font-weight: bold; color: #00737d; margin-bottom: 6px;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos Limpios)</div>
             ${h4OpenCards}
           </div>
         ` : ''}
       </div>
 
       <!-- Sección 4: Orientaciones Pedagógicas -->
-      <div style="margin-bottom: 20px; padding: 10px 12px; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; page-break-inside: avoid;">
-        <div style="font-size: 11px; font-weight: bold; color: #166534; margin-bottom: 4px;">Orientación para el Profesor/a Líder:</div>
+      <div style="margin-bottom: 20px; padding: 10px 12px; background-color: #f1f9e9; border: 1px solid #cbe99c; border-radius: 8px; page-break-inside: avoid;">
+        <div style="font-size: 11px; font-weight: bold; color: #3f6515; margin-bottom: 4px;">Orientación para el Profesor/a Líder:</div>
         <p style="font-size: 10px; color: #14532d; margin: 0; line-height: 1.45;">
           ${p.status === 'Mejoró' ? 
             'El participante evidenció un avance significativo en la apropiación de conceptos y terminología científica tanto en preguntas de selección múltiple como en sus explicaciones escritas. Se recomienda canalizar esta motivación hacia la fase de ideación de soluciones climáticas escolares.' : 
