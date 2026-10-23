@@ -47,6 +47,33 @@
     .card-shadow {
       box-shadow: 0 12px 30px -6px rgba(10, 22, 34, 0.15), 0 4px 10px -3px rgba(10, 22, 34, 0.08);
     }
+    /* Estilos fieles a las tarjetas físicas del Climatón */
+    .climaton-card {
+      background-color: #ffffff;
+      border: 1px solid #dcd9cf;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
+      transition: all 0.25s ease-in-out;
+    }
+    .climaton-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 32px -6px rgba(0, 0, 0, 0.16), 0 8px 14px -2px rgba(0, 0, 0, 0.08);
+      border-color: #688a24;
+    }
+    .climaton-header-v1 {
+      background: linear-gradient(135deg, #5b791e 0%, #6d9124 100%);
+      color: #ffffff;
+    }
+    .climaton-header-v2 {
+      background: linear-gradient(135deg, #4f6e1b 0%, #608620 100%);
+      color: #ffffff;
+    }
+    .climaton-body-ruled {
+      background-color: #ffffff;
+      background-image: repeating-linear-gradient(transparent, transparent 27px, #e9e7e1 28px);
+      line-height: 28px;
+    }
   </style>
 </head>
 <body class="bg-[#112231] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#193248] via-[#112231] to-[#0a1622] text-slate-800 min-h-screen flex flex-col antialiased">
@@ -90,6 +117,10 @@
       <button onclick="switchTab('establecimientos')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition" id="tab-btn-establecimientos">
         <i data-lucide="school" class="w-4 h-4"></i>
         <span>Por Establecimiento</span>
+      </button>
+      <button onclick="switchTab('climaton')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition" id="tab-btn-climaton">
+        <i data-lucide="sparkles" class="w-4 h-4 text-[#00d09c]"></i>
+        <span>Ideas Climatón 2026</span>
       </button>
       <button onclick="switchTab('preguntas')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition" id="tab-btn-preguntas">
         <i data-lucide="help-circle" class="w-4 h-4"></i>
@@ -357,7 +388,8 @@
                 <th class="py-3.5 px-3 text-center">Variación (Delta)</th>
                 <th class="py-3.5 px-3 text-center">% Mejora</th>
                 <th class="py-3.5 px-3">Distribución</th>
-                <th class="py-3.5 px-4 rounded-r-xl">Profesor/a Líder</th>
+                <th class="py-3.5 px-3">Profesor/a Líder</th>
+                <th class="py-3.5 px-4 text-center rounded-r-xl">Climatón 2026</th>
               </tr>
             </thead>
             <tbody id="schools-table-body" class="divide-y divide-slate-100">
@@ -365,6 +397,93 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Fichas Detalladas Institucionales y Climatón -->
+        <div class="mt-8 pt-6 border-t border-slate-100 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="font-bold text-slate-900 text-base">Fichas Institucionales y Proyectos de Equipo</h4>
+              <p class="text-xs text-slate-400">Detalle de acreditación ambiental SNCAE, profesores líderes y las 5 ideas de solución de cada colegio</p>
+            </div>
+            <button onclick="switchTab('climaton')" class="px-4 py-1.5 text-xs font-bold text-slate-900 bg-[#00d09c] hover:bg-[#00bfa5] rounded-full transition shadow-sm inline-flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              <span>Ver Muro Completo</span>
+            </button>
+          </div>
+          <div id="schools-cards-container" class="space-y-6">
+            <!-- Dynamically rendered school profile cards with climaton drawer -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2.5 TAB: GALERÍA CLIMATÓN 2026 -->
+    <section id="view-climaton" class="tab-view hidden space-y-6">
+      <!-- Banner Climatón -->
+      <div class="bg-gradient-to-r from-[#173322] via-[#102434] to-[#0c1a27] p-6 sm:p-8 rounded-3xl border border-white/10 card-shadow text-white relative overflow-hidden">
+        <div class="absolute right-0 top-0 bottom-0 w-1/3 bg-radial from-emerald-500/10 to-transparent pointer-events-none"></div>
+        <div class="max-w-3xl relative z-10 space-y-2">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-[#00d09c]/20 text-[#00d09c] border border-[#00d09c]/30">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            <span>Jornada Final Climatón 2026 · Línea Verde</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+            Muro de Ideas: Propuestas Escolares hacia el 2050
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+            Catálogo digital de las <strong>35 ideas de solución</strong> formuladas por los 7 equipos escolares de la Línea Verde durante la Climatón final. Cada tarjeta representa la propuesta original de los estudiantes para responder a los desafíos de biodiversidad urbana y cielos limpios en Antofagasta.
+          </p>
+          <div class="flex flex-wrap gap-4 pt-2 text-xs text-slate-400">
+            <span class="flex items-center gap-1.5"><strong class="text-white">7</strong> Establecimientos</span>
+            <span>·</span>
+            <span class="flex items-center gap-1.5"><strong class="text-[#00d09c]">35</strong> Ideas Formuladas</span>
+            <span>·</span>
+            <span class="flex items-center gap-1.5"><strong class="text-emerald-400">V1</strong> (Biodiversidad y Humedales)</span>
+            <span>·</span>
+            <span class="flex items-center gap-1.5"><strong class="text-teal-400">V2</strong> (Atmósfera y Cielos)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Filtros y Búsqueda del Climatón -->
+      <div class="bg-white p-5 rounded-3xl border border-slate-100 card-shadow flex flex-wrap items-center justify-between gap-4 text-xs">
+        <!-- Filtros temáticos -->
+        <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-full border border-slate-200">
+          <button onclick="filterClimatonByDesafio('ALL')" id="btn-climaton-filter-all" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#00d09c] text-slate-950 shadow-sm transition">
+            Todas las Ideas (35)
+          </button>
+          <button onclick="filterClimatonByDesafio('V1')" id="btn-climaton-filter-v1" class="px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 transition">
+            V1: Los otros vecinos (20)
+          </button>
+          <button onclick="filterClimatonByDesafio('V2')" id="btn-climaton-filter-v2" class="px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 transition">
+            V2: El escudo invisible (15)
+          </button>
+        </div>
+
+        <!-- Filtro por colegio y búsqueda -->
+        <div class="flex items-center gap-2.5 flex-wrap flex-1 justify-end">
+          <select id="select-climaton-school" onchange="renderClimatonCards()" class="bg-slate-50 border border-slate-200 rounded-full px-3.5 py-1.5 text-xs text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-[#00d09c]">
+            <option value="ALL">Todos los Establecimientos</option>
+            <option value="Escuela Presbiteriana">Escuela Presbiteriana (V1)</option>
+            <option value="Escuela Rómulo Peña">Escuela Rómulo Peña (V1)</option>
+            <option value="Escuela La Bandera">Escuela La Bandera (V1)</option>
+            <option value="Escuela Héroes de la Concepción">Escuela Héroes de la Concepción (V1)</option>
+            <option value="Colegio Bet-El">Colegio Bet-El (V2)</option>
+            <option value="Colegio Greenhill">Colegio Greenhill (V2)</option>
+            <option value="Liceo Bicentenario Andrés Sabella">Liceo Andrés Sabella (V2)</option>
+          </select>
+
+          <div class="relative w-full sm:w-64">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="input-climaton-search" oninput="renderClimatonCards()" placeholder="Buscar en ideas (ej. drones, luces, abejas)..." class="w-full pl-9 pr-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00d09c]">
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenedor dinámico de las Tarjetas Climatón -->
+      <div id="climaton-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Renderizado dinámico vía renderClimatonCards() -->
       </div>
     </section>
 

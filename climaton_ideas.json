@@ -1,0 +1,86 @@
+{
+  "Escuela Presbiteriana": {
+    "desafio_codigo": "V1",
+    "desafio_nombre": "Los otros vecinos",
+    "eje": "Biodiversidad y Humedales",
+    "ideas": [
+      { "numero": 1, "titulo": "Lugar para ver las aves con binoculares." },
+      { "numero": 2, "titulo": "Crearemos un QR con un video informativo para culturizar a la comunidad sobre nuestras aves costeras" },
+      { "numero": 3, "titulo": "Dispensador de bolsas de basura." },
+      { "numero": 4, "titulo": "Crear carteles de madera informativos sobre aves costeras como viven y habitan en nuestra región" },
+      { "numero": 5, "titulo": "Drones que vigilen la playa" }
+    ]
+  },
+  "Escuela Rómulo Peña": {
+    "desafio_codigo": "V1",
+    "desafio_nombre": "Los otros vecinos",
+    "eje": "Biodiversidad y Humedales",
+    "ideas": [
+      { "numero": 1, "titulo": "Hacer juegos con materiales reciclables para la escuela y paneles para que los niños jueguen" },
+      { "numero": 2, "titulo": "Poner basureros de colores con materiales de reciclajes para seleccionar basura de la escuela" },
+      { "numero": 3, "titulo": "Formar equipo o grupo de estudiantes para recoger basura cuando cuidemos medio ambiente de la escuela ser: guardianes de la biodiversidad" },
+      { "numero": 4, "titulo": "Hacer un jardín utilizando residuos de comida orgánica para mejorar la tierra, así las abejas tienen lugar donde vivir" },
+      { "numero": 5, "titulo": "Campaña: Hacer afiches informativos para cuidar el hábitat de los animales y plantas y enseñar en actos" }
+    ]
+  },
+  "Colegio Bet-El": {
+    "desafio_codigo": "V2",
+    "desafio_nombre": "El escudo invisible",
+    "eje": "Atmósfera y Cielos Limpios",
+    "ideas": [
+      { "numero": 1, "titulo": "Usar luz día" },
+      { "numero": 2, "titulo": "Solo luces amarillas apuntando hacia abajo" },
+      { "numero": 3, "titulo": "Usar paneles solares" },
+      { "numero": 4, "titulo": "Luces con sensor de movimiento" },
+      { "numero": 5, "titulo": "Carteles publicitarios apagados durante el día" }
+    ]
+  },
+  "Colegio Greenhill": {
+    "desafio_codigo": "V2",
+    "desafio_nombre": "El escudo invisible",
+    "eje": "Atmósfera y Cielos Limpios",
+    "ideas": [
+      { "numero": 1, "titulo": "Que los mall apaguen sus luces en las noches/tardes. Poner sensores de movimiento en las casas y programar la luz para que se prenda y apaguen a una hora exacta." },
+      { "numero": 2, "titulo": "Pactando con las empresas las luces en la noche como ejemplo 8 PM - 1 AM" },
+      { "numero": 3, "titulo": "Bajando la intensidad de las luces, así no encandila mucho y no le hace mal a nadie" },
+      { "numero": 4, "titulo": "Solo ocupar las luces en horas necesarias y no desperdiciar" },
+      { "numero": 5, "titulo": "Cambiar los focos a luces cálidas y cambiar su forma para que miren hacia abajo, y las aves no se desorienten tanto" }
+    ]
+  },
+  "Escuela La Bandera": {
+    "desafio_codigo": "V1",
+    "desafio_nombre": "Los otros vecinos",
+    "eje": "Biodiversidad y Humedales",
+    "ideas": [
+      { "numero": 1, "titulo": "Basurero del centro y dividir contenedores en 4 secciones de reciclaje y hacerlo con dispositivo de voz claro" },
+      { "numero": 2, "titulo": "Hacer una red de apoyo entre colegios y estudiantes para compartir sus experiencias con la fauna mediante un podcast" },
+      { "numero": 3, "titulo": "El camino de las huellas: Poner huellas de patas en el suelo que conduzcan hacia un mirador :D" },
+      { "numero": 4, "titulo": "La persona contaminada: Un estudiante se viste con residuos limpios pero con contaminación y llevar un cartel ¿Así queremos vivir?" },
+      { "numero": 5, "titulo": "Cubos con fotografías de los animales, información, e imágenes" }
+    ]
+  },
+  "Escuela Héroes de la Concepción": {
+    "desafio_codigo": "V1",
+    "desafio_nombre": "Los otros vecinos",
+    "eje": "Biodiversidad y Humedales",
+    "ideas": [
+      { "numero": 1, "titulo": "Reunir residuos orgánicos con la comunidad, alimentar lombrices y finalmente trocar plantas a vecinos a cambio de su compromiso" },
+      { "numero": 2, "titulo": "Hacer un tipo de scout que se encargue de generar conciencia sobre el medio ambiente" },
+      { "numero": 3, "titulo": "Crear una app para denunciar microbasurales y que a la vez enseñe sobre la ley y cómo ayudar" },
+      { "numero": 4, "titulo": "Charlas en colegios sobre los peligros de la flora y fauna costera. No botar basura, talleres en comunidades y juntas de vecinos" },
+      { "numero": 5, "titulo": "Crear desafíos para la comunidad con conceptos de humedales y participación" }
+    ]
+  },
+  "Liceo Bicentenario Andrés Sabella": {
+    "desafio_codigo": "V2",
+    "desafio_nombre": "El escudo invisible",
+    "eje": "Atmósfera y Cielos Limpios",
+    "ideas": [
+      { "numero": 1, "titulo": "Apoyo a la ordenanza y fiscalizaciones reales hacia empresas, industrias y particulares" },
+      { "numero": 2, "titulo": "Radio escolar que funcione para concientizar. Prácticas didácticas dirigidas a estudiantes según sus motivaciones" },
+      { "numero": 3, "titulo": "Campaña 'Que tu noche no sea mi día' en los barrios a través de federaciones y sedes sociales" },
+      { "numero": 4, "titulo": "Pantalla en ciudad mostrando fotos que se ven en Antofagasta hoy versus las de antes y que en ambos lados se cuide" },
+      { "numero": 5, "titulo": "Realizar talleres y actividades integrando a amigos de las escuelas sustentables y que cada uno comparta la iniciativa que les enseñaron" }
+    ]
+  }
+}

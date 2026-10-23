@@ -953,6 +953,7 @@ function updateUI() {
   updateKPIs();
   renderCharts();
   renderSchoolsTab();
+  renderClimatonTab();
   renderQuestionsTab();
   renderQualitativeTab();
   renderPedagogicalTab();
@@ -1313,75 +1314,483 @@ function renderCharts() {
   });
 }
 
-// 2. TAB: ESTABLECIMIENTOS TABLE
+// =========================================================================
+// MÓDULO CLIMATÓN 2026: IDEAS HACIA EL 2050 (LÍNEA VERDE)
+// =========================================================================
+
+const CLIMATON_DATA_FALLBACK = {
+  "Escuela Presbiteriana": {
+    "desafio_codigo": "V1",
+    "desafio_nombre": "Los otros vecinos",
+    "eje": "Biodiversidad y Humedales",
+    "equipo": 4,
+    "ideas": [
+      { "numero": 1, "titulo": "Lugar para ver las aves con binoculares." },
+      { "numero": 2, "titulo": "Crearemos un QR con un video informativo para culturizar a la comunidad sobre nuestras aves costeras" },
+      { "numero": 3, "titulo": "Dispensador de bolsas de basura." },
+      { "numero": 4, "titulo": "Crear carteles de madera informativos sobre aves costeras como viven y habitan en nuestra región" },
+      { "numero": 5, "titulo": "Drones que vigilen la playa" }
+    ]
+  },
+  "Escuela Rómulo Peña": {
+    "desafio_codigo": "V1",
+    "desafio_nombre": "Los otros vecinos",
+    "eje": "Biodiversidad y Humedales",
+    "equipo": 1,
+    "ideas": [
+      { "numero": 1, "titulo": "Hacer juegos con materiales reciclables para la escuela y paneles para que los niños jueguen" },
+      { "numero": 2, "titulo": "Poner basureros de colores con materiales de reciclajes para seleccionar basura de la escuela" },
+      { "numero": 3, "titulo": "Formar equipo o grupo de estudiantes para recoger basura cuando cuidemos medio ambiente de la escuela ser: guardianes de la biodiversidad" },
+      { "numero": 4, "titulo": "Hacer un jardín utilizando residuos de comida orgánica para mejorar la tierra, así las abejas tienen lugar donde vivir" },
+      { "numero": 5, "titulo": "Campaña: Hacer afiches informativos para cuidar el hábitat de los animales y plantas y enseñar en actos" }
+    ]
+  },
+  "Colegio Bet-El": {
+    "desafio_codigo": "V2",
+    "desafio_nombre": "El escudo invisible",
+    "eje": "Atmósfera y Cielos Limpios",
+    "equipo": 7,
+    "ideas": [
+      { "numero": 1, "titulo": "Usar luz día" },
+      { "numero": 2, "titulo": "Solo luces amarillas apuntando hacia abajo" },
+      { "numero": 3, "titulo": "Usar paneles solares" },
+      { "numero": 4, "titulo": "Luces con sensor de movimiento" },
+      { "numero": 5, "titulo": "Carteles publicitarios apagados durante el día" }
+    ]
+  },
+  "Colegio Greenhill": {
+    "desafio_codigo": "V2",
+    "desafio_nombre": "El escudo invisible",
+    "eje": "Atmósfera y Cielos Limpios",
+    "equipo": 14,
+    "ideas": [
+      { "numero": 1, "titulo": "Que los mall apaguen sus luces en las noches/tardes. Poner sensores de movimiento en las casas y programar la luz para que se prenda y apaguen a una hora exacta." },
+      { "numero": 2, "titulo": "Pactando con las empresas las luces en la noche como ejemplo 8 PM - 1 AM" },
+      { "numero": 3, "titulo": "Bajando la intensidad de las luces, así no encandila mucho y no le hace mal a nadie" },
+      { "numero": 4, "titulo": "Solo ocupar las luces en horas necesarias y no desperdiciar" },
+      { "numero": 5, "titulo": "Cambiar los focos a luces cálidas y cambiar su forma para que miren hacia abajo, y las aves no se desorienten tanto" }
+    ]
+  },
+  "Escuela La Bandera": {
+    "desafio_codigo": "V1",
+    "desafio_nombre": "Los otros vecinos",
+    "eje": "Biodiversidad y Humedales",
+    "equipo": 6,
+    "ideas": [
+      { "numero": 1, "titulo": "Basurero del centro y dividir contenedores en 4 secciones de reciclaje y hacerlo con dispositivo de voz claro" },
+      { "numero": 2, "titulo": "Hacer una red de apoyo entre colegios y estudiantes para compartir sus experiencias con la fauna mediante un podcast" },
+      { "numero": 3, "titulo": "El camino de las huellas: Poner huellas de patas en el suelo que conduzcan hacia un mirador :D" },
+      { "numero": 4, "titulo": "La persona contaminada: Un estudiante se viste con residuos limpios pero con contaminación y llevar un cartel ¿Así queremos vivir?" },
+      { "numero": 5, "titulo": "Cubos con fotografías de los animales, información, e imágenes" }
+    ]
+  },
+  "Escuela Héroes de la Concepción": {
+    "desafio_codigo": "V1",
+    "desafio_nombre": "Los otros vecinos",
+    "eje": "Biodiversidad y Humedales",
+    "equipo": 2,
+    "ideas": [
+      { "numero": 1, "titulo": "Reunir residuos orgánicos con la comunidad, alimentar lombrices y finalmente trocar plantas a vecinos a cambio de su compromiso" },
+      { "numero": 2, "titulo": "Hacer un tipo de scout que se encargue de generar conciencia sobre el medio ambiente" },
+      { "numero": 3, "titulo": "Crear una app para denunciar microbasurales y que a la vez enseñe sobre la ley y cómo ayudar" },
+      { "numero": 4, "titulo": "Charlas en colegios sobre los peligros de la flora y fauna costera. No botar basura, talleres en comunidades y juntas de vecinos" },
+      { "numero": 5, "titulo": "Crear desafíos para la comunidad con conceptos de humedales y participación" }
+    ]
+  },
+  "Liceo Bicentenario Andrés Sabella": {
+    "desafio_codigo": "V2",
+    "desafio_nombre": "El escudo invisible",
+    "eje": "Atmósfera y Cielos Limpios",
+    "equipo": 11,
+    "ideas": [
+      { "numero": 1, "titulo": "Apoyo a la ordenanza y fiscalizaciones reales hacia empresas, industrias y particulares" },
+      { "numero": 2, "titulo": "Radio escolar que funcione para concientizar. Prácticas didácticas dirigidas a estudiantes según sus motivaciones" },
+      { "numero": 3, "titulo": "Campaña 'Que tu noche no sea mi día' en los barrios a través de federaciones y sedes sociales" },
+      { "numero": 4, "titulo": "Pantalla en ciudad mostrando fotos que se ven en Antofagasta hoy versus las de antes y que en ambos lados se cuide" },
+      { "numero": 5, "titulo": "Realizar talleres y actividades integrando a amigos de las escuelas sustentables y que cada uno comparta la iniciativa que les enseñaron" }
+    ]
+  }
+};
+
+function getClimatonData() {
+  if (RAW_DATA && RAW_DATA.climaton_ideas && Object.keys(RAW_DATA.climaton_ideas).length > 0) {
+    return RAW_DATA.climaton_ideas;
+  }
+  return CLIMATON_DATA_FALLBACK;
+}
+
+function getSchoolClimaton(schoolName) {
+  if (!schoolName) return null;
+  const cData = getClimatonData();
+  const target = stripAccents(schoolName);
+  
+  for (const [key, val] of Object.entries(cData)) {
+    const kClean = stripAccents(key);
+    if (kClean === target || target.includes(kClean) || kClean.includes(target)) {
+      return val;
+    }
+    if (target.includes('heroes') && kClean.includes('heroes')) return val;
+    if (target.includes('sabella') && kClean.includes('sabella')) return val;
+    if (target.includes('bet-el') && (kClean.includes('bet-el') || kClean.includes('bet el'))) return val;
+    if (target.includes('bandera') && kClean.includes('bandera')) return val;
+    if (target.includes('presbiteriana') && kClean.includes('presbiteriana')) return val;
+    if (target.includes('romulo') && kClean.includes('romulo')) return val;
+    if (target.includes('greenhill') && kClean.includes('greenhill')) return val;
+  }
+  return null;
+}
+
+function createClimatonCardHTML(idea, schoolName, desafioCodigo, desafioNombre, totalIdeas) {
+  const isV1 = desafioCodigo === 'V1';
+  const headerClass = isV1 ? 'climaton-header-v1' : 'climaton-header-v2';
+
+  let indicatorsHtml = '';
+  for (let i = 1; i <= 5; i++) {
+    if (i === idea.numero) {
+      indicatorsHtml += `
+        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#526f18] text-white font-extrabold text-[10px] shadow-xs">
+          ${i}
+        </span>
+      `;
+    } else {
+      indicatorsHtml += `
+        <span class="inline-flex items-center justify-center w-4 h-4 text-slate-300 font-semibold text-[10px]">
+          ${i}
+        </span>
+      `;
+    }
+  }
+
+  return `
+    <div class="climaton-card flex flex-col justify-between">
+      <!-- Header verde oliva fiel a la tarjeta física -->
+      <div class="${headerClass} px-4 py-3 flex items-center justify-between text-white">
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 rounded bg-white/20 text-white font-black text-xs tracking-wider border border-white/20">${desafioCodigo}</span>
+          <span class="text-[11px] font-semibold text-white/95 tracking-wide">${escapeHtml(desafioNombre)}</span>
+        </div>
+        <div class="text-right">
+          <span class="text-xs font-bold text-white tracking-tight">${escapeHtml(schoolName)}</span>
+        </div>
+      </div>
+
+      <!-- Cuerpo pautado con renglones de libreta -->
+      <div class="climaton-body-ruled p-5 flex-1 flex flex-col justify-between space-y-3 min-h-[145px]">
+        <div>
+          <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#688a24]"></span>
+            <span>NUESTRA IDEA</span>
+          </div>
+          <p class="text-slate-900 font-bold text-xs sm:text-[13px] leading-relaxed tracking-tight">
+            "${escapeHtml(idea.titulo)}"
+          </p>
+        </div>
+      </div>
+
+      <!-- Pie de tarjeta con contador IDEA y marca PAC -->
+      <div class="bg-slate-50/90 px-4 py-2 border-t border-slate-200/70 flex items-center justify-between">
+        <div class="flex items-center gap-1">
+          <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider mr-1">IDEA:</span>
+          <div class="flex items-center gap-0.5">
+            ${indicatorsHtml}
+          </div>
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="text-[9px] font-black tracking-wider uppercase text-slate-600 bg-white px-2 py-0.5 rounded border border-slate-200 shadow-xs">
+            PAC 2026
+          </span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+let CLIMATON_FILTER_DESAFIO = 'ALL';
+
+function filterClimatonByDesafio(codigo) {
+  CLIMATON_FILTER_DESAFIO = codigo;
+  const btnAll = document.getElementById('btn-climaton-filter-all');
+  const btnV1 = document.getElementById('btn-climaton-filter-v1');
+  const btnV2 = document.getElementById('btn-climaton-filter-v2');
+
+  const activeClasses = 'px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#00d09c] text-slate-950 shadow-sm transition';
+  const inactiveClasses = 'px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 transition';
+
+  if (btnAll) btnAll.className = codigo === 'ALL' ? activeClasses : inactiveClasses;
+  if (btnV1) btnV1.className = codigo === 'V1' ? activeClasses : inactiveClasses;
+  if (btnV2) btnV2.className = codigo === 'V2' ? activeClasses : inactiveClasses;
+
+  renderClimatonCards();
+}
+
+function openSchoolInClimaton(schoolName) {
+  const sel = document.getElementById('select-climaton-school');
+  if (sel) {
+    let matchedOpt = 'ALL';
+    const sClean = stripAccents(schoolName);
+    for (let i = 0; i < sel.options.length; i++) {
+      const optValClean = stripAccents(sel.options[i].value);
+      if (optValClean.includes(sClean) || sClean.includes(optValClean)) {
+        matchedOpt = sel.options[i].value;
+        break;
+      }
+    }
+    sel.value = matchedOpt;
+  }
+  switchTab('climaton');
+  renderClimatonCards();
+}
+
+function renderClimatonCards() {
+  const container = document.getElementById('climaton-cards-grid');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const cData = getClimatonData();
+  const schoolFilter = (document.getElementById('select-climaton-school') && document.getElementById('select-climaton-school').value) || 'ALL';
+  const searchFilter = (document.getElementById('input-climaton-search') && document.getElementById('input-climaton-search').value.toLowerCase().trim()) || '';
+
+  const allCards = [];
+
+  for (const [schName, schClim] of Object.entries(cData)) {
+    // Filtrar por desafío
+    if (CLIMATON_FILTER_DESAFIO !== 'ALL' && schClim.desafio_codigo !== CLIMATON_FILTER_DESAFIO) {
+      continue;
+    }
+
+    // Filtrar por escuela
+    if (schoolFilter !== 'ALL') {
+      const sClean = stripAccents(schName);
+      const fClean = stripAccents(schoolFilter);
+      if (!sClean.includes(fClean) && !fClean.includes(sClean)) {
+        continue;
+      }
+    }
+
+    (schClim.ideas || []).forEach(idea => {
+      if (searchFilter) {
+        const textToSearch = `${idea.titulo} ${schName} ${schClim.desafio_nombre} ${schClim.eje}`.toLowerCase();
+        if (!textToSearch.includes(searchFilter)) {
+          return;
+        }
+      }
+
+      allCards.push({
+        idea,
+        schName,
+        desafio_codigo: schClim.desafio_codigo,
+        desafio_nombre: schClim.desafio_nombre,
+        eje: schClim.eje
+      });
+    });
+  }
+
+  if (allCards.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full p-12 text-center bg-white rounded-3xl border border-slate-100 card-shadow space-y-3">
+        <i data-lucide="search-x" class="w-10 h-10 text-slate-300 mx-auto"></i>
+        <h4 class="font-bold text-slate-700 text-sm">No se encontraron ideas con los filtros seleccionados</h4>
+        <p class="text-xs text-slate-400">Prueba cambiando el establecimiento o la palabra de búsqueda.</p>
+        <button onclick="document.getElementById('input-climaton-search').value=''; document.getElementById('select-climaton-school').value='ALL'; filterClimatonByDesafio('ALL');" class="px-4 py-1.5 text-xs font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-full transition">
+          Restablecer filtros
+        </button>
+      </div>
+    `;
+    if (window.lucide) lucide.createIcons();
+    return;
+  }
+
+  allCards.forEach(c => {
+    const cardWrapper = document.createElement('div');
+    cardWrapper.innerHTML = createClimatonCardHTML(c.idea, c.schName, c.desafio_codigo, c.desafio_nombre, 5);
+    container.appendChild(cardWrapper.firstElementChild);
+  });
+
+  if (window.lucide) lucide.createIcons();
+}
+
+function renderClimatonTab() {
+  renderClimatonCards();
+}
+
+// 2. TAB: ESTABLECIMIENTOS TABLE & FICHAS INSTITUCIONALES
 function renderSchoolsTab() {
   const hitoKey = (CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global') ? 'Global' : CURRENT_HITO;
   const schools = RAW_DATA.hitos[hitoKey].schools;
   const tbody = document.getElementById('schools-table-body');
-  tbody.innerHTML = '';
+  if (tbody) tbody.innerHTML = '';
+
+  const cardsContainer = document.getElementById('schools-cards-container');
+  if (cardsContainer) cardsContainer.innerHTML = '';
 
   schools.forEach(s => {
-    const tr = document.createElement('tr');
-    tr.className = 'hover:bg-slate-50/70 transition';
+    const meta = (RAW_DATA.schools_directory && RAW_DATA.schools_directory[s.school]) || {};
+    const climData = getSchoolClimaton(s.school);
+    const eqNum = meta.equipo || s.equipo || (climData && climData.equipo) || null;
+    const cert = meta.certificacion || s.certificacion || 'No';
+    const hasData = s.has_data !== false && s.n > 0;
 
-    if (s.has_data === false || s.n === 0) {
-      tr.innerHTML = `
-        <td class="py-3.5 px-4 font-semibold text-slate-800">${s.school}</td>
-        <td class="py-3.5 px-3">
-          <span class="px-2.5 py-1 rounded-full text-[11px] bg-slate-100 text-slate-700 font-medium">${s.dependencia}</span>
-        </td>
-        <td class="py-3.5 px-3 text-center text-slate-400 italic font-semibold">0 (Sin datos)</td>
-        <td class="py-3.5 px-3 text-center text-slate-400">-</td>
-        <td class="py-3.5 px-3 text-center text-slate-400">-</td>
-        <td class="py-3.5 px-3 text-center">
-          <span class="px-2.5 py-1 rounded-full text-[10px] bg-amber-50 text-amber-800 border border-amber-200 font-medium">Sin datos en este hito</span>
-        </td>
-        <td class="py-3.5 px-3 text-center text-slate-400">-</td>
-        <td class="py-3.5 px-3 text-center text-slate-400 text-[10px]">No evaluado</td>
-        <td class="py-3.5 px-4">
-          <div class="text-slate-800 font-medium">${s.lider1 || 'Coordinador del equipo'}</div>
-          <div class="text-[10px] text-slate-400">${s.email1 || ''} ${s.tel1 ? '· Tel: ' + s.tel1 : ''}</div>
-        </td>
-      `;
-    } else {
-      const deltaSign = s.delta_avg >= 0 ? '+' : '';
-      const deltaBadge = s.delta_avg > 0 ? 
-        `<span class="px-3 py-1 rounded-full text-xs font-bold bg-[#00d09c]/15 text-[#00a87e] border border-[#00d09c]/25">+${s.delta_avg.toFixed(2)}</span>` : 
-        (s.delta_avg === 0 ? 
-          `<span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">0.00</span>` : 
-          `<span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">${s.delta_avg.toFixed(2)}</span>`);
+    // 1. Fila en la tabla comparativa
+    if (tbody) {
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-slate-50/70 transition';
 
-      tr.innerHTML = `
-        <td class="py-3.5 px-4 font-bold text-slate-800">${s.school}</td>
-        <td class="py-3.5 px-3">
-          <span class="px-2.5 py-1 rounded-full text-[11px] bg-slate-100 text-slate-700 font-medium">${s.dependencia}</span>
-        </td>
-        <td class="py-3.5 px-3 text-center font-bold text-slate-800">${s.n}</td>
-        <td class="py-3.5 px-3 text-center text-slate-600 font-medium">${s.pre_avg !== null ? s.pre_avg.toFixed(2) : '-'}</td>
-        <td class="py-3.5 px-3 text-center text-[#00a87e] font-bold">${s.post_avg !== null ? s.post_avg.toFixed(2) : '-'}</td>
-        <td class="py-3.5 px-3 text-center">${deltaBadge}</td>
-        <td class="py-3.5 px-3 text-center">
-          <span class="px-3 py-1 rounded-full text-xs font-bold ${s.pct_mejora >= 50 ? 'bg-[#00d09c]/20 text-[#00a87e]' : 'bg-slate-100 text-slate-700'}">
-            ${s.pct_mejora}%
-          </span>
-        </td>
-        <td class="py-3.5 px-3">
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-100 text-[11px]">
-            <span class="text-[#00a87e] font-bold" title="Mejoró">${s.status_counts['Mejoró'] || 0}↗</span>
-            <span class="text-slate-300">·</span>
-            <span class="text-slate-500 font-semibold" title="Mantuvo">${s.status_counts['Mantuvo'] || 0}=</span>
-            <span class="text-slate-300">·</span>
-            <span class="text-rose-600 font-bold" title="Retrocedió">${s.status_counts['Retrocedió'] || 0}↘</span>
-          </div>
-        </td>
-        <td class="py-3.5 px-4">
-          <div class="text-slate-800 font-medium">${s.lider1 || 'Coordinador del equipo'}</div>
-          <div class="text-[10px] text-slate-400">${s.email1 || ''} ${s.tel1 ? '· Tel: ' + s.tel1 : ''}</div>
-        </td>
-      `;
+      const eqBadge = eqNum ? 
+        `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#00d09c]/15 text-[#00a87e] border border-[#00d09c]/30 mr-1.5 shrink-0">Eq. ${parseInt(eqNum)}</span>` : '';
+      
+      const certBadge = cert.toLowerCase() === 'si' ? 
+        `<span class="ml-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">SNCAE</span>` : '';
+
+      const climatonBtn = climData ? 
+        `<button onclick="openSchoolInClimaton('${escapeHtml(s.school)}')" class="px-3 py-1 rounded-full text-xs font-bold bg-[#688a24]/15 text-[#4e6b17] border border-[#688a24]/30 hover:bg-[#688a24]/25 transition inline-flex items-center gap-1.5 shadow-xs" title="Ver las 5 ideas formuladas por este colegio en el Climatón">
+          <i data-lucide="sparkles" class="w-3 h-3 text-[#688a24]"></i>
+          <span>5 Ideas</span>
+        </button>` : 
+        `<span class="text-slate-300 text-[10px]">-</span>`;
+
+      if (!hasData) {
+        tr.innerHTML = `
+          <td class="py-3.5 px-4 font-bold text-slate-800 flex items-center">${eqBadge} <span>${escapeHtml(s.school)}</span></td>
+          <td class="py-3.5 px-3">
+            <span class="px-2.5 py-1 rounded-full text-[11px] bg-slate-100 text-slate-700 font-medium">${escapeHtml(s.dependencia)} ${certBadge}</span>
+          </td>
+          <td class="py-3.5 px-3 text-center text-slate-400 italic font-semibold">0 (Sin datos)</td>
+          <td class="py-3.5 px-3 text-center text-slate-400">-</td>
+          <td class="py-3.5 px-3 text-center text-slate-400">-</td>
+          <td class="py-3.5 px-3 text-center">
+            <span class="px-2.5 py-1 rounded-full text-[10px] bg-amber-50 text-amber-800 border border-amber-200 font-medium">Sin datos en este hito</span>
+          </td>
+          <td class="py-3.5 px-3 text-center text-slate-400">-</td>
+          <td class="py-3.5 px-3 text-center text-slate-400 text-[10px]">No evaluado</td>
+          <td class="py-3.5 px-3">
+            <div class="text-slate-800 font-medium">${escapeHtml(s.lider1 || 'Coordinador del equipo')}</div>
+            <div class="text-[10px] text-slate-400">${s.email1 || ''} ${s.tel1 ? '· Tel: ' + s.tel1 : ''}</div>
+          </td>
+          <td class="py-3.5 px-4 text-center">${climatonBtn}</td>
+        `;
+      } else {
+        const deltaSign = s.delta_avg >= 0 ? '+' : '';
+        const deltaBadge = s.delta_avg > 0 ? 
+          `<span class="px-3 py-1 rounded-full text-xs font-bold bg-[#00d09c]/15 text-[#00a87e] border border-[#00d09c]/25">+${s.delta_avg.toFixed(2)}</span>` : 
+          (s.delta_avg === 0 ? 
+            `<span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">0.00</span>` : 
+            `<span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">${s.delta_avg.toFixed(2)}</span>`);
+
+        tr.innerHTML = `
+          <td class="py-3.5 px-4 font-bold text-slate-800 flex items-center">${eqBadge} <span>${escapeHtml(s.school)}</span></td>
+          <td class="py-3.5 px-3">
+            <span class="px-2.5 py-1 rounded-full text-[11px] bg-slate-100 text-slate-700 font-medium">${escapeHtml(s.dependencia)} ${certBadge}</span>
+          </td>
+          <td class="py-3.5 px-3 text-center font-bold text-slate-800">${s.n}</td>
+          <td class="py-3.5 px-3 text-center text-slate-600 font-medium">${s.pre_avg !== null ? s.pre_avg.toFixed(2) : '-'}</td>
+          <td class="py-3.5 px-3 text-center text-[#00a87e] font-bold">${s.post_avg !== null ? s.post_avg.toFixed(2) : '-'}</td>
+          <td class="py-3.5 px-3 text-center">${deltaBadge}</td>
+          <td class="py-3.5 px-3 text-center">
+            <span class="px-3 py-1 rounded-full text-xs font-bold ${s.pct_mejora >= 50 ? 'bg-[#00d09c]/20 text-[#00a87e]' : 'bg-slate-100 text-slate-700'}">
+              ${s.pct_mejora}%
+            </span>
+          </td>
+          <td class="py-3.5 px-3">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-100 text-[11px]">
+              <span class="text-[#00a87e] font-bold" title="Mejoró">${s.status_counts['Mejoró'] || 0}↗</span>
+              <span class="text-slate-300">·</span>
+              <span class="text-slate-500 font-semibold" title="Mantuvo">${s.status_counts['Mantuvo'] || 0}=</span>
+              <span class="text-slate-300">·</span>
+              <span class="text-rose-600 font-bold" title="Retrocedió">${s.status_counts['Retrocedió'] || 0}↘</span>
+            </div>
+          </td>
+          <td class="py-3.5 px-3">
+            <div class="text-slate-800 font-medium">${escapeHtml(s.lider1 || 'Coordinador del equipo')}</div>
+            <div class="text-[10px] text-slate-400">${s.email1 || ''} ${s.tel1 ? '· Tel: ' + s.tel1 : ''}</div>
+          </td>
+          <td class="py-3.5 px-4 text-center">${climatonBtn}</td>
+        `;
+      }
+      tbody.appendChild(tr);
     }
-    tbody.appendChild(tr);
+
+    // 2. Ficha institucional expandida
+    if (cardsContainer) {
+      const card = document.createElement('div');
+      card.className = 'bg-white p-6 rounded-3xl border border-slate-100 card-shadow space-y-4';
+
+      let climatonSectionHTML = '';
+      if (climData && climData.ideas) {
+        const miniCards = climData.ideas.map(id => `
+          <div class="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-200/70 hover:border-[#688a24] transition space-y-1.5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                <span>Idea ${id.numero}</span>
+                <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold ${climData.desafio_codigo === 'V1' ? 'bg-emerald-100 text-emerald-800' : 'bg-teal-100 text-teal-800'}">${climData.desafio_codigo}</span>
+              </div>
+              <p class="text-xs font-bold text-slate-800 leading-snug">"${escapeHtml(id.titulo)}"</p>
+            </div>
+          </div>
+        `).join('');
+
+        climatonSectionHTML = `
+          <div class="pt-4 border-t border-slate-100 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i data-lucide="sparkles" class="w-4 h-4 text-[#688a24]"></i>
+                <h5 class="text-xs font-bold uppercase tracking-wider text-slate-800">Propuestas Climatón 2026 (${climData.desafio_codigo} · ${climData.desafio_nombre})</h5>
+              </div>
+              <button onclick="openSchoolInClimaton('${escapeHtml(s.school)}')" class="text-[11px] font-bold text-[#537318] hover:underline inline-flex items-center gap-1">
+                <span>Ver en Muro Digital</span>
+                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              </button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              ${miniCards}
+            </div>
+          </div>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3.5">
+          <div class="flex items-center gap-2.5">
+            ${eqNum ? `<span class="px-3 py-1 rounded-full text-xs font-extrabold bg-[#00d09c]/15 text-[#00a87e] border border-[#00d09c]/30">Equipo ${parseInt(eqNum)}</span>` : ''}
+            <div>
+              <h4 class="text-base font-extrabold text-slate-900">${escapeHtml(s.school)}</h4>
+              <p class="text-xs text-slate-400 font-medium">${meta.direccion ? meta.direccion + ' · ' : ''}Dependencia: <strong>${s.dependencia}</strong></p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs px-2.5 py-1 rounded-full font-bold ${cert.toLowerCase() === 'si' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-500'}">
+              SNCAE: ${cert}
+            </span>
+            <span class="text-xs px-2.5 py-1 rounded-full font-bold bg-slate-100 text-slate-600">
+              PAC Previo: ${meta.participacion_previa || 'No'}
+            </span>
+            ${hasData ? `
+              <span class="text-xs px-3 py-1 rounded-full font-bold bg-[#00d09c]/20 text-[#00a87e]">
+                Delta: ${s.delta_avg >= 0 ? '+' : ''}${s.delta_avg.toFixed(2)} pts (${s.pct_mejora}%)
+              </span>
+            ` : `<span class="text-xs px-2.5 py-1 rounded-full font-bold bg-amber-100 text-amber-800">Sin datos en ${hitoKey}</span>`}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100 space-y-1">
+            <div class="text-[10px] uppercase font-bold text-slate-400">Profesor/a Líder 1</div>
+            <div class="text-slate-900 font-bold">${escapeHtml(s.lider1 || 'Coordinador del equipo')}</div>
+            <div class="text-slate-500 text-[11px]">${s.email1 ? '✉ ' + s.email1 : ''} ${s.tel1 ? '· 📞 ' + s.tel1 : ''}</div>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100 space-y-1">
+            <div class="text-[10px] uppercase font-bold text-slate-400">Profesor/a Líder 2 / Apoyo</div>
+            <div class="text-slate-900 font-bold">${escapeHtml(s.lider2 || meta.lider2 || 'No registrado')}</div>
+            <div class="text-slate-500 text-[11px]">${s.email2 || meta.email2 ? '✉ ' + (s.email2 || meta.email2) : ''} ${(s.tel2 || meta.tel2) ? '· 📞 ' + (s.tel2 || meta.tel2) : ''}</div>
+          </div>
+        </div>
+
+        ${climatonSectionHTML}
+      `;
+      cardsContainer.appendChild(card);
+    }
   });
+
+  if (window.lucide) lucide.createIcons();
 }
 
 // 3. TAB: PREGUNTAS Y DISTRACTORES
