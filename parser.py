@@ -185,7 +185,7 @@ def compare_open_answers(pre_text, post_text, hito):
     elif lvl_post == lvl_pre:
         return {
             'status': 'Mantuvo',
-            'detail': f'Mantuvo respuesta informada ({lbl_post})',
+            'detail': f'Consolidó respuesta informada ({lbl_post})',
             'requires_review': False,
             'pre_level': lvl_pre,
             'post_level': lvl_post
@@ -387,7 +387,7 @@ def parse_excel_data(file_path):
                 elif mc_status == 'Mejoró':
                     real_status = 'Mejora en Alternativas'
                 else:
-                    real_status = 'Rendimiento Estable'
+                    real_status = 'Requiere Refuerzo Conceptual' if mc_status == 'Retrocedió' else 'Aprendizaje Consolidado'
                 
                 p_obj = {
                     'name': name,

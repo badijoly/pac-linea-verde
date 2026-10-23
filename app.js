@@ -172,7 +172,7 @@ function getUniqueParticipants(data) {
         delta: parseFloat(((postTot - preTot) / 2).toFixed(2)),
         delta_raw: deltaTot,
         status: statusTot,
-        real_status: (p3.status === 'Mejoró' || p4.status === 'Mejoró') ? 'Avance en Aprendizajes' : (statusTot === 'Mantuvo' ? 'Rendimiento Estable' : 'Requiere Refuerzo'),
+        real_status: (p3.status === 'Mejoró' || p4.status === 'Mejoró') ? 'Avance en Aprendizajes' : (statusTot === 'Mantuvo' ? 'Aprendizaje Consolidado' : 'Requiere Refuerzo'),
         h3: p3,
         h4: p4
       });
@@ -525,7 +525,7 @@ function compareOpenAnswers(preText, postText, hito) {
   } else if (lvlPost === lvlPre) {
     return {
       status: 'Mantuvo',
-      detail: `Mantuvo respuesta informada (${lblPost})`,
+      detail: `Consolidó respuesta informada (${lblPost})`,
       requires_review: false,
       pre_level: lvlPre,
       post_level: lvlPost
@@ -712,7 +712,7 @@ function processWorkbookInBrowser(wb, fileName) {
           }
 
           // Estado Real Integrado
-          let realStatus = 'Rendimiento Estable';
+          let realStatus = mcStatus === 'Retrocedió' ? 'Requiere Refuerzo Conceptual' : 'Aprendizaje Consolidado';
           if (qualStats['Sin Evidencia'] === 4) {
             realStatus = 'Sin evidencia suficiente (Requiere revisión con líder)';
           } else if (qualStats['Mejoró'] > 0 || qualStats['Mantuvo'] >= 2) {
@@ -1027,7 +1027,11 @@ function getFilteredParticipants() {
   }
 
   if (statusFilter !== 'ALL') {
-    list = list.filter(p => p.status === statusFilter);
+    list = list.filter(p => p.status === statusFilter || 
+      (statusFilter === 'Consolidó' && p.status === 'Mantuvo') || 
+      (statusFilter === 'Mantuvo' && p.status === 'Mantuvo') ||
+      (statusFilter === 'Requiere refuerzo' && p.status === 'Retrocedió') ||
+      (statusFilter === 'Retrocedió' && p.status === 'Retrocedió'));
   }
 
   if (searchFilter) {
@@ -1164,7 +1168,7 @@ function renderCharts() {
   CHARTS['status'] = new Chart(ctxStatus, {
     type: 'doughnut',
     data: {
-      labels: ['Mejoró (+pts)', 'Mantuvo (0 pts)', 'Requiere refuerzo (-pts)'],
+      labels: ['Mejoró (+pts)', 'Consolidó (0 pts)', 'Requiere refuerzo (-pts)'],
       datasets: [{
         data: [nMejora, nMantuvo, nRetrocedio],
         backgroundColor: ['#88C23F', '#00ADBB', '#F8B04C'],
@@ -1198,7 +1202,7 @@ function renderCharts() {
         <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#00ADBB]"></span>
         <span class="font-bold text-slate-800">${nMantuvo}</span>
       </div>
-      <div class="text-[10px] text-slate-400 font-medium mt-0.5">Mantuvo (${N ? ((nMantuvo/N)*100).toFixed(0) : 0}%)</div>
+      <div class="text-[10px] text-slate-400 font-medium mt-0.5">Consolidó (${N ? ((nMantuvo/N)*100).toFixed(0) : 0}%)</div>
     </div>
     <div class="bg-slate-50/80 p-2.5 rounded-2xl border border-slate-100">
       <div class="flex items-center justify-center gap-1.5">
@@ -1785,9 +1789,9 @@ function renderSchoolsTab() {
             <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-100 text-[11px]">
               <span class="text-[#52801b] font-bold" title="Mejoró">${s.status_counts['Mejoró'] || 0}↗</span>
               <span class="text-slate-300">·</span>
-              <span class="text-slate-500 font-semibold" title="Mantuvo">${s.status_counts['Mantuvo'] || 0}=</span>
+              <span class="text-[#00737d] font-semibold" title="Consolidó">${s.status_counts['Mantuvo'] || 0}=</span>
               <span class="text-slate-300">·</span>
-              <span class="text-rose-600 font-bold" title="Retrocedió">${s.status_counts['Retrocedió'] || 0}↘</span>
+              <span class="text-amber-700 font-bold" title="Requiere refuerzo">${s.status_counts['Retrocedió'] || 0}↘</span>
             </div>
           </td>
           <td class="py-3.5 px-3">
@@ -1944,12 +1948,12 @@ function renderQuestionsTab() {
           <span class="font-extrabold text-[#52801b] text-sm mt-0.5 block">${q.post_correct} (${q.post_pct}%)</span>
         </div>
         <div>
-          <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Mantuvieron Correcto</span>
-          <span class="font-extrabold text-slate-700 text-sm mt-0.5 block">${q.transitions['Mantuvo Correcto'] || 0}</span>
+          <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Consolidaron Correcto</span>
+          <span class="font-extrabold text-[#00737d] text-sm mt-0.5 block">${q.transitions['Mantuvo Correcto'] || 0}</span>
         </div>
         <div>
-          <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Retrocedieron</span>
-          <span class="font-extrabold text-rose-600 text-sm mt-0.5 block">${q.transitions['Retrocedió'] || 0}</span>
+          <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Requieren Refuerzo</span>
+          <span class="font-extrabold text-amber-700 text-sm mt-0.5 block">${q.transitions['Retrocedió'] || 0}</span>
         </div>
       </div>
 
@@ -2019,8 +2023,8 @@ function renderQualitativeTab() {
       badgeClass = 'badge-improved font-bold';
       badgeText = 'Mejora Cualitativa ↗';
     } else if (qData.status === 'Mantuvo') {
-      badgeClass = 'bg-blue-50 text-blue-700 border border-blue-200 font-medium';
-      badgeText = 'Mantuvo Respuesta Informada =';
+      badgeClass = 'bg-[#e6f9fa] text-[#00737d] border border-[#99e1e7] font-semibold';
+      badgeText = 'Consolidó Respuesta Informada =';
     } else if (qData.status === 'Retrocedió') {
       badgeClass = 'badge-regressed font-bold';
       badgeText = 'Requiere refuerzo en texto';
@@ -2317,10 +2321,12 @@ function renderParticipantsTab() {
 
     const deltaSign = p.delta >= 0 ? '+' : '';
     const badgeClass = p.status === 'Mejoró' ? 'badge-improved' : (p.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained');
-    const statusLabel = p.status === 'Retrocedió' ? 'Requiere refuerzo' : p.status;
+    const statusLabel = p.status === 'Retrocedió' ? 'Requiere refuerzo' : (p.status === 'Mantuvo' ? 'Consolidó' : p.status);
     let realStatusLabel = p.real_status || '';
     if (realStatusLabel.includes('Dificultad Conceptual')) {
       realStatusLabel = 'Refuerzo conceptual sugerido';
+    } else if (realStatusLabel === 'Rendimiento Estable') {
+      realStatusLabel = 'Aprendizaje Consolidado';
     }
 
     let hitoBadge = '';
@@ -2508,7 +2514,7 @@ function renderModalContent(mode) {
       <div class="p-2.5 bg-white rounded-xl border border-slate-100 shadow-sm">
         <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Diagnóstico de Aprendizajes</div>
         <div class="mt-1">
-          <span class="inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${p.status === 'Mejoró' ? 'badge-improved' : (p.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${p.status === 'Retrocedió' ? 'Requiere refuerzo' : p.status}</span>
+          <span class="inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${p.status === 'Mejoró' ? 'badge-improved' : (p.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${p.status === 'Retrocedió' ? 'Requiere refuerzo' : (p.status === 'Mantuvo' ? 'Consolidó' : p.status)}</span>
         </div>
         <div class="text-[10px] text-slate-500 font-semibold mt-1">${escapeHtml(p.real_status || 'Rendimiento Registrado')}</div>
       </div>
@@ -2569,7 +2575,7 @@ function renderModalContent(mode) {
       </div>
       <div>
         <div class="text-[10px] text-slate-400 font-bold uppercase">Condición</div>
-        <span class="mt-1 inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${dataH.status === 'Mejoró' ? 'badge-improved' : (dataH.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${dataH.status === 'Retrocedió' ? 'Requiere refuerzo' : dataH.status}</span>
+        <span class="mt-1 inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${dataH.status === 'Mejoró' ? 'badge-improved' : (dataH.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${dataH.status === 'Retrocedió' ? 'Requiere refuerzo' : (dataH.status === 'Mantuvo' ? 'Consolidó' : dataH.status)}</span>
       </div>
     `;
     container.appendChild(kpiH3);
@@ -2614,7 +2620,7 @@ function renderModalContent(mode) {
       </div>
       <div>
         <div class="text-[10px] text-slate-400 font-bold uppercase">Condición</div>
-        <span class="mt-1 inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${dataH.status === 'Mejoró' ? 'badge-improved' : (dataH.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${dataH.status === 'Retrocedió' ? 'Requiere refuerzo' : dataH.status}</span>
+        <span class="mt-1 inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${dataH.status === 'Mejoró' ? 'badge-improved' : (dataH.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${dataH.status === 'Retrocedió' ? 'Requiere refuerzo' : (dataH.status === 'Mantuvo' ? 'Consolidó' : dataH.status)}</span>
       </div>
     `;
     container.appendChild(kpiH4);
@@ -2665,7 +2671,7 @@ function buildHitoMCBlock(title, hData, questionsMeta, theme) {
     else if (evo === 'Retrocedió') evoBadgeClass = 'badge-regressed font-bold';
     else if (evo === 'Mantuvo Correcto') evoBadgeClass = 'badge-maintained font-medium';
 
-    const evoText = evo === 'Retrocedió' ? 'Requiere refuerzo' : evo;
+    const evoText = evo === 'Retrocedió' ? 'Requiere refuerzo' : (evo === 'Mantuvo Correcto' ? 'Consolidó Correcto' : (evo === 'Mantuvo Incorrecto' ? 'Persiste Brecha' : evo));
 
     itemsHtml += `
       <div class="p-3.5 rounded-2xl border ${isCorrectPost ? 'bg-[#f1f9e9]/40 border-[#cbe99c]' : 'bg-amber-50/30 border-amber-200'} text-xs flex flex-wrap items-center justify-between gap-2">
@@ -2718,7 +2724,7 @@ function buildHitoOpenBlock(title, hData, theme) {
   let itemsHtml = '';
   hData.open_analysis.forEach((oq, idx) => {
     let oBadge = 'badge-maintained';
-    let oBadgeText = oq.status;
+    let oBadgeText = oq.status === 'Retrocedió' ? 'Requiere refuerzo' : (oq.status === 'Mantuvo' ? 'Consolidó' : oq.status);
 
     if (oq.status === 'Mejoró') {
       oBadge = 'badge-improved font-bold';
@@ -2727,8 +2733,8 @@ function buildHitoOpenBlock(title, hData, theme) {
       oBadge = 'badge-regressed font-bold';
       oBadgeText = 'Requiere refuerzo en texto';
     } else if (oq.status === 'Mantuvo') {
-      oBadge = 'bg-blue-50 text-blue-700 border border-blue-200 font-semibold';
-      oBadgeText = 'Mantuvo Respuesta =';
+      oBadge = 'bg-[#e6f9fa] text-[#00737d] border border-[#99e1e7] font-semibold';
+      oBadgeText = 'Consolidó Respuesta =';
     } else if (oq.status === 'Sin Evidencia') {
       oBadge = 'bg-slate-100 text-slate-600 border border-slate-300 font-semibold';
       oBadgeText = 'Sin Evidencia (Revisar)';
@@ -2889,7 +2895,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
           <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold;">${(h3Data.pre_mc[idx] || 'N/A').toUpperCase()}</td>
           <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${isPostCorr ? '#52801b' : '#e11d48'};">${(h3Data.post_mc[idx] || 'N/A').toUpperCase()}</td>
           <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #52801b;">${key3[idx]}</td>
-          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-size: 10px;">${evo}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-size: 10px;">${evo === 'Retrocedió' ? 'Requiere refuerzo' : (evo === 'Mantuvo Correcto' ? 'Consolidó Correcto' : (evo === 'Mantuvo Incorrecto' ? 'Persiste Brecha' : evo))}</td>
         </tr>
       `;
     });
@@ -2909,7 +2915,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
           <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold;">${(h4Data.pre_mc[idx] || 'N/A').toUpperCase()}</td>
           <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${isPostCorr ? '#00737d' : '#e11d48'};">${(h4Data.post_mc[idx] || 'N/A').toUpperCase()}</td>
           <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00737d;">${key4[idx]}</td>
-          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-size: 10px;">${evo}</td>
+          <td style="padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; font-size: 10px;">${evo === 'Retrocedió' ? 'Requiere refuerzo' : (evo === 'Mantuvo Correcto' ? 'Consolidó Correcto' : (evo === 'Mantuvo Incorrecto' ? 'Persiste Brecha' : evo))}</td>
         </tr>
       `;
     });
@@ -2923,7 +2929,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
         <div style="margin-bottom: 8px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #fafafa; page-break-inside: avoid;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <strong style="font-size: 11px; color: #0f172a;">P${idx + 1}: ${escapeHtml(oq.question)}</strong>
-            <span style="font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 12px; background-color: ${oq.status === 'Mejoró' ? '#f1f9e9' : (oq.status === 'Retrocedió' ? '#fef9ed' : '#f1f5f9')}; color: ${oq.status === 'Mejoró' ? '#52801b' : (oq.status === 'Retrocedió' ? '#b45309' : '#475569')};">${oq.status === 'Retrocedió' ? 'Requiere refuerzo' : oq.status}</span>
+            <span style="font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 12px; background-color: ${oq.status === 'Mejoró' ? '#f1f9e9' : (oq.status === 'Retrocedió' ? '#fef9ed' : '#e6f9fa')}; color: ${oq.status === 'Mejoró' ? '#52801b' : (oq.status === 'Retrocedió' ? '#b45309' : '#00737d')};">${oq.status === 'Retrocedió' ? 'Requiere refuerzo' : (oq.status === 'Mantuvo' ? 'Consolidó' : oq.status)}</span>
           </div>
           <div style="font-size: 10px; color: #64748b; margin-bottom: 6px;">Diagnóstico: <strong>${escapeHtml(oq.detail)}</strong></div>
           <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
@@ -2952,7 +2958,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
         <div style="margin-bottom: 8px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #fafafa; page-break-inside: avoid;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <strong style="font-size: 11px; color: #0f172a;">P${idx + 1}: ${escapeHtml(oq.question)}</strong>
-            <span style="font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 12px; background-color: ${oq.status === 'Mejoró' ? '#e6f9fa' : (oq.status === 'Retrocedió' ? '#fef9ed' : '#f1f5f9')}; color: ${oq.status === 'Mejoró' ? '#00737d' : (oq.status === 'Retrocedió' ? '#b45309' : '#475569')};">${oq.status === 'Retrocedió' ? 'Requiere refuerzo' : oq.status}</span>
+            <span style="font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 12px; background-color: ${oq.status === 'Mejoró' ? '#e6f9fa' : (oq.status === 'Retrocedió' ? '#fef9ed' : '#e6f9fa')}; color: ${oq.status === 'Mejoró' ? '#00737d' : (oq.status === 'Retrocedió' ? '#b45309' : '#00737d')};">${oq.status === 'Retrocedió' ? 'Requiere refuerzo' : (oq.status === 'Mantuvo' ? 'Consolidó' : oq.status)}</span>
           </div>
           <div style="font-size: 10px; color: #64748b; margin-bottom: 6px;">Diagnóstico: <strong>${escapeHtml(oq.detail)}</strong></div>
           <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
@@ -3030,7 +3036,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">${h3Data.pre_score} / 5</td>
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #52801b;">${h3Data.post_score} / 5</td>
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${h3Data.delta >= 0 ? '#52801b' : '#e11d48'};">${h3Data.delta >= 0 ? '+' : ''}${h3Data.delta} pts</td>
-                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">${h3Data.status}</td>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: 600;">${h3Data.status === 'Retrocedió' ? 'Requiere refuerzo' : (h3Data.status === 'Mantuvo' ? 'Consolidó' : h3Data.status)}</td>
               </tr>
             ` : ''}
             ${h4Data ? `
@@ -3039,7 +3045,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">${h4Data.pre_score} / 5</td>
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00737d;">${h4Data.post_score} / 5</td>
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${h4Data.delta >= 0 ? '#00737d' : '#e11d48'};">${h4Data.delta >= 0 ? '+' : ''}${h4Data.delta} pts</td>
-                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">${h4Data.status}</td>
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: 600;">${h4Data.status === 'Retrocedió' ? 'Requiere refuerzo' : (h4Data.status === 'Mantuvo' ? 'Consolidó' : h4Data.status)}</td>
               </tr>
             ` : ''}
             ${h3Data && h4Data ? `
@@ -3048,7 +3054,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
                 <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center;">${totPre} / 10 pts</td>
                 <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; color: #52801b;">${totPost} / 10 pts</td>
                 <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; color: ${totDelta >= 0 ? '#52801b' : '#e11d48'};">${deltaSign}${totDelta} pts</td>
-                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; color: #3f6515;">${p.status}</td>
+                <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; color: #3f6515; font-weight: bold;">${p.status === 'Retrocedió' ? 'Requiere refuerzo' : (p.status === 'Mantuvo' ? 'Consolidó' : p.status)}</td>
               </tr>
             ` : ''}
           </tbody>
@@ -3128,8 +3134,8 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
           ${p.status === 'Mejoró' ? 
             'El participante evidenció un avance significativo en la apropiación de conceptos y terminología científica tanto en preguntas de selección múltiple como en sus explicaciones escritas. Se recomienda canalizar esta motivación hacia la fase de ideación de soluciones climáticas escolares.' : 
             (p.status === 'Mantuvo' ? 
-              'El participante sostuvo un nivel de respuesta coherente y estructurado entre el PRE y POST test. Se sugiere afianzar los conceptos clave en un plenario grupal de 15 minutos previo a la formulación del proyecto de acción climática.' : 
-              'Se observaron elementos no concluyentes o respuestas breves asociadas a la aplicación inmediata en terreno. Se recomienda una breve conversación formativa con el docente líder para verificar la asimilación del contenido.')}
+              'El participante consolidó su aprendizaje, sosteniendo un nivel de dominio conceptual estructurado y seguro entre el PRE y POST test. Esta consolidación es una base sólida y esperable para liderar la formulación de proyectos de acción climática escolar.' : 
+              'Se observaron elementos no concluyentes o respuestas breves que requieren refuerzo conceptual. Se recomienda una breve conversación formativa con el docente líder para afianzar los conceptos clave mediante actividades de aula.')}
         </p>
       </div>
 
