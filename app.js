@@ -964,6 +964,70 @@ function populateFilterDropdowns() {
   }
 }
 
+// Estado de sub-pestaña para Evaluación de Contenidos (cerradas vs abiertas)
+let PREGUNTAS_SUBTAB = 'cerradas';
+
+function setPreguntasSubtab(subtab) {
+  PREGUNTAS_SUBTAB = subtab;
+  const secCerradas = document.getElementById('sec-preguntas-cerradas');
+  const secAbiertas = document.getElementById('sec-preguntas-abiertas');
+  const btnCerradas = document.getElementById('btn-subtab-cerradas');
+  const btnAbiertas = document.getElementById('btn-subtab-abiertas');
+
+  if (subtab === 'cerradas') {
+    if (secCerradas) secCerradas.classList.remove('hidden');
+    if (secAbiertas) secAbiertas.classList.add('hidden');
+    if (btnCerradas) {
+      btnCerradas.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm transition';
+    }
+    if (btnAbiertas) {
+      btnAbiertas.className = 'px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 transition';
+    }
+  } else {
+    if (secCerradas) secCerradas.classList.add('hidden');
+    if (secAbiertas) secAbiertas.classList.remove('hidden');
+    if (btnCerradas) {
+      btnCerradas.className = 'px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 transition';
+    }
+    if (btnAbiertas) {
+      btnAbiertas.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm transition';
+    }
+    renderQualitativeTab();
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+// Control de seguridad con contraseña para Fichas Individuales (PIN: 1234)
+function isFichasUnlocked() {
+  return sessionStorage.getItem('fichas_unlocked') === 'true';
+}
+
+function verifyFichasPassword() {
+  const pinInput = document.getElementById('fichas-pin-input');
+  const pinErr = document.getElementById('fichas-pin-error');
+  const val = pinInput ? pinInput.value.trim() : '';
+
+  if (val === '1234') {
+    sessionStorage.setItem('fichas_unlocked', 'true');
+    if (pinErr) pinErr.classList.add('hidden');
+    if (pinInput) pinInput.value = '';
+    renderParticipantsTab();
+  } else {
+    if (pinErr) pinErr.classList.remove('hidden');
+    if (pinInput) {
+      pinInput.value = '';
+      pinInput.focus();
+    }
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+function lockFichas() {
+  sessionStorage.removeItem('fichas_unlocked');
+  renderParticipantsTab();
+  if (window.lucide) lucide.createIcons();
+}
+
 // Cambiar pestaña activa
 function switchTab(tabId) {
   ACTIVE_TAB = tabId;
@@ -993,6 +1057,17 @@ function switchTab(tabId) {
 
   // En todas las pestañas la vista por defecto debe ser con la información de Resumen Global
   setHito('Global');
+
+  if (tabId === 'preguntas') {
+    setPreguntasSubtab(PREGUNTAS_SUBTAB);
+  }
+
+  if (tabId === 'participantes' && !isFichasUnlocked()) {
+    setTimeout(() => {
+      const pinInput = document.getElementById('fichas-pin-input');
+      if (pinInput) pinInput.focus();
+    }, 100);
+  }
 
   if (window.lucide) lucide.createIcons();
 }
@@ -1126,14 +1201,25 @@ function updateBanner() {
     titleEl.innerText = 'Resumen Global del Programa (Hito 3 y Hito 4)';
     descEl.innerText = 'Consolidado general de aprendizajes en la Línea Verde del Programa de Acción Climática (PAC 2026), integrando tramas tróficas, biodiversidad aledaña a Antofagasta, atmósfera y preservación de cielos limpios.';
     if (tagEl) {
-      tagEl.className = 'text-xs uppercase tracking-wider text-slate-700 font-extrabold';
+      tagEl.className = 'text-xs uppercase tracking-wider text-[#00737d] font-bold';
     }
     if (bannerEl) {
-      bannerEl.className = 'p-6 rounded-3xl bg-white border border-slate-200 text-slate-900 card-shadow flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-slate-800';
+      bannerEl.className = 'p-6 rounded-3xl bg-white border border-slate-200 text-slate-900 card-shadow flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-[#00ADBB]';
     }
     const glob = RAW_DATA.hitos['Global'];
     if (glob) hakeEl.innerText = `g = +${glob.hake_gain}`;
-    else hakeEl.innerText = 'Global PAC';
+    else hakeEl.innerText = 'g = +0.214';
+  }
+
+  const sampleEl = document.getElementById('banner-sample-text');
+  if (sampleEl) {
+    if (CURRENT_HITO === 'Hito 4') {
+      sampleEl.innerText = 'Muestra: 61 evaluaciones pareadas (Hito 4)';
+    } else if (CURRENT_HITO === 'Hito 3') {
+      sampleEl.innerText = 'Muestra: 66 evaluaciones pareadas (Hito 3)';
+    } else {
+      sampleEl.innerText = 'Muestra: 127 evaluaciones pareadas (83 estudiantes únicos)';
+    }
   }
 }
 
@@ -1141,24 +1227,27 @@ function updateKPIs() {
   const filtered = getFilteredParticipants();
   const N = filtered.length;
 
-  const nEl = document.getElementById('kpi-n');
-  const preEl = document.getElementById('kpi-pre');
+  const hitoKey = (CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global') ? 'Global' : CURRENT_HITO;
+  const hData = (RAW_DATA && RAW_DATA.hitos && RAW_DATA.hitos[hitoKey]) || (RAW_DATA && RAW_DATA.hitos && RAW_DATA.hitos['Global']);
+
+  const pctFavorableEl = document.getElementById('kpi-pct-favorable');
+  const countFavorableEl = document.getElementById('kpi-count-favorable');
   const postEl = document.getElementById('kpi-post');
+  const postDetailEl = document.getElementById('kpi-post-detail');
+  const hakeCardEl = document.getElementById('kpi-hake-card');
+  const hakeDetailEl = document.getElementById('kpi-hake-detail');
   const deltaEl = document.getElementById('kpi-delta');
-  const pctMejoraEl = document.getElementById('kpi-pct-mejora');
-  const countMejoraEl = document.getElementById('kpi-count-mejora');
-  const pctFavorableEl = document.getElementById('kpi-pct-favorable') || document.getElementById('kpi-pct-estancados');
-  const countFavorableEl = document.getElementById('kpi-count-favorable') || document.getElementById('kpi-count-estancados');
+  const deltaDetailEl = document.getElementById('kpi-delta-detail');
+  const coberturaEl = document.getElementById('kpi-cobertura');
+  const coberturaDetailEl = document.getElementById('kpi-cobertura-detail');
+  const ideasEl = document.getElementById('kpi-ideas');
+  const ideasDetailEl = document.getElementById('kpi-ideas-detail');
 
   if (N === 0) {
-    nEl.innerText = '0';
-    preEl.innerHTML = '0.0 <span class="text-xs font-normal text-slate-400">/ 5</span>';
-    postEl.innerHTML = '0.0 <span class="text-xs font-normal text-slate-400">/ 5</span>';
-    deltaEl.innerText = '0.00';
-    pctMejoraEl.innerText = '0%';
-    countMejoraEl.innerText = '0 participantes';
     if (pctFavorableEl) pctFavorableEl.innerText = '0%';
-    if (countFavorableEl) countFavorableEl.innerText = '0 participantes';
+    if (countFavorableEl) countFavorableEl.innerHTML = '<span>0 participantes</span>';
+    if (postEl) postEl.innerHTML = '0.0 <span class="text-xs font-normal text-slate-400">/ 5</span>';
+    if (deltaEl) deltaEl.innerText = '0.00';
     return;
   }
 
@@ -1168,23 +1257,55 @@ function updateKPIs() {
 
   const nMejora = filtered.filter(p => p.status === 'Mejoró').length;
   const nMantuvo = filtered.filter(p => p.status === 'Mantuvo').length;
-  const nRetrocedio = filtered.filter(p => p.status === 'Retrocedió').length;
-
-  const pctMejora = ((nMejora / N) * 100).toFixed(1);
   const nFavorable = nMejora + nMantuvo;
   const pctFavorable = ((nFavorable / N) * 100).toFixed(1);
+  const pctLogro = ((avgPost / 5) * 100).toFixed(1);
+  const pctInc = avgPre > 0 ? ((avgDelta / avgPre) * 100).toFixed(1) : '0.0';
 
-  nEl.innerText = N;
-  preEl.innerHTML = `${avgPre.toFixed(2)} <span class="text-xs font-normal text-slate-400">/ 5</span>`;
-  postEl.innerHTML = `${avgPost.toFixed(2)} <span class="text-xs font-normal text-slate-400">/ 5</span>`;
-  deltaEl.innerText = `${avgDelta >= 0 ? '+' : ''}${avgDelta.toFixed(2)}`;
-  deltaEl.className = avgDelta >= 0 ? 'text-3xl font-extrabold text-[#52801b] tracking-tight mt-1.5' : 'text-3xl font-extrabold text-rose-600 tracking-tight mt-1.5';
-
-  pctMejoraEl.innerText = `${pctMejora}%`;
-  countMejoraEl.innerText = `${nMejora} participantes subieron`;
+  const hakeVal = hData ? hData.hake_gain : 0.214;
+  const schoolsList = (hData && hData.schools) || [];
+  const nActiveSchools = schoolsList.filter(s => s.has_data !== false).length;
 
   if (pctFavorableEl) pctFavorableEl.innerText = `${pctFavorable}%`;
-  if (countFavorableEl) countFavorableEl.innerText = `${nMejora} subieron, ${nMantuvo} consolidaron`;
+  if (countFavorableEl) {
+    countFavorableEl.innerHTML = `<span>${nFavorable} de ${N} consolidaron o avanzaron</span><span class="w-2 h-2 rounded-full bg-[#00ADBB]"></span>`;
+  }
+
+  if (postEl) {
+    postEl.innerHTML = `${avgPost.toFixed(2)} <span class="text-xs font-normal text-slate-400">/ 5</span>`;
+  }
+  if (postDetailEl) {
+    postDetailEl.innerHTML = `<span>${pctLogro}% de logro conceptual</span><div class="w-12 h-1.5 bg-[#f1f9e9] rounded-full overflow-hidden"><div class="h-full bg-[#88C23F] rounded-full" style="width: ${pctLogro}%"></div></div>`;
+  }
+
+  if (hakeCardEl) {
+    hakeCardEl.innerText = `${hakeVal >= 0 ? '+' : ''}${hakeVal.toFixed(3)}`;
+  }
+  if (hakeDetailEl) {
+    hakeDetailEl.innerHTML = `<span>Efectividad formativa</span><span class="text-xs">★</span>`;
+  }
+
+  if (deltaEl) {
+    deltaEl.innerText = `${avgDelta >= 0 ? '+' : ''}${avgDelta.toFixed(2)}`;
+    deltaEl.className = avgDelta >= 0 ? 'text-3xl font-extrabold text-[#52801b] tracking-tight mt-1.5' : 'text-3xl font-extrabold text-rose-600 tracking-tight mt-1.5';
+  }
+  if (deltaDetailEl) {
+    deltaDetailEl.innerHTML = `<span>${avgDelta >= 0 ? '+' : ''}${pctInc}% incremento neto</span><span class="text-xs">↗</span>`;
+  }
+
+  if (coberturaEl) {
+    coberturaEl.innerText = '100%';
+  }
+  if (coberturaDetailEl) {
+    coberturaDetailEl.innerHTML = `<span>${nActiveSchools} de ${schoolsList.length || 7} Escuelas activas</span><span class="w-2 h-2 rounded-full bg-[#88C23F]"></span>`;
+  }
+
+  if (ideasEl) {
+    ideasEl.innerText = '35';
+  }
+  if (ideasDetailEl) {
+    ideasDetailEl.innerHTML = `<span>Proyectos en Climatón</span><i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#f59e0b]"></i>`;
+  }
 }
 
 // RENDER CHARTS CON CHART.JS (Estilo moderno y paleta oficial del logo PAC)
@@ -2340,8 +2461,21 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-// 6. TAB: FICHAS INDIVIDUALES
+// 5. TAB: FICHAS INDIVIDUALES (Protegida)
 function renderParticipantsTab() {
+  const lockedView = document.getElementById('fichas-locked-view');
+  const contentView = document.getElementById('fichas-content-view');
+
+  if (!isFichasUnlocked()) {
+    if (lockedView) lockedView.classList.remove('hidden');
+    if (contentView) contentView.classList.add('hidden');
+    if (window.lucide) lucide.createIcons();
+    return;
+  }
+
+  if (lockedView) lockedView.classList.add('hidden');
+  if (contentView) contentView.classList.remove('hidden');
+
   const isGlobal = CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global';
   let filtered = getFilteredParticipants();
 
@@ -2426,6 +2560,10 @@ let currentModalParticipant = null;
 // MODAL INDIVIDUAL PARTICIPANTE (Soporte integral de ambos desafíos y test-retest)
 function openModal(p) {
   if (!p) return;
+  if (!isFichasUnlocked()) {
+    switchTab('participantes');
+    return;
+  }
 
   const allData = getParticipantAllData(p.name);
   const h3Data = p.h3 || allData.h3;
