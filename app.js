@@ -872,14 +872,14 @@ function switchTab(tabId) {
   ACTIVE_TAB = tabId;
   document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
   document.querySelectorAll('.nav-tab').forEach(el => {
-    el.className = 'nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition';
+    el.className = 'nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition';
   });
 
   const targetView = document.getElementById(`view-${tabId}`);
   const targetBtn = document.getElementById(`tab-btn-${tabId}`);
   if (targetView) targetView.classList.remove('hidden');
   if (targetBtn) {
-    targetBtn.className = 'nav-tab active-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-md shadow-lime-500/25 whitespace-nowrap transition';
+    targetBtn.className = 'nav-tab active-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm whitespace-nowrap transition';
   }
 
   updateUI();
@@ -895,17 +895,17 @@ function setHito(hito) {
   const btnGlobal = document.getElementById('btn-hito-global') || document.getElementById('btn-hito-ambos');
 
   [btn4, btn3, btnGlobal].forEach(btn => {
-    if (btn) btn.className = 'px-4 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:text-white transition';
+    if (btn) btn.className = 'px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 transition';
   });
 
   const activeBtn = hito === 'Hito 4' ? btn4 : (hito === 'Hito 3' ? btn3 : btnGlobal);
   if (activeBtn) {
     if (hito === 'Hito 4') {
-      activeBtn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-[#00ADBB] text-white shadow-md shadow-cyan-500/25 transition';
+      activeBtn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-[#00ADBB] text-white shadow-sm transition';
     } else if (hito === 'Hito 3') {
-      activeBtn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-md shadow-lime-500/25 transition';
+      activeBtn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm transition';
     } else {
-      activeBtn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#88C23F] to-[#00ADBB] text-slate-950 shadow-md shadow-teal-500/25 transition';
+      activeBtn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white shadow-sm transition';
     }
   }
 
@@ -982,7 +982,7 @@ function updateBanner() {
       tagEl.className = 'text-xs uppercase tracking-wider text-[#00ADBB] font-bold';
     }
     if (bannerEl) {
-      bannerEl.className = 'p-6 rounded-3xl bg-gradient-to-r from-[#152a3d] via-[#103042] to-[#0c2434] border border-[#00ADBB]/35 text-white card-shadow flex flex-wrap items-center justify-between gap-4';
+      bannerEl.className = 'p-6 rounded-3xl bg-white border border-slate-200 text-slate-900 card-shadow flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-[#00ADBB]';
     }
     const h4 = RAW_DATA.hitos['Hito 4'];
     if (h4) hakeEl.innerText = `g = +${h4.hake_gain}`;
@@ -990,10 +990,10 @@ function updateBanner() {
     titleEl.innerText = 'Los otros vecinos de Antofagasta (Hito 3)';
     descEl.innerText = 'Evaluación del aprendizaje sobre biodiversidad del desierto costero, tramas tróficas, fauna y flora aledaña a la ciudad de Antofagasta (Gaviotín Chico, descomponedores) y el humedal La Chimba.';
     if (tagEl) {
-      tagEl.className = 'text-xs uppercase tracking-wider text-[#88C23F] font-bold';
+      tagEl.className = 'text-xs uppercase tracking-wider text-[#52801b] font-bold';
     }
     if (bannerEl) {
-      bannerEl.className = 'p-6 rounded-3xl bg-gradient-to-r from-[#173024] via-[#112d2c] to-[#0c1f24] border border-[#88C23F]/35 text-white card-shadow flex flex-wrap items-center justify-between gap-4';
+      bannerEl.className = 'p-6 rounded-3xl bg-white border border-slate-200 text-slate-900 card-shadow flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-[#88C23F]';
     }
     const h3 = RAW_DATA.hitos['Hito 3'];
     if (h3) hakeEl.innerText = `g = +${h3.hake_gain}`;
@@ -1001,10 +1001,10 @@ function updateBanner() {
     titleEl.innerText = 'Resumen Global del Programa (Hito 3 y Hito 4)';
     descEl.innerText = 'Consolidado general de aprendizajes en la Línea Verde del Programa de Acción Climática (PAC 2026), integrando tramas tróficas, biodiversidad aledaña a Antofagasta, atmósfera y preservación de cielos limpios.';
     if (tagEl) {
-      tagEl.className = 'text-xs uppercase tracking-wider bg-gradient-to-r from-[#88C23F] to-[#00ADBB] bg-clip-text text-transparent font-extrabold';
+      tagEl.className = 'text-xs uppercase tracking-wider text-slate-700 font-extrabold';
     }
     if (bannerEl) {
-      bannerEl.className = 'p-6 rounded-3xl bg-gradient-to-r from-[#162f2c] via-[#112433] to-[#0c1a27] border border-[#00ADBB]/30 text-white card-shadow flex flex-wrap items-center justify-between gap-4';
+      bannerEl.className = 'p-6 rounded-3xl bg-white border border-slate-200 text-slate-900 card-shadow flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-slate-800';
     }
     const glob = RAW_DATA.hitos['Global'];
     if (glob) hakeEl.innerText = `g = +${glob.hake_gain}`;
@@ -1087,6 +1087,7 @@ function renderCharts() {
       }]
     },
     options: {
+      animation: false,
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
@@ -1159,15 +1160,6 @@ function renderCharts() {
   const ctxQuestions = document.getElementById('chart-questions-bar').getContext('2d');
   if (CHARTS['questions']) CHARTS['questions'].destroy();
 
-  // Create smooth gradients matching the official PAC logo (Turquesa #00ADBB to Verde Lima #88C23F)
-  const gradPost = ctxQuestions.createLinearGradient(0, 220, 0, 10);
-  gradPost.addColorStop(0, '#00ADBB');   // Turquesa PAC
-  gradPost.addColorStop(1, '#88C23F');   // Verde Lima PAC
-
-  const gradPre = ctxQuestions.createLinearGradient(0, 220, 0, 10);
-  gradPre.addColorStop(0, '#94a3b8');    // Slate
-  gradPre.addColorStop(1, '#cbd5e1');    // Light Slate
-
   CHARTS['questions'] = new Chart(ctxQuestions, {
     type: 'bar',
     data: {
@@ -1176,20 +1168,21 @@ function renderCharts() {
         {
           label: '% Aciertos PRE (Basal)',
           data: prePcts,
-          backgroundColor: gradPre,
+          backgroundColor: '#94a3b8',
           borderRadius: 8,
           borderSkipped: false
         },
         {
           label: '% Aciertos POST (Terreno)',
           data: postPcts,
-          backgroundColor: gradPost,
+          backgroundColor: '#88C23F',
           borderRadius: 8,
           borderSkipped: false
         }
       ]
     },
     options: {
+      animation: false,
       responsive: true,
       maintainAspectRatio: false,
       scales: {
@@ -1228,15 +1221,7 @@ function renderCharts() {
   const ctxSchools = document.getElementById('chart-schools-delta').getContext('2d');
   if (CHARTS['schools']) CHARTS['schools'].destroy();
 
-  const gradSchoolPos = ctxSchools.createLinearGradient(0, 220, 0, 10);
-  gradSchoolPos.addColorStop(0, '#00ADBB'); // Turquesa PAC
-  gradSchoolPos.addColorStop(1, '#88C23F'); // Verde Lima PAC
-
-  const gradSchoolNeg = ctxSchools.createLinearGradient(0, 220, 0, 10);
-  gradSchoolNeg.addColorStop(0, '#F8B04C'); // Ámbar Solar PAC
-  gradSchoolNeg.addColorStop(1, '#e11d48'); // Warm Rose
-
-  const schoolColors = schoolDeltas.map(d => d >= 0 ? gradSchoolPos : gradSchoolNeg);
+  const schoolColors = schoolDeltas.map(d => d >= 0 ? '#88C23F' : '#F8B04C');
 
   CHARTS['schools'] = new Chart(ctxSchools, {
     type: 'bar',
@@ -1251,6 +1236,7 @@ function renderCharts() {
       }]
     },
     options: {
+      animation: false,
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
@@ -1278,14 +1264,6 @@ function renderCharts() {
   const gPre = gLabels.map(g => genderData[g].pre_avg);
   const gPost = gLabels.map(g => genderData[g].post_avg);
 
-  const gradGenderPost = ctxGender.createLinearGradient(0, 220, 0, 10);
-  gradGenderPost.addColorStop(0, '#00ADBB'); // Turquesa PAC
-  gradGenderPost.addColorStop(1, '#88C23F'); // Verde Lima PAC
-
-  const gradGenderPre = ctxGender.createLinearGradient(0, 220, 0, 10);
-  gradGenderPre.addColorStop(0, '#94a3b8');
-  gradGenderPre.addColorStop(1, '#cbd5e1');
-
   CHARTS['gender'] = new Chart(ctxGender, {
     type: 'bar',
     data: {
@@ -1294,20 +1272,21 @@ function renderCharts() {
         {
           label: 'Puntaje PRE',
           data: gPre,
-          backgroundColor: gradGenderPre,
+          backgroundColor: '#94a3b8',
           borderRadius: 8,
           borderSkipped: false
         },
         {
           label: 'Puntaje POST',
           data: gPost,
-          backgroundColor: gradGenderPost,
+          backgroundColor: '#88C23F',
           borderRadius: 8,
           borderSkipped: false
         }
       ]
     },
     options: {
+      animation: false,
       responsive: true,
       maintainAspectRatio: false,
       scales: {
@@ -1328,6 +1307,15 @@ function renderCharts() {
           labels: {
             boxWidth: 12,
             boxHeight: 12,
+            useBorderRadius: true,
+            borderRadius: 4,
+            font: { size: 11, weight: '600' }
+          }
+        }
+      }
+    }
+  });
+}
             useBorderRadius: true,
             borderRadius: 4,
             font: { size: 11, weight: '600' }

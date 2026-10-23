@@ -62,11 +62,11 @@
       border-color: #88C23F;
     }
     .climaton-header-v1 {
-      background: linear-gradient(135deg, #74ab2e 0%, #88C23F 100%);
+      background-color: #74ab2e;
       color: #ffffff;
     }
     .climaton-header-v2 {
-      background: linear-gradient(135deg, #008f9b 0%, #00ADBB 100%);
+      background-color: #00ADBB;
       color: #ffffff;
     }
     .climaton-body-ruled {
@@ -76,32 +76,32 @@
     }
   </style>
 </head>
-<body class="bg-[#112231] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#193248] via-[#112231] to-[#0a1622] text-slate-800 min-h-screen flex flex-col antialiased">
+<body class="bg-[#f8fafc] text-slate-800 min-h-screen flex flex-col antialiased">
 
   <!-- TOP NAVBAR -->
-  <header class="bg-[#0c1824]/90 backdrop-blur-md border-b border-white/10 sticky top-0 z-40 shadow-xl shadow-black/10">
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <!-- Logo oficial del Programa de Acción Climática -->
-        <div class="bg-white/95 p-1 rounded-2xl shadow-md border border-white/20">
+        <div class="bg-white p-1 rounded-2xl shadow-sm border border-slate-200">
           <img src="logo.png" alt="Programa de Acción Climática" class="h-10 w-auto object-contain">
         </div>
-        <div class="border-l border-white/15 pl-3">
+        <div class="border-l border-slate-200 pl-3">
           <div class="flex items-center gap-2">
-            <h1 class="text-base sm:text-lg font-bold text-white tracking-tight">Evaluación de Aprendizajes · Línea Verde</h1>
-            <span class="text-xs font-bold px-3 py-0.5 rounded-full bg-[#88C23F]/20 text-[#88C23F] border border-[#88C23F]/40 shadow-sm">PAC 2026</span>
+            <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Evaluación de Aprendizajes · Línea Verde</h1>
+            <span class="text-xs font-bold px-3 py-0.5 rounded-full bg-[#88C23F]/15 text-[#52801b] border border-[#cbe99c] shadow-sm">PAC 2026</span>
           </div>
         </div>
       </div>
 
       <!-- Action buttons y File Sync Status -->
       <div class="flex items-center gap-2.5 flex-wrap">
-        <div id="sync-status" class="flex items-center gap-2 text-xs text-slate-300 bg-white/5 px-3.5 py-1.5 rounded-full border border-white/10">
+        <div id="sync-status" class="flex items-center gap-2 text-xs text-slate-600 bg-slate-100 px-3.5 py-1.5 rounded-full border border-slate-200">
           <span class="w-2 h-2 rounded-full bg-[#88C23F] animate-pulse"></span>
           <span id="sync-text">Cargando datos...</span>
         </div>
 
-        <button id="btn-reload" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium text-white bg-white/10 border border-white/15 rounded-full hover:bg-white/20 active:bg-white/25 transition shadow-sm" title="Recargar datos">
+        <button id="btn-reload" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-full hover:bg-slate-100 active:bg-slate-200 transition shadow-sm" title="Recargar datos">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
           <span>Actualizar</span>
         </button>
@@ -109,32 +109,32 @@
     </div>
 
     <!-- MAIN TABS NAVIGATION (Pill Style) -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-white/10 py-2.5 flex gap-2 overflow-x-auto custom-scrollbar">
-      <button onclick="switchTab('resumen')" class="nav-tab active-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-md shadow-lime-500/25 whitespace-nowrap transition" id="tab-btn-resumen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-100 py-2.5 flex gap-2 overflow-x-auto custom-scrollbar">
+      <button onclick="switchTab('resumen')" class="nav-tab active-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm whitespace-nowrap transition" id="tab-btn-resumen">
         <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
         <span>Resumen Ejecutivo</span>
       </button>
-      <button onclick="switchTab('establecimientos')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition" id="tab-btn-establecimientos">
+      <button onclick="switchTab('establecimientos')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition" id="tab-btn-establecimientos">
         <i data-lucide="school" class="w-4 h-4"></i>
         <span>Por Establecimiento</span>
       </button>
-      <button onclick="switchTab('climaton')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition" id="tab-btn-climaton">
+      <button onclick="switchTab('climaton')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition" id="tab-btn-climaton">
         <i data-lucide="sparkles" class="w-4 h-4 text-[#88C23F]"></i>
         <span>Ideas Climatón 2026</span>
       </button>
-      <button onclick="switchTab('preguntas')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition" id="tab-btn-preguntas">
+      <button onclick="switchTab('preguntas')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition" id="tab-btn-preguntas">
         <i data-lucide="help-circle" class="w-4 h-4"></i>
         <span>Preguntas y Distractores</span>
       </button>
-      <button onclick="switchTab('cualitativo')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition" id="tab-btn-cualitativo">
+      <button onclick="switchTab('cualitativo')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition" id="tab-btn-cualitativo">
         <i data-lucide="message-square-text" class="w-4 h-4"></i>
         <span>Análisis Cualitativo</span>
       </button>
-      <button onclick="switchTab('pedagogico')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition" id="tab-btn-pedagogico">
+      <button onclick="switchTab('pedagogico')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition" id="tab-btn-pedagogico">
         <i data-lucide="lightbulb" class="w-4 h-4"></i>
         <span>Casos Críticos y Orientaciones</span>
       </button>
-      <button onclick="switchTab('participantes')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-300 hover:text-white hover:bg-white/10 whitespace-nowrap transition" id="tab-btn-participantes">
+      <button onclick="switchTab('participantes')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition" id="tab-btn-participantes">
         <i data-lucide="users" class="w-4 h-4"></i>
         <span>Fichas Individuales</span>
       </button>
@@ -142,18 +142,18 @@
   </header>
 
   <!-- FILTER CONTROLS BAR -->
-  <div class="bg-[#0e1d2c]/85 backdrop-blur-md border-b border-white/10 py-3 px-4 sm:px-6 lg:px-8 shadow-md">
+  <div class="bg-white border-b border-slate-200 py-3 px-4 sm:px-6 lg:px-8 shadow-sm">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
       
       <!-- Hito selection pills -->
-      <div class="flex items-center gap-1 bg-[#07131e] p-1 rounded-full border border-white/10">
-        <button onclick="setHito('Hito 4')" id="btn-hito-4" class="px-4 py-1.5 rounded-full text-xs font-bold bg-[#00ADBB] text-white shadow-md shadow-cyan-500/25 transition">
+      <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-full border border-slate-200">
+        <button onclick="setHito('Hito 4')" id="btn-hito-4" class="px-4 py-1.5 rounded-full text-xs font-bold bg-[#00ADBB] text-white shadow-sm transition">
           Hito 4: Escudo Invisible
         </button>
-        <button onclick="setHito('Hito 3')" id="btn-hito-3" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:text-white transition">
+        <button onclick="setHito('Hito 3')" id="btn-hito-3" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 transition">
           Hito 3: Otros Vecinos
         </button>
-        <button onclick="setHito('Global')" id="btn-hito-global" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-300 hover:text-white transition">
+        <button onclick="setHito('Global')" id="btn-hito-global" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 transition">
           Resumen Global
         </button>
       </div>
@@ -162,16 +162,16 @@
       <div class="flex items-center gap-2 flex-wrap">
         <!-- School Select -->
         <div class="flex items-center gap-1.5">
-          <label class="text-slate-400 font-medium">Colegio:</label>
-          <select id="filter-school" onchange="applyFilters()" class="bg-[#152739] border border-white/15 rounded-full px-3.5 py-1.5 text-xs text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#88C23F]">
+          <label class="text-slate-500 font-semibold">Colegio:</label>
+          <select id="filter-school" onchange="applyFilters()" class="bg-slate-50 border border-slate-200 rounded-full px-3.5 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-[#88C23F]">
             <option value="ALL">Todos los Establecimientos</option>
           </select>
         </div>
 
         <!-- Gender Select -->
         <div class="flex items-center gap-1.5">
-          <label class="text-slate-400 font-medium">Género:</label>
-          <select id="filter-gender" onchange="applyFilters()" class="bg-[#152739] border border-white/15 rounded-full px-3.5 py-1.5 text-xs text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#88C23F]">
+          <label class="text-slate-500 font-semibold">Género:</label>
+          <select id="filter-gender" onchange="applyFilters()" class="bg-slate-50 border border-slate-200 rounded-full px-3.5 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-[#88C23F]">
             <option value="ALL">Todos los Géneros</option>
             <option value="Femenino">Femenino</option>
             <option value="Masculino">Masculino</option>
@@ -180,8 +180,8 @@
 
         <!-- Status Select -->
         <div class="flex items-center gap-1.5">
-          <label class="text-slate-400 font-medium">Evolución:</label>
-          <select id="filter-status" onchange="applyFilters()" class="bg-[#152739] border border-white/15 rounded-full px-3.5 py-1.5 text-xs text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#88C23F]">
+          <label class="text-slate-500 font-semibold">Evolución:</label>
+          <select id="filter-status" onchange="applyFilters()" class="bg-slate-50 border border-slate-200 rounded-full px-3.5 py-1.5 text-xs text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-[#88C23F]">
             <option value="ALL">Todos los estados</option>
             <option value="Mejoró">Mejoró (+pts)</option>
             <option value="Mantuvo">Mantuvo (0 pts)</option>
@@ -192,7 +192,7 @@
         <!-- Search Input -->
         <div class="relative">
           <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-2 text-slate-400"></i>
-          <input type="text" id="filter-search" oninput="applyFilters()" placeholder="Buscar participante..." class="pl-8 pr-3.5 py-1.5 bg-[#152739] border border-white/15 rounded-full text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#88C23F] w-48">
+          <input type="text" id="filter-search" oninput="applyFilters()" placeholder="Buscar participante..." class="pl-8 pr-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#88C23F] w-48">
         </div>
       </div>
 
@@ -206,19 +206,19 @@
     <section id="view-resumen" class="tab-view space-y-6">
       
       <!-- Challenge banner -->
-      <div id="banner-desafio" class="p-6 rounded-3xl bg-gradient-to-r from-[#152a3d] via-[#103042] to-[#0c2434] border border-[#00ADBB]/30 text-white card-shadow flex flex-wrap items-center justify-between gap-4">
+      <div id="banner-desafio" class="p-6 rounded-3xl bg-white border border-slate-200 text-slate-900 card-shadow flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-[#00ADBB]">
         <div>
           <span class="text-xs uppercase tracking-wider text-[#00ADBB] font-bold">Desafío Territorial Seleccionado</span>
-          <h2 id="banner-title" class="text-xl sm:text-2xl font-extrabold text-white mt-1">Proteger nuestro escudo invisible (Hito 4)</h2>
-          <p id="banner-desc" class="text-xs text-slate-300 mt-1.5 max-w-3xl leading-relaxed">
+          <h2 id="banner-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-1">Proteger nuestro escudo invisible (Hito 4)</h2>
+          <p id="banner-desc" class="text-xs text-slate-600 mt-1.5 max-w-3xl leading-relaxed">
             Evaluación del aprendizaje sobre la atmósfera como regulador climático, la contaminación lumínica en Antofagasta, la protección del cielo oscuro para la astronomía mundial y la fauna costera.
           </p>
         </div>
-        <div class="flex items-center gap-3 bg-[#00ADBB]/15 border border-[#00ADBB]/35 px-5 py-3 rounded-2xl backdrop-blur-sm">
+        <div class="flex items-center gap-3 bg-cyan-50/70 border border-[#00ADBB]/40 px-5 py-3 rounded-2xl">
           <i data-lucide="award" class="w-7 h-7 text-[#00ADBB]"></i>
           <div>
-            <div class="text-[10px] uppercase text-cyan-200 font-semibold tracking-wider">Ganancia Normalizada (Hake)</div>
-            <div id="kpi-hake-val" class="text-xl font-extrabold text-white">g = +0.255</div>
+            <div class="text-[10px] uppercase text-[#00737d] font-bold tracking-wider">Ganancia Normalizada (Hake)</div>
+            <div id="kpi-hake-val" class="text-xl font-extrabold text-slate-900">g = +0.255</div>
           </div>
         </div>
       </div>
@@ -421,27 +421,26 @@
     <!-- 2.5 TAB: GALERÍA CLIMATÓN 2026 -->
     <section id="view-climaton" class="tab-view hidden space-y-6">
       <!-- Banner Climatón -->
-      <div class="bg-gradient-to-r from-[#173322] via-[#102434] to-[#0c1a27] p-6 sm:p-8 rounded-3xl border border-white/10 card-shadow text-white relative overflow-hidden">
-        <div class="absolute right-0 top-0 bottom-0 w-1/3 bg-radial from-emerald-500/10 to-transparent pointer-events-none"></div>
+      <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 card-shadow text-slate-900 relative overflow-hidden border-l-4 border-l-[#88C23F]">
         <div class="max-w-3xl relative z-10 space-y-2">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-[#88C23F]/20 text-[#88C23F] border border-[#88C23F]/40">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-[#88C23F]/15 text-[#52801b] border border-[#cbe99c]">
             <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
             <span>Jornada Final Climatón 2026 · Línea Verde</span>
           </div>
-          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
             Muro de Ideas: Propuestas Escolares hacia el 2050
           </h2>
-          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
             Catálogo digital de las <strong>35 ideas de solución</strong> formuladas por los 7 equipos escolares de la Línea Verde durante la Climatón final. Cada tarjeta representa la propuesta original de los estudiantes para responder a los desafíos de biodiversidad urbana y cielos limpios en Antofagasta.
           </p>
-          <div class="flex flex-wrap gap-4 pt-2 text-xs text-slate-400">
-            <span class="flex items-center gap-1.5"><strong class="text-white">7</strong> Establecimientos</span>
+          <div class="flex flex-wrap gap-4 pt-2 text-xs text-slate-500">
+            <span class="flex items-center gap-1.5"><strong class="text-slate-900">7</strong> Establecimientos</span>
             <span>·</span>
-            <span class="flex items-center gap-1.5"><strong class="text-[#88C23F]">35</strong> Ideas Formuladas</span>
+            <span class="flex items-center gap-1.5"><strong class="text-[#52801b]">35</strong> Ideas Formuladas</span>
             <span>·</span>
-            <span class="flex items-center gap-1.5"><strong class="text-[#88C23F]">V1</strong> (Biodiversidad y Humedales)</span>
+            <span class="flex items-center gap-1.5"><strong class="text-[#52801b]">V1</strong> (Biodiversidad y Humedales)</span>
             <span>·</span>
-            <span class="flex items-center gap-1.5"><strong class="text-[#00ADBB]">V2</strong> (Atmósfera y Cielos)</span>
+            <span class="flex items-center gap-1.5"><strong class="text-[#00737d]">V2</strong> (Atmósfera y Cielos)</span>
           </div>
         </div>
       </div>
@@ -687,15 +686,15 @@
   </div>
 
   <!-- FOOTER -->
-  <footer class="bg-[#0a1622] border-t border-white/10 py-8 text-center text-xs text-slate-400 mt-auto">
+  <footer class="bg-white border-t border-slate-200 py-8 text-center text-xs text-slate-500 mt-auto">
     <div class="max-w-7xl mx-auto px-4 flex flex-col items-center justify-center space-y-3">
-      <div class="flex items-center justify-center bg-white/95 px-4 py-2 rounded-2xl shadow-md border border-white/20">
+      <div class="flex items-center justify-center bg-slate-50 px-4 py-2 rounded-2xl shadow-sm border border-slate-200">
         <img src="logo_verdical.png" alt="Grupo Verdical" class="h-9 w-auto object-contain">
       </div>
-      <div class="font-medium text-slate-300">
-        Herramienta desarrollada por <a href="mailto:rodolfo.tapia@verdical.cl" class="text-[#88C23F] font-bold hover:underline">rodolfo.tapia@verdical.cl</a> para <strong class="font-bold text-white">Grupo Verdical SPA</strong>
+      <div class="font-medium text-slate-600">
+        Herramienta desarrollada por <a href="mailto:rodolfo.tapia@verdical.cl" class="text-[#52801b] font-bold hover:underline">rodolfo.tapia@verdical.cl</a> para <strong class="font-bold text-slate-900">Grupo Verdical SPA</strong>
       </div>
-      <div class="text-[11px] text-slate-500">
+      <div class="text-[11px] text-slate-400">
         Programa de Acción Climática (PAC) 2026 · Habilidades Verdes · Antofagasta, Chile
       </div>
     </div>
