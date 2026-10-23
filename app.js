@@ -8,14 +8,22 @@ let CURRENT_HITO = 'Hito 4'; // Default a Hito 4
 let ACTIVE_TAB = 'resumen';
 let CHARTS = {};
 
-// Inicialización al cargar el DOM
-document.addEventListener('DOMContentLoaded', () => {
+const GOOGLE_SPREADSHEET_ID = '1tI7030zyCF16tAQ_HvlUSzrFkZ-aWSjVABZDInmHejY';
+
+// Inicialización resiliente al cargar el DOM o script
+function initApp() {
   if (window.lucide) {
     lucide.createIcons();
   }
   loadDashboardData();
   setupEventListeners();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
 
 function setupEventListeners() {
   const reloadBtn = document.getElementById('btn-reload');
@@ -31,38 +39,69 @@ function setupEventListeners() {
   }
 }
 
-// Cargar datos desde la API local o data.json de respaldo
+// Sincronización en tiempo real desde Google Drive
+async function loadFromGoogleDrive() {
+  const sheets = ['Encuestas Hito 3_Verde', 'Encuestas Hito 4_Verde', 'Participantes 2026', 'Resumen Líderes'];
+  const wb = XLSX.utils.book_new();
+
+  await Promise.all(sheets.map(async (sheetName) => {
+    const url = `https://docs.google.com/spreadsheets/d/${GOOGLE_SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status} al leer ${sheetName}`);
+    const csv = await res.text();
+    const tempWb = XLSX.read(csv, { type: 'string' });
+    const ws = tempWb.Sheets[tempWb.SheetNames[0]];
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  }));
+
+  processWorkbookInBrowser(wb, 'Google Drive (En vivo)');
+}
+
+// Cargar datos: 1° Google Drive (en vivo), 2° API local, 3° data.json de respaldo
 async function loadDashboardData(forceReload = false) {
   const syncStatus = document.getElementById('sync-status');
   const syncText = document.getElementById('sync-text');
-  syncText.innerText = 'Cargando datos...';
-  syncStatus.className = 'flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200';
+  if (syncText) syncText.innerText = 'Cargando datos desde Google Drive...';
+  if (syncStatus) syncStatus.className = 'flex items-center gap-2 text-xs text-slate-600 bg-slate-100 px-3.5 py-1.5 rounded-full border border-slate-200';
 
+  // 1. Intentar cargar en tiempo real desde Google Drive
+  try {
+    await loadFromGoogleDrive();
+    return;
+  } catch (errDrive) {
+    console.warn('No se pudo sincronizar directamente con Google Drive, intentando fuente local...', errDrive);
+  }
+
+  // 2. Intentar API local (si está corriendo server.py)
   try {
     const response = await fetch(`/api/data?t=${Date.now()}`);
     if (!response.ok) throw new Error('API local no respondió');
     RAW_DATA = await response.json();
-    syncText.innerText = 'Conectado a Excel (En vivo)';
-    syncStatus.className = 'flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200';
-  } catch (err) {
-    console.warn('Fallo API local, cargando data.json estático...', err);
-    try {
-      const respStatic = await fetch(`./data.json?t=${Date.now()}`);
-      if (!respStatic.ok) throw new Error('data.json no disponible');
-      RAW_DATA = await respStatic.json();
-      syncText.innerText = 'Datos locales cargados (data.json)';
-      syncStatus.className = 'flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200';
-    } catch (e2) {
-      console.error('Error crítico al cargar datos:', e2);
-      syncText.innerText = 'Error al cargar datos.';
-      syncStatus.className = 'flex items-center gap-1.5 text-xs text-rose-800 bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200';
-      return;
-    }
+    if (syncText) syncText.innerText = 'Conectado a Excel (Local en vivo)';
+    if (syncStatus) syncStatus.className = 'flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200';
+    ensureGlobalHito(RAW_DATA);
+    populateFilterDropdowns();
+    updateUI();
+    return;
+  } catch (errApi) {
+    console.warn('Fallo API local, cargando data.json de respaldo...', errApi);
   }
 
-  ensureGlobalHito(RAW_DATA);
-  populateFilterDropdowns();
-  updateUI();
+  // 3. Fallback estático a data.json
+  try {
+    const respStatic = await fetch(`./data.json?t=${Date.now()}`);
+    if (!respStatic.ok) throw new Error('data.json no disponible');
+    RAW_DATA = await respStatic.json();
+    if (syncText) syncText.innerText = 'Datos de respaldo cargados (data.json)';
+    if (syncStatus) syncStatus.className = 'flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200';
+    ensureGlobalHito(RAW_DATA);
+    populateFilterDropdowns();
+    updateUI();
+  } catch (e2) {
+    console.error('Error crítico al cargar datos:', e2);
+    if (syncText) syncText.innerText = 'Error al cargar datos.';
+    if (syncStatus) syncStatus.className = 'flex items-center gap-2 text-xs text-rose-800 bg-rose-50 px-3.5 py-1.5 rounded-full border border-rose-200';
+  }
 }
 
 // Obtiene la lista consolidada de participantes únicos (83 estudiantes)
@@ -829,14 +868,21 @@ function processWorkbookInBrowser(wb, fileName) {
     };
 
     ensureGlobalHito(RAW_DATA);
-    syncText.innerText = `Cálculo autónomo: ${fileName}`;
-    syncStatus.className = 'flex items-center gap-1.5 text-xs text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200';
+    if (syncText) {
+      syncText.innerText = fileName.includes('Google Drive') ? 'Conectado a Google Drive (En vivo)' : `Cálculo autónomo: ${fileName}`;
+    }
+    if (syncStatus) {
+      syncStatus.className = 'flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200';
+    }
 
     populateFilterDropdowns();
     updateUI();
   } catch (err) {
     console.error('Error parseando Excel en navegador:', err);
-    alert('Error al procesar el archivo Excel en el navegador: ' + err.message);
+    if (!fileName.includes('Google Drive')) {
+      alert('Error al procesar el archivo Excel en el navegador: ' + err.message);
+    }
+    throw err;
   }
 }
 
@@ -1307,15 +1353,6 @@ function renderCharts() {
           labels: {
             boxWidth: 12,
             boxHeight: 12,
-            useBorderRadius: true,
-            borderRadius: 4,
-            font: { size: 11, weight: '600' }
-          }
-        }
-      }
-    }
-  });
-}
             useBorderRadius: true,
             borderRadius: 4,
             font: { size: 11, weight: '600' }
