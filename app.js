@@ -3015,22 +3015,17 @@ function exportParticipantPDF() {
     oldDoc.parentNode.removeChild(oldDoc);
   }
 
+  // Contenedor del documento para renderizado PDF
+  // NOTA CLAVE: NO usar position: absolute o fixed, ni z-index negativo.
+  // html2pdf gestiona su propio contenedor con opacidad 0. Un elemento con position absolute
+  // colapsa la altura del contenedor html2pdf a 0px, generando un canvas vacío.
   const printableDoc = document.createElement('div');
   printableDoc.id = 'pdf-printable-document';
   printableDoc.innerHTML = buildPDFDocumentHTML(p, h3Data, h4Data, currentModalMode, h3Meta, h4Meta);
-
-  // Ubicación precisa:
-  // IMPORTANTE: NO USAR left: -9999px (genera canvas blanco en html2canvas).
-  // Se ubica en posición absoluta top: 0, left: 0 con z-index negativo detrás del modal/backdrop.
-  printableDoc.style.position = 'absolute';
-  printableDoc.style.left = '0px';
-  printableDoc.style.top = '0px';
-  printableDoc.style.width = '794px'; // Formato A4 a 96dpi aprox
+  printableDoc.style.width = '794px';
+  printableDoc.style.maxWidth = '794px';
   printableDoc.style.backgroundColor = '#ffffff';
-  printableDoc.style.zIndex = '-9999';
-  printableDoc.style.opacity = '1';
-  printableDoc.style.visibility = 'visible';
-  document.body.appendChild(printableDoc);
+  printableDoc.style.boxSizing = 'border-box';
 
   const cleanFileName = `Ficha_PAC_2026_${p.name.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]/g, '_')}.pdf`;
 
@@ -3044,7 +3039,17 @@ function exportParticipantPDF() {
     }
   };
 
-  // Esperar a que las imágenes (logos) estén cargadas en el DOM antes de renderizar el canvas
+  const fallbackPrint = () => {
+    if (!document.body.contains(printableDoc)) {
+      printableDoc.style.position = 'static';
+      printableDoc.style.display = 'block';
+      document.body.appendChild(printableDoc);
+    }
+    window.print();
+    setTimeout(restoreUI, 1200);
+  };
+
+  // Esperar a que las imágenes (logos) estén cargadas antes de renderizar el canvas
   const images = Array.from(printableDoc.querySelectorAll('img'));
   const imagePromises = images.map(img => {
     if (img.complete) return Promise.resolve();
@@ -3055,10 +3060,6 @@ function exportParticipantPDF() {
   });
 
   Promise.all(imagePromises).then(() => {
-    const prevScrollX = window.scrollX;
-    const prevScrollY = window.scrollY;
-    window.scrollTo(0, 0);
-
     if (typeof html2pdf !== 'undefined') {
       const opt = {
         margin: [8, 8, 8, 8],
@@ -3067,31 +3068,23 @@ function exportParticipantPDF() {
         html2canvas: {
           scale: 2,
           useCORS: true,
-          allowTaint: true,
-          logging: false,
-          scrollX: 0,
-          scrollY: 0,
-          windowWidth: 794
+          logging: false
         },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
       html2pdf().set(opt).from(printableDoc).save().then(() => {
-        window.scrollTo(prevScrollX, prevScrollY);
         restoreUI();
       }).catch(err => {
         console.warn('html2pdf falló, recurriendo a impresión nativa:', err);
-        window.scrollTo(prevScrollX, prevScrollY);
-        // Fallback a impresión nativa manteniendo printableDoc en el DOM
-        window.print();
-        setTimeout(restoreUI, 1200);
+        fallbackPrint();
       });
     } else {
-      window.scrollTo(prevScrollX, prevScrollY);
-      window.print();
-      setTimeout(restoreUI, 1200);
+      fallbackPrint();
     }
+  }).catch(() => {
+    fallbackPrint();
   });
 }
 
