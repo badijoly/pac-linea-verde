@@ -63,6 +63,11 @@ if (document.readyState === 'loading') {
 }
 
 function setupEventListeners() {
+  window.addEventListener('hashchange', () => {
+    if (window.location.hash === '#biblioteca') {
+      switchTab('biblioteca');
+    }
+  });
   const reloadBtn = document.getElementById('btn-reload');
   if (reloadBtn) {
     reloadBtn.addEventListener('click', () => {
@@ -3064,6 +3069,7 @@ function exportParticipantPDF() {
         margin: [8, 8, 8, 8],
         filename: cleanFileName,
         image: { type: 'jpeg', quality: 0.98 },
+        enableLinks: true,
         html2canvas: {
           scale: 2,
           useCORS: true,
@@ -3103,6 +3109,71 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
   else if (h3Data) coverageText = 'Hito 3: Los otros vecinos de Antofagasta';
   else if (h4Data) coverageText = 'Hito 4: Proteger nuestro escudo invisible';
 
+  // Diagnóstico pedagógico dinámico y altamente accionable
+  let orientacionDocente = '';
+  let orientacionActividad = '';
+  let orientacionGuias = [];
+
+  const h3Gap = h3Data && (h3Data.delta < 0 || h3Data.post_score < 4 || (h3Data.open_analysis && h3Data.open_analysis.some(o => o.status === 'Retrocedió' || o.status === 'Requiere Refuerzo')));
+  const h4Gap = h4Data && (h4Data.delta < 0 || h4Data.post_score < 4 || (h4Data.open_analysis && h4Data.open_analysis.some(o => o.status === 'Retrocedió' || o.status === 'Requiere Refuerzo')));
+
+  if (h3Data && h4Data) {
+    if (h3Gap && h4Gap) {
+      orientacionDocente = 'Se observa un avance heterogéneo con elementos que requieren refuerzo en ambos hitos. En Biodiversidad precisa afianzar las tramas tróficas y el rol del humedal La Chimba; en Atmósfera requiere clarificar la distinción entre efecto invernadero natural vs. cambio climático y el impacto de luminarias en aves marinas.';
+      orientacionActividad = 'Taller práctico de aula sobre redes ecológicas litorales y auditoría escolar de luminarias hacia el suelo (Decreto 1 MMA).';
+      orientacionGuias = [
+        { name: 'Guía Docente Hito 3: Biodiversidad Costera', file: 'Guia_Docente_Hito3_Biodiversidad_Costera.pdf' },
+        { name: 'Guía Docente Hito 4: Cielos Limpios y Atmósfera', file: 'Guia_Docente_Hito4_Cielos_Atmosfera.pdf' }
+      ];
+    } else if (h3Gap) {
+      orientacionDocente = 'Sólido dominio en contenidos de atmósfera con necesidad de afianzar conceptos ecológicos en Hito 3 (redes tróficas, especies descomponedoras y amenazas por perros asilvestrados al Gaviotín chico).';
+      orientacionActividad = 'Simulación de camuflaje de nidos costeros y elaboración de un mapa de relaciones tróficas en el humedal La Chimba.';
+      orientacionGuias = [
+        { name: 'Guía Docente Hito 3: Biodiversidad Costera', file: 'Guia_Docente_Hito3_Biodiversidad_Costera.pdf' }
+      ];
+    } else if (h4Gap) {
+      orientacionDocente = 'Sólido dominio en biodiversidad con brecha conceptual en Hito 4: requiere comprender el efecto invernadero como escudo regulador del clima y la orientación hacia el suelo en luminarias urbanas.';
+      orientacionActividad = 'Experimento de retención térmica en frasco y campaña escolar de rescate de volantones de golondrinas de mar.';
+      orientacionGuias = [
+        { name: 'Guía Docente Hito 4: Cielos Limpios y Atmósfera', file: 'Guia_Docente_Hito4_Cielos_Atmosfera.pdf' }
+      ];
+    } else {
+      orientacionDocente = 'Desempeño destacado y consolidado. El participante evidencia alta apropiación conceptual y argumentativa en ambos desafíos, posicionándose como un líder natural para formular iniciativas escolares.';
+      orientacionActividad = 'Canalizar su motivación hacia la formulación de una Ficha de Proyecto para el Climatón escolar 2026.';
+      orientacionGuias = [
+        { name: 'Guía de Formulación de Proyectos Climatón 2026', file: 'Guia_Docente_Climaton_Accion_Climatica.pdf' }
+      ];
+    }
+  } else if (h3Data) {
+    if (h3Gap) {
+      orientacionDocente = 'El estudiante evidencia avance formativo con necesidad de reforzar el rol de los descomponedores, las tramas tróficas del litoral y el impacto de los perros asilvestrados sobre el Gaviotín chico.';
+      orientacionActividad = 'Taller práctico de redes ecológicas y modelamiento de hábitats protegidos para aves litorales de Antofagasta.';
+      orientacionGuias = [
+        { name: 'Guía Docente Hito 3: Biodiversidad Costera', file: 'Guia_Docente_Hito3_Biodiversidad_Costera.pdf' }
+      ];
+    } else {
+      orientacionDocente = 'Apropiación sobresaliente de los contenidos de biodiversidad y ecosistemas costeros. Se sugiere incentivar el liderazgo en proyectos ambientales escolares.';
+      orientacionActividad = 'Formular una iniciativa escolar de protección ambiental para presentar en el Climatón 2026.';
+      orientacionGuias = [
+        { name: 'Guía de Formulación de Proyectos Climatón 2026', file: 'Guia_Docente_Climaton_Accion_Climatica.pdf' }
+      ];
+    }
+  } else if (h4Data) {
+    if (h4Gap) {
+      orientacionDocente = 'El participante requiere afianzar el rol de la atmósfera en la regulación climática y comprender la norma de emisión lumínica (Decreto 1 MMA) protegiendo cielos astronómicos y fauna silvestre.';
+      orientacionActividad = 'Auditoría escolar de luminarias en el recinto educativo y diseño de afiches de concientización comunitaria.';
+      orientacionGuias = [
+        { name: 'Guía Docente Hito 4: Cielos Limpios y Atmósfera', file: 'Guia_Docente_Hito4_Cielos_Atmosfera.pdf' }
+      ];
+    } else {
+      orientacionDocente = 'Dominio integral y reflexivo de la física atmosférica y la protección del cielo oscuro en la Región de Antofagasta.';
+      orientacionActividad = 'Proponer soluciones de eficiencia lumínica escolar en el marco del Climatón 2026.';
+      orientacionGuias = [
+        { name: 'Guía de Formulación de Proyectos Climatón 2026', file: 'Guia_Docente_Climaton_Accion_Climatica.pdf' }
+      ];
+    }
+  }
+
   // Filas para preguntas cerradas H3
   let h3MCRows = '';
   if (h3Data && h3Data.pre_mc && h3Data.post_mc) {
@@ -3112,12 +3183,12 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
       const isPostCorr = (h3Data.post_mc[idx] || '').toUpperCase() === key3[idx];
       h3MCRows += `
         <tr>
-          <td style="padding: 3px 5px; border: 1px solid #e2e8f0; font-weight: bold; text-align: center; width: 25px;">Q${idx + 1}</td>
-          <td style="padding: 3px 5px; border: 1px solid #e2e8f0;">${escapeHtml(h3Meta[idx].title)}</td>
-          <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; width: 35px;">${(h3Data.pre_mc[idx] || 'N/A').toUpperCase()}</td>
-          <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${isPostCorr ? '#52801b' : '#e11d48'}; width: 35px;">${(h3Data.post_mc[idx] || 'N/A').toUpperCase()}</td>
-          <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #52801b; width: 45px;">${key3[idx]}</td>
-          <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center; font-size: 9.5px; width: 85px;">${evo === 'Retrocedió' ? 'Requiere refuerzo' : (evo === 'Mantuvo Correcto' ? 'Consolidó' : (evo === 'Mantuvo Incorrecto' ? 'Persiste Brecha' : evo))}</td>
+          <td style="padding: 2.5px 4px; border: 1px solid #e2e8f0; font-weight: bold; text-align: center; width: 25px;">Q${idx + 1}</td>
+          <td style="padding: 2.5px 4px; border: 1px solid #e2e8f0;">${escapeHtml(h3Meta[idx].title)}</td>
+          <td style="padding: 2.5px 4px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; width: 35px;">${(h3Data.pre_mc[idx] || 'N/A').toUpperCase()}</td>
+          <td style="padding: 2.5px 4px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${isPostCorr ? '#52801b' : '#e11d48'}; width: 35px;">${(h3Data.post_mc[idx] || 'N/A').toUpperCase()}</td>
+          <td style="padding: 2.5px 4px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #52801b; width: 45px;">${key3[idx]}</td>
+          <td style="padding: 2.5px 4px; border: 1px solid #e2e8f0; text-align: center; font-size: 9px; width: 85px;">${evo === 'Retrocedió' ? 'Req. refuerzo' : (evo === 'Mantuvo Correcto' ? 'Consolidó' : (evo === 'Mantuvo Incorrecto' ? 'Persiste Brecha' : evo))}</td>
         </tr>
       `;
     });
@@ -3132,36 +3203,36 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
       const isPostCorr = (h4Data.post_mc[idx] || '').toUpperCase() === key4[idx];
       h4MCRows += `
         <tr>
-          <td style="padding: 3px 5px; border: 1px solid #e2e8f0; font-weight: bold; text-align: center; width: 25px;">Q${idx + 1}</td>
-          <td style="padding: 3px 5px; border: 1px solid #e2e8f0;">${escapeHtml(h4Meta[idx].title)}</td>
-          <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; width: 35px;">${(h4Data.pre_mc[idx] || 'N/A').toUpperCase()}</td>
-          <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${isPostCorr ? '#00737d' : '#e11d48'}; width: 35px;">${(h4Data.post_mc[idx] || 'N/A').toUpperCase()}</td>
-          <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00737d; width: 45px;">${key4[idx]}</td>
-          <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center; font-size: 9.5px; width: 85px;">${evo === 'Retrocedió' ? 'Requiere refuerzo' : (evo === 'Mantuvo Correcto' ? 'Consolidó' : (evo === 'Mantuvo Incorrecto' ? 'Persiste Brecha' : evo))}</td>
+          <td style="padding: 2.5px 4px; border: 1px solid #e2e8f0; font-weight: bold; text-align: center; width: 25px;">Q${idx + 1}</td>
+          <td style="padding: 2.5px 4px; border: 1px solid #e2e8f0;">${escapeHtml(h4Meta[idx].title)}</td>
+          <td style="padding: 2.5px 4px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; width: 35px;">${(h4Data.pre_mc[idx] || 'N/A').toUpperCase()}</td>
+          <td style="padding: 2.5px 4px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${isPostCorr ? '#00737d' : '#e11d48'}; width: 35px;">${(h4Data.post_mc[idx] || 'N/A').toUpperCase()}</td>
+          <td style="padding: 2.5px 4px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00737d; width: 45px;">${key4[idx]}</td>
+          <td style="padding: 2.5px 4px; border: 1px solid #e2e8f0; text-align: center; font-size: 9px; width: 85px;">${evo === 'Retrocedió' ? 'Req. refuerzo' : (evo === 'Mantuvo Correcto' ? 'Consolidó' : (evo === 'Mantuvo Incorrecto' ? 'Persiste Brecha' : evo))}</td>
         </tr>
       `;
     });
   }
 
-  // Tarjetas para preguntas abiertas H3 (diseño compacto para ajuste estricto a 1 página)
+  // Tarjetas para preguntas abiertas H3 (diseño compacto)
   let h3OpenCards = '';
   if (h3Data && h3Data.open_analysis) {
     h3Data.open_analysis.forEach((oq, idx) => {
       h3OpenCards += `
         <div style="margin-bottom: 5px; padding: 4px 6px; border: 1px solid #e2e8f0; border-radius: 6px; background-color: #fafafa; box-sizing: border-box;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
-            <strong style="font-size: 10px; color: #0f172a;">P${idx + 1}: ${escapeHtml(oq.question)}</strong>
-            <span style="font-size: 8.5px; font-weight: bold; padding: 1px 6px; border-radius: 10px; background-color: ${oq.status === 'Mejoró' ? '#f1f9e9' : (oq.status === 'Retrocedió' ? '#fef9ed' : '#e6f9fa')}; color: ${oq.status === 'Mejoró' ? '#52801b' : (oq.status === 'Retrocedió' ? '#b45309' : '#00737d')}; white-space: nowrap;">${oq.status === 'Retrocedió' ? 'Requiere refuerzo' : (oq.status === 'Mantuvo' ? 'Consolidó' : oq.status)}</span>
+            <strong style="font-size: 9.5px; color: #0f172a;">P${idx + 1}: ${escapeHtml(oq.question)}</strong>
+            <span style="font-size: 8px; font-weight: bold; padding: 1px 5px; border-radius: 8px; background-color: ${oq.status === 'Mejoró' ? '#f1f9e9' : (oq.status === 'Retrocedió' ? '#fef9ed' : '#e6f9fa')}; color: ${oq.status === 'Mejoró' ? '#52801b' : (oq.status === 'Retrocedió' ? '#b45309' : '#00737d')}; white-space: nowrap;">${oq.status === 'Retrocedió' ? 'Requiere refuerzo' : (oq.status === 'Mantuvo' ? 'Consolidó' : oq.status)}</span>
           </div>
-          <div style="font-size: 9px; color: #64748b; margin-bottom: 3px;">Diagnóstico: <strong>${escapeHtml(oq.detail)}</strong></div>
-          <table style="width: 100%; border-collapse: collapse; font-size: 9.5px; table-layout: fixed;">
+          <div style="font-size: 8.5px; color: #64748b; margin-bottom: 2px;">Diagnóstico: <strong>${escapeHtml(oq.detail)}</strong></div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 9px; table-layout: fixed;">
             <tr>
-              <td style="width: 50%; padding: 4px 5px; border: 1px solid #e2e8f0; background-color: #ffffff; vertical-align: top; word-break: break-word;">
-                <span style="font-size: 8.5px; font-weight: bold; color: #94a3b8; display: block; text-transform: uppercase;">PRE:</span>
+              <td style="width: 50%; padding: 3px 5px; border: 1px solid #e2e8f0; background-color: #ffffff; vertical-align: top; word-break: break-word;">
+                <span style="font-size: 8px; font-weight: bold; color: #94a3b8; display: block; text-transform: uppercase;">PRE:</span>
                 <span style="font-style: italic; color: #334155;">${oq.pre_text && oq.pre_text.trim() ? '"' + escapeHtml(oq.pre_text) + '"' : '(Sin respuesta)'}</span>
               </td>
-              <td style="width: 50%; padding: 4px 5px; border: 1px solid #e2e8f0; background-color: #f1f9e9; vertical-align: top; word-break: break-word;">
-                <span style="font-size: 8.5px; font-weight: bold; color: #52801b; display: block; text-transform: uppercase;">POST:</span>
+              <td style="width: 50%; padding: 3px 5px; border: 1px solid #e2e8f0; background-color: #f1f9e9; vertical-align: top; word-break: break-word;">
+                <span style="font-size: 8px; font-weight: bold; color: #52801b; display: block; text-transform: uppercase;">POST:</span>
                 <span style="color: #0f172a; font-weight: 500;">${oq.post_text && oq.post_text.trim() ? '"' + escapeHtml(oq.post_text) + '"' : '(Sin respuesta)'}</span>
               </td>
             </tr>
@@ -3171,25 +3242,25 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
     });
   }
 
-  // Tarjetas para preguntas abiertas H4
+  // Tarjetas para preguntas abiertas H4 (diseño compacto)
   let h4OpenCards = '';
   if (h4Data && h4Data.open_analysis) {
     h4Data.open_analysis.forEach((oq, idx) => {
       h4OpenCards += `
         <div style="margin-bottom: 5px; padding: 4px 6px; border: 1px solid #e2e8f0; border-radius: 6px; background-color: #fafafa; box-sizing: border-box;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
-            <strong style="font-size: 10px; color: #0f172a;">P${idx + 1}: ${escapeHtml(oq.question)}</strong>
-            <span style="font-size: 8.5px; font-weight: bold; padding: 1px 6px; border-radius: 10px; background-color: ${oq.status === 'Mejoró' ? '#e6f9fa' : (oq.status === 'Retrocedió' ? '#fef9ed' : '#e6f9fa')}; color: ${oq.status === 'Mejoró' ? '#00737d' : (oq.status === 'Retrocedió' ? '#b45309' : '#00737d')}; white-space: nowrap;">${oq.status === 'Retrocedió' ? 'Requiere refuerzo' : (oq.status === 'Mantuvo' ? 'Consolidó' : oq.status)}</span>
+            <strong style="font-size: 9.5px; color: #0f172a;">P${idx + 1}: ${escapeHtml(oq.question)}</strong>
+            <span style="font-size: 8px; font-weight: bold; padding: 1px 5px; border-radius: 8px; background-color: ${oq.status === 'Mejoró' ? '#e6f9fa' : (oq.status === 'Retrocedió' ? '#fef9ed' : '#e6f9fa')}; color: ${oq.status === 'Mejoró' ? '#00737d' : (oq.status === 'Retrocedió' ? '#b45309' : '#00737d')}; white-space: nowrap;">${oq.status === 'Retrocedió' ? 'Requiere refuerzo' : (oq.status === 'Mantuvo' ? 'Consolidó' : oq.status)}</span>
           </div>
-          <div style="font-size: 9px; color: #64748b; margin-bottom: 3px;">Diagnóstico: <strong>${escapeHtml(oq.detail)}</strong></div>
-          <table style="width: 100%; border-collapse: collapse; font-size: 9.5px; table-layout: fixed;">
+          <div style="font-size: 8.5px; color: #64748b; margin-bottom: 2px;">Diagnóstico: <strong>${escapeHtml(oq.detail)}</strong></div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 9px; table-layout: fixed;">
             <tr>
-              <td style="width: 50%; padding: 4px 5px; border: 1px solid #e2e8f0; background-color: #ffffff; vertical-align: top; word-break: break-word;">
-                <span style="font-size: 8.5px; font-weight: bold; color: #94a3b8; display: block; text-transform: uppercase;">PRE:</span>
+              <td style="width: 50%; padding: 3px 5px; border: 1px solid #e2e8f0; background-color: #ffffff; vertical-align: top; word-break: break-word;">
+                <span style="font-size: 8px; font-weight: bold; color: #94a3b8; display: block; text-transform: uppercase;">PRE:</span>
                 <span style="font-style: italic; color: #334155;">${oq.pre_text && oq.pre_text.trim() ? '"' + escapeHtml(oq.pre_text) + '"' : '(Sin respuesta)'}</span>
               </td>
-              <td style="width: 50%; padding: 4px 5px; border: 1px solid #e2e8f0; background-color: #e6f9fa; vertical-align: top; word-break: break-word;">
-                <span style="font-size: 8.5px; font-weight: bold; color: #00737d; display: block; text-transform: uppercase;">POST:</span>
+              <td style="width: 50%; padding: 3px 5px; border: 1px solid #e2e8f0; background-color: #e6f9fa; vertical-align: top; word-break: break-word;">
+                <span style="font-size: 8px; font-weight: bold; color: #00737d; display: block; text-transform: uppercase;">POST:</span>
                 <span style="color: #0f172a; font-weight: 500;">${oq.post_text && oq.post_text.trim() ? '"' + escapeHtml(oq.post_text) + '"' : '(Sin respuesta)'}</span>
               </td>
             </tr>
@@ -3200,115 +3271,136 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
   }
 
   return `
-    <div style="font-family: Arial, Helvetica, sans-serif; color: #1e293b; padding: 0 4px; line-height: 1.35; background-color: #ffffff; box-sizing: border-box; width: 100%;">
+    <div style="font-family: Arial, Helvetica, sans-serif; color: #1e293b; padding: 0 4px; line-height: 1.3; background-color: #ffffff; box-sizing: border-box; width: 100%;">
       
-      <!-- PÁGINA 1: Encabezado + Ficha Identificación + Sección 1 + Sección 2 -->
+      <!-- PÁGINA 1: Encabezado + Identificación + Punto 1 (Cuantitativo) + Punto 2 (Orientación Docente) + Punto 3 (Preguntas Cerradas) -->
       <div>
         <!-- Encabezado con Logos Oficiales -->
-        <table style="width: 100%; border-bottom: 2px solid #88C23F; padding-bottom: 8px; margin-bottom: 10px; table-layout: fixed;">
+        <table style="width: 100%; border-bottom: 2px solid #88C23F; padding-bottom: 6px; margin-bottom: 8px; table-layout: fixed;">
           <tr>
-            <td style="width: 65px; vertical-align: middle;">
-              <img src="logo.png" style="height: 44px; width: auto; max-width: 60px; object-fit: contain;" alt="PAC 2026">
+            <td style="width: 60px; vertical-align: middle;">
+              <img src="logo.png" style="height: 40px; width: auto; max-width: 55px; object-fit: contain;" alt="PAC 2026">
             </td>
             <td style="vertical-align: middle; padding-left: 8px;">
-              <div style="font-size: 11.5px; font-weight: bold; text-transform: uppercase; color: #0f172a; letter-spacing: 0.5px;">Programa de Acción Climática 2026 · Línea Verde</div>
-              <div style="font-size: 15px; font-weight: 900; color: #52801b; margin-top: 2px;">FICHA INDIVIDUAL DE EVALUACIÓN TEST-RETEST</div>
-              <div style="font-size: 9.5px; color: #64748b;">Antofagasta: Laboratorio Vivo hacia el 2050 · Reporte de Aprendizajes</div>
+              <div style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: #0f172a; letter-spacing: 0.5px;">Programa de Acción Climática 2026 · Línea Verde</div>
+              <div style="font-size: 14px; font-weight: 900; color: #52801b; margin-top: 1px;">FICHA INDIVIDUAL DE EVALUACIÓN TEST-RETEST</div>
+              <div style="font-size: 9px; color: #64748b;">Antofagasta: Laboratorio Vivo hacia el 2050 · Reporte de Aprendizajes</div>
             </td>
-            <td style="width: 110px; text-align: right; vertical-align: middle;">
-              <img src="logo_verdical.png" style="height: 34px; width: auto; max-width: 105px; object-fit: contain;" alt="Grupo Verdical">
+            <td style="width: 105px; text-align: right; vertical-align: middle;">
+              <img src="logo_verdical.png" style="height: 32px; width: auto; max-width: 100px; object-fit: contain;" alt="Grupo Verdical">
             </td>
           </tr>
         </table>
 
         <!-- Ficha de Identificación del Participante -->
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; table-layout: fixed;">
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; table-layout: fixed;">
           <tr>
-            <td style="padding: 6px 10px; width: 50%; vertical-align: top;">
-              <div style="font-size: 8.5px; text-transform: uppercase; font-weight: bold; color: #94a3b8;">Participante:</div>
-              <div style="font-size: 14px; font-weight: 900; color: #0f172a;">${escapeHtml(p.name)}</div>
-              <div style="font-size: 10px; color: #475569; margin-top: 2px;">Establecimiento: <strong>${escapeHtml(p.school)}</strong></div>
+            <td style="padding: 5px 8px; width: 50%; vertical-align: top;">
+              <div style="font-size: 8px; text-transform: uppercase; font-weight: bold; color: #94a3b8;">Participante:</div>
+              <div style="font-size: 13px; font-weight: 900; color: #0f172a;">${escapeHtml(p.name)}</div>
+              <div style="font-size: 9.5px; color: #475569; margin-top: 1px;">Establecimiento: <strong>${escapeHtml(p.school)}</strong></div>
             </td>
-            <td style="padding: 6px 10px; width: 50%; vertical-align: top; border-left: 1px solid #e2e8f0;">
-              <div style="font-size: 8.5px; text-transform: uppercase; font-weight: bold; color: #94a3b8;">Detalles de Participación:</div>
-              <div style="font-size: 10px; color: #334155; margin-top: 1px;">Género: <strong>${escapeHtml(p.gender)}</strong> · Rol: <strong>${escapeHtml(p.role || 'Estudiante')}</strong></div>
-              <div style="font-size: 10px; color: #52801b; font-weight: bold; margin-top: 1px;">${coverageText}</div>
-              <div style="font-size: 10px; color: #64748b; margin-top: 1px;">Diagnóstico: <strong style="color: #0f172a;">${escapeHtml(p.real_status || p.status)}</strong></div>
+            <td style="padding: 5px 8px; width: 50%; vertical-align: top; border-left: 1px solid #e2e8f0;">
+              <div style="font-size: 8px; text-transform: uppercase; font-weight: bold; color: #94a3b8;">Detalles de Participación:</div>
+              <div style="font-size: 9.5px; color: #334155;">Género: <strong>${escapeHtml(p.gender)}</strong> · Rol: <strong>${escapeHtml(p.role || 'Estudiante')}</strong></div>
+              <div style="font-size: 9.5px; color: #52801b; font-weight: bold; margin-top: 1px;">${coverageText}</div>
+              <div style="font-size: 9.5px; color: #64748b; margin-top: 1px;">Diagnóstico: <strong style="color: #0f172a;">${escapeHtml(p.real_status || p.status)}</strong></div>
             </td>
           </tr>
         </table>
 
-        <!-- Tabla de Rendimiento Cuantitativo -->
-        <div style="margin-bottom: 12px;">
-          <div style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 5px; border-left: 3px solid #88C23F; padding-left: 6px;">1. Resumen Cuantitativo de Rendimiento (Puntajes PRE vs. POST)</div>
-          <table style="width: 100%; border-collapse: collapse; font-size: 10px; table-layout: fixed;">
+        <!-- 1. RESUMEN CUANTITATIVO DE RENDIMIENTO -->
+        <div style="margin-bottom: 8px;">
+          <div style="font-size: 10.5px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 4px; border-left: 3px solid #88C23F; padding-left: 6px;">1. Resumen Cuantitativo de Rendimiento (Puntajes PRE vs. POST)</div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 9.5px; table-layout: fixed;">
             <thead>
               <tr style="background-color: #f1f5f9; text-align: left;">
-                <th style="padding: 4px 6px; border: 1px solid #cbd5e1; width: 44%;">Desafío / Hito Evaluado</th>
-                <th style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: center; width: 13%;">Puntaje PRE</th>
-                <th style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: center; width: 13%;">Puntaje POST</th>
-                <th style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: center; width: 14%;">Diferencia</th>
-                <th style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: center; width: 16%;">Condición</th>
+                <th style="padding: 3px 5px; border: 1px solid #cbd5e1; width: 44%;">Desafío / Hito Evaluado</th>
+                <th style="padding: 3px 5px; border: 1px solid #cbd5e1; text-align: center; width: 13%;">Puntaje PRE</th>
+                <th style="padding: 3px 5px; border: 1px solid #cbd5e1; text-align: center; width: 13%;">Puntaje POST</th>
+                <th style="padding: 3px 5px; border: 1px solid #cbd5e1; text-align: center; width: 14%;">Diferencia</th>
+                <th style="padding: 3px 5px; border: 1px solid #cbd5e1; text-align: center; width: 16%;">Condición</th>
               </tr>
             </thead>
             <tbody>
               ${h3Data ? `
                 <tr>
-                  <td style="padding: 4px 6px; border: 1px solid #e2e8f0; font-weight: bold;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad)</td>
-                  <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: center;">${h3Data.pre_score} / 5</td>
-                  <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #52801b;">${h3Data.post_score} / 5</td>
-                  <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${h3Data.delta >= 0 ? '#52801b' : '#e11d48'};">${h3Data.delta >= 0 ? '+' : ''}${h3Data.delta} pts</td>
-                  <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: 600;">${h3Data.status === 'Retrocedió' ? 'Requiere refuerzo' : (h3Data.status === 'Mantuvo' ? 'Consolidó' : h3Data.status)}</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e2e8f0; font-weight: bold;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad)</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center;">${h3Data.pre_score} / 5</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #52801b;">${h3Data.post_score} / 5</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${h3Data.delta >= 0 ? '#52801b' : '#e11d48'};">${h3Data.delta >= 0 ? '+' : ''}${h3Data.delta} pts</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: 600;">${h3Data.status === 'Retrocedió' ? 'Requiere refuerzo' : (h3Data.status === 'Mantuvo' ? 'Consolidó' : h3Data.status)}</td>
                 </tr>
               ` : `
                 <tr style="color: #94a3b8; font-style: italic;">
-                  <td style="padding: 4px 6px; border: 1px solid #e2e8f0;">Hito 3: Los otros vecinos de Antofagasta</td>
-                  <td colspan="4" style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: center;">No convocado a este hito (escuela asignada a Hito 4)</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e2e8f0;">Hito 3: Los otros vecinos de Antofagasta</td>
+                  <td colspan="4" style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center;">No convocado a este hito (escuela asignada a Hito 4)</td>
                 </tr>
               `}
               ${h4Data ? `
                 <tr>
-                  <td style="padding: 4px 6px; border: 1px solid #e2e8f0; font-weight: bold;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos)</td>
-                  <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: center;">${h4Data.pre_score} / 5</td>
-                  <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00737d;">${h4Data.post_score} / 5</td>
-                  <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${h4Data.delta >= 0 ? '#00737d' : '#e11d48'};">${h4Data.delta >= 0 ? '+' : ''}${h4Data.delta} pts</td>
-                  <td style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: center; font-weight: 600;">${h4Data.status === 'Retrocedió' ? 'Requiere refuerzo' : (h4Data.status === 'Mantuvo' ? 'Consolidó' : h4Data.status)}</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e2e8f0; font-weight: bold;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos)</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center;">${h4Data.pre_score} / 5</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: #00737d;">${h4Data.post_score} / 5</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${h4Data.delta >= 0 ? '#00737d' : '#e11d48'};">${h4Data.delta >= 0 ? '+' : ''}${h4Data.delta} pts</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center; font-weight: 600;">${h4Data.status === 'Retrocedió' ? 'Requiere refuerzo' : (h4Data.status === 'Mantuvo' ? 'Consolidó' : h4Data.status)}</td>
                 </tr>
               ` : `
                 <tr style="color: #94a3b8; font-style: italic;">
-                  <td style="padding: 4px 6px; border: 1px solid #e2e8f0;">Hito 4: Proteger nuestro escudo invisible</td>
-                  <td colspan="4" style="padding: 4px 6px; border: 1px solid #e2e8f0; text-align: center;">No convocado a este hito (escuela asignada a Hito 3)</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e2e8f0;">Hito 4: Proteger nuestro escudo invisible</td>
+                  <td colspan="4" style="padding: 3px 5px; border: 1px solid #e2e8f0; text-align: center;">No convocado a este hito (escuela asignada a Hito 3)</td>
                 </tr>
               `}
               ${h3Data && h4Data ? `
                 <tr style="background-color: #f1f9e9; font-weight: bold;">
-                  <td style="padding: 4px 6px; border: 1px solid #cbd5e1; color: #3f6515;">Consolidado Combinado (10 preguntas cerradas)</td>
-                  <td style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: center;">${totPre} / 10 pts</td>
-                  <td style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: center; color: #52801b;">${totPost} / 10 pts</td>
-                  <td style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: center; color: ${totDelta >= 0 ? '#52801b' : '#e11d48'};">${deltaSign}${totDelta} pts</td>
-                  <td style="padding: 4px 6px; border: 1px solid #cbd5e1; text-align: center; color: #3f6515; font-weight: bold;">${p.status === 'Retrocedió' ? 'Requiere refuerzo' : (p.status === 'Mantuvo' ? 'Consolidó' : p.status)}</td>
+                  <td style="padding: 3px 5px; border: 1px solid #cbd5e1; color: #3f6515;">Consolidado Combinado (10 preguntas cerradas)</td>
+                  <td style="padding: 3px 5px; border: 1px solid #cbd5e1; text-align: center;">${totPre} / 10 pts</td>
+                  <td style="padding: 3px 5px; border: 1px solid #cbd5e1; text-align: center; color: #52801b;">${totPost} / 10 pts</td>
+                  <td style="padding: 3px 5px; border: 1px solid #cbd5e1; text-align: center; color: ${totDelta >= 0 ? '#52801b' : '#e11d48'};">${deltaSign}${totDelta} pts</td>
+                  <td style="padding: 3px 5px; border: 1px solid #cbd5e1; text-align: center; color: #3f6515; font-weight: bold;">${p.status === 'Retrocedió' ? 'Requiere refuerzo' : (p.status === 'Mantuvo' ? 'Consolidó' : p.status)}</td>
                 </tr>
               ` : ''}
             </tbody>
           </table>
         </div>
 
-        <!-- Sección 2: Desglose Preguntas Cerradas -->
+        <!-- 2. ORIENTACIÓN PARA EL PROFESOR/A LÍDER (NUEVA POSICIÓN COMO PUNTO 2) -->
+        <div style="margin-bottom: 8px; padding: 6px 8px; background-color: #f1f9e9; border: 1px solid #cbe99c; border-radius: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+            <div style="font-size: 10.5px; font-weight: bold; color: #3f6515; text-transform: uppercase;">2. Orientación Pedagógica y Plan de Acción Docente</div>
+            <span style="font-size: 8px; background-color: #ffffff; color: #52801b; padding: 1px 6px; border-radius: 8px; font-weight: bold; border: 1px solid #cbe99c;">Metodología VERDICAL</span>
+          </div>
+          <p style="font-size: 9px; color: #14532d; margin: 0 0 3px 0; line-height: 1.3;">
+            <strong>Diagnóstico Curricular:</strong> ${orientacionDocente}
+          </p>
+          <p style="font-size: 9px; color: #14532d; margin: 0 0 4px 0; line-height: 1.3;">
+            <strong>Actividad Formativa Sugerida:</strong> ${orientacionActividad}
+          </p>
+          <div style="background-color: #ffffff; padding: 4px 6px; border-radius: 4px; border: 1px solid #d9f0b5; font-size: 8.5px; color: #334155;">
+            <strong style="color: #274209;">Recursos y Guías en la Biblioteca del Dashboard:</strong>
+            <span style="display: inline-block; margin-left: 4px;">
+              ${orientacionGuias.map(g => `<a href="https://badijoly.github.io/pac-linea-verde/biblioteca/guias/${g.file}" target="_blank" style="color: #00737d; text-decoration: underline; font-weight: bold; margin-right: 6px;">📄 ${g.name} ↗</a>`).join('')}
+              <a href="https://badijoly.github.io/pac-linea-verde/#biblioteca" target="_blank" style="color: #52801b; text-decoration: underline; font-weight: bold;">[Ver Biblioteca Completa ↗]</a>
+            </span>
+          </div>
+        </div>
+
+        <!-- 3. DESGLOSE DE PREGUNTAS CERRADAS (PUNTO 3) -->
         <div style="margin-bottom: 0px;">
-          <div style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 4px; border-left: 3px solid #88C23F; padding-left: 6px;">2. Desglose de Preguntas Cerradas (Alternativas)</div>
+          <div style="font-size: 10.5px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 3px; border-left: 3px solid #88C23F; padding-left: 6px;">3. Desglose de Preguntas Cerradas (Alternativas)</div>
           
           ${h3Data ? `
-            <div style="margin-bottom: 8px;">
-              <div style="font-size: 10px; font-weight: bold; color: #52801b; margin-bottom: 3px;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y Humedales) · Puntaje: ${h3Data.post_score} / 5</div>
-              <table style="width: 100%; border-collapse: collapse; font-size: 9.5px; table-layout: fixed;">
+            <div style="margin-bottom: 5px;">
+              <div style="font-size: 9.5px; font-weight: bold; color: #52801b; margin-bottom: 2px;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y Humedales) · Puntaje: ${h3Data.post_score} / 5</div>
+              <table style="width: 100%; border-collapse: collapse; font-size: 9px; table-layout: fixed;">
                 <thead>
                   <tr style="background-color: #f8fafc;">
-                    <th style="padding: 3px 4px; border: 1px solid #cbd5e1; width: 25px; text-align: center;">#</th>
-                    <th style="padding: 3px 4px; border: 1px solid #cbd5e1;">Pregunta Evaluada</th>
-                    <th style="padding: 3px 4px; border: 1px solid #cbd5e1; width: 35px; text-align: center;">PRE</th>
-                    <th style="padding: 3px 4px; border: 1px solid #cbd5e1; width: 35px; text-align: center;">POST</th>
-                    <th style="padding: 3px 4px; border: 1px solid #cbd5e1; width: 45px; text-align: center;">Correcta</th>
-                    <th style="padding: 3px 4px; border: 1px solid #cbd5e1; width: 85px; text-align: center;">Evolución</th>
+                    <th style="padding: 2.5px 4px; border: 1px solid #cbd5e1; width: 25px; text-align: center;">#</th>
+                    <th style="padding: 2.5px 4px; border: 1px solid #cbd5e1;">Pregunta Evaluada</th>
+                    <th style="padding: 2.5px 4px; border: 1px solid #cbd5e1; width: 35px; text-align: center;">PRE</th>
+                    <th style="padding: 2.5px 4px; border: 1px solid #cbd5e1; width: 35px; text-align: center;">POST</th>
+                    <th style="padding: 2.5px 4px; border: 1px solid #cbd5e1; width: 45px; text-align: center;">Correcta</th>
+                    <th style="padding: 2.5px 4px; border: 1px solid #cbd5e1; width: 85px; text-align: center;">Evolución</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -3319,17 +3411,17 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
           ` : ''}
 
           ${h4Data ? `
-            <div style="margin-bottom: 4px;">
-              <div style="font-size: 10px; font-weight: bold; color: #00737d; margin-bottom: 3px;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos Limpios) · Puntaje: ${h4Data.post_score} / 5</div>
-              <table style="width: 100%; border-collapse: collapse; font-size: 9.5px; table-layout: fixed;">
+            <div style="margin-bottom: 0px;">
+              <div style="font-size: 9.5px; font-weight: bold; color: #00737d; margin-bottom: 2px;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos Limpios) · Puntaje: ${h4Data.post_score} / 5</div>
+              <table style="width: 100%; border-collapse: collapse; font-size: 9px; table-layout: fixed;">
                 <thead>
                   <tr style="background-color: #f8fafc;">
-                    <th style="padding: 3px 4px; border: 1px solid #cbd5e1; width: 25px; text-align: center;">#</th>
-                    <th style="padding: 3px 4px; border: 1px solid #cbd5e1;">Pregunta Evaluada</th>
-                    <th style="padding: 3px 4px; border: 1px solid #cbd5e1; width: 35px; text-align: center;">PRE</th>
-                    <th style="padding: 3px 4px; border: 1px solid #cbd5e1; width: 35px; text-align: center;">POST</th>
-                    <th style="padding: 3px 4px; border: 1px solid #cbd5e1; width: 45px; text-align: center;">Correcta</th>
-                    <th style="padding: 3px 4px; border: 1px solid #cbd5e1; width: 85px; text-align: center;">Evolución</th>
+                    <th style="padding: 2.5px 4px; border: 1px solid #cbd5e1; width: 25px; text-align: center;">#</th>
+                    <th style="padding: 2.5px 4px; border: 1px solid #cbd5e1;">Pregunta Evaluada</th>
+                    <th style="padding: 2.5px 4px; border: 1px solid #cbd5e1; width: 35px; text-align: center;">PRE</th>
+                    <th style="padding: 2.5px 4px; border: 1px solid #cbd5e1; width: 35px; text-align: center;">POST</th>
+                    <th style="padding: 2.5px 4px; border: 1px solid #cbd5e1; width: 45px; text-align: center;">Correcta</th>
+                    <th style="padding: 2.5px 4px; border: 1px solid #cbd5e1; width: 85px; text-align: center;">Evolución</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -3341,45 +3433,33 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
         </div>
       </div>
 
-      <!-- PÁGINA 2: Salto de página limpio hacia Sección 3 + Sección 4 + Footer -->
+      <!-- PÁGINA 2: Salto limpio para Punto 4 (Preguntas Abiertas) + Pie Institucional -->
       <div style="page-break-before: always; break-before: page; padding-top: 4px;">
         
-        <!-- Sección 3: Desglose Preguntas Abiertas (Cualitativo) -->
-        <div style="margin-bottom: 10px;">
-          <div style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 5px; border-left: 3px solid #88C23F; padding-left: 6px;">3. Desglose de Preguntas Abiertas (Análisis Cualitativo de Apropiación)</div>
+        <!-- 4. DESGLOSE DE PREGUNTAS ABIERTAS (PUNTO 4) -->
+        <div style="margin-bottom: 8px;">
+          <div style="font-size: 10.5px; font-weight: bold; text-transform: uppercase; color: #0f172a; margin-bottom: 4px; border-left: 3px solid #88C23F; padding-left: 6px;">4. Desglose de Preguntas Abiertas (Análisis Cualitativo de Apropiación)</div>
           
           ${h3Data ? `
-            <div style="margin-bottom: 8px;">
-              <div style="font-size: 10px; font-weight: bold; color: #52801b; margin-bottom: 4px;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y Ecosistemas)</div>
+            <div style="margin-bottom: 6px;">
+              <div style="font-size: 9.5px; font-weight: bold; color: #52801b; margin-bottom: 3px;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad y Ecosistemas)</div>
               ${h3OpenCards}
             </div>
           ` : ''}
 
           ${h4Data ? `
-            <div style="margin-bottom: 8px;">
-              <div style="font-size: 10px; font-weight: bold; color: #00737d; margin-bottom: 4px;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos Limpios)</div>
+            <div style="margin-bottom: 6px;">
+              <div style="font-size: 9.5px; font-weight: bold; color: #00737d; margin-bottom: 3px;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos Limpios)</div>
               ${h4OpenCards}
             </div>
           ` : ''}
         </div>
 
-        <!-- Sección 4: Orientaciones Pedagógicas -->
-        <div style="margin-bottom: 12px; padding: 6px 10px; background-color: #f1f9e9; border: 1px solid #cbe99c; border-radius: 6px;">
-          <div style="font-size: 10px; font-weight: bold; color: #3f6515; margin-bottom: 2px;">Orientación para el Profesor/a Líder:</div>
-          <p style="font-size: 9.5px; color: #14532d; margin: 0; line-height: 1.35;">
-            ${p.status === 'Mejoró' ? 
-              'El participante evidenció un avance significativo en la apropiación de conceptos y terminología científica tanto en preguntas de selección múltiple como en sus explicaciones escritas. Se recomienda canalizar esta motivación hacia la fase de ideación de soluciones climáticas escolares.' : 
-              (p.status === 'Mantuvo' ? 
-                'El participante consolidó su aprendizaje, sosteniendo un nivel de dominio conceptual estructurado y seguro entre el PRE y POST test. Esta consolidación es una base sólida y esperable para liderar la formulación de proyectos de acción climática escolar.' : 
-                'Se observaron elementos no concluyentes o respuestas breves que requieren refuerzo conceptual. Se recomienda una breve conversación formativa con el docente líder para afianzar los conceptos clave mediante actividades de aula.')}
-          </p>
-        </div>
-
         <!-- Pie de Página Institucional -->
-        <table style="width: 100%; border-top: 1px solid #e2e8f0; padding-top: 6px; font-size: 8.5px; color: #94a3b8; table-layout: fixed;">
+        <table style="width: 100%; border-top: 1px solid #e2e8f0; padding-top: 5px; font-size: 8px; color: #94a3b8; table-layout: fixed;">
           <tr>
             <td style="width: 50%;">Herramienta desarrollada por <strong>rodolfo.tapia@verdical.cl</strong> para <strong>Grupo Verdical SPA</strong></td>
-            <td style="width: 50%; text-align: right;">PAC Línea Verde 2026 · Antofagasta, Chile</td>
+            <td style="width: 50%; text-align: right;">PAC Línea Verde 2026 · Metodología VERDICAL · Antofagasta, Chile</td>
           </tr>
         </table>
 
@@ -3388,6 +3468,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
     </div>
   `;
 }
+
 
 // Exportar tabla a CSV
 function exportSchoolsTable() {
@@ -3410,4 +3491,46 @@ function exportSchoolsTable() {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+
+// ==========================================
+// FUNCIONALIDADES DE LA BIBLIOTECA DE RECURSOS
+// ==========================================
+function filterBiblioteca(category) {
+  const cards = document.querySelectorAll('.biblioteca-card');
+  const pills = document.querySelectorAll('.biblioteca-pill');
+
+  pills.forEach(p => {
+    if (p.getAttribute('data-cat') === category) {
+      p.className = 'biblioteca-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm transition';
+    } else {
+      p.className = 'biblioteca-pill px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition';
+    }
+  });
+
+  cards.forEach(card => {
+    const cardCat = card.getAttribute('data-category');
+    if (category === 'all' || cardCat === category || (category === 'guias' && cardCat === 'guias')) {
+      card.classList.remove('hidden');
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+}
+
+function searchBiblioteca(query) {
+  const q = (query || '').toLowerCase().trim();
+  const cards = document.querySelectorAll('.biblioteca-card');
+
+  cards.forEach(card => {
+    const title = (card.getAttribute('data-title') || '').toLowerCase();
+    const desc = (card.getAttribute('data-desc') || '').toLowerCase();
+    const tags = (card.getAttribute('data-tags') || '').toLowerCase();
+    if (!q || title.includes(q) || desc.includes(q) || tags.includes(q)) {
+      card.classList.remove('hidden');
+    } else {
+      card.classList.add('hidden');
+    }
+  });
 }

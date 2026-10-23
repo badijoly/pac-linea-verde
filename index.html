@@ -116,6 +116,11 @@
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
           <span>Actualizar</span>
         </button>
+
+        <button onclick="switchTab('biblioteca')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-slate-800 bg-[#88C23F]/25 hover:bg-[#88C23F]/40 border border-[#88C23F]/60 rounded-full transition shadow-sm" title="Biblioteca de Recursos y Guías Pedagógicas">
+          <i data-lucide="book-open" class="w-3.5 h-3.5 text-emerald-800"></i>
+          <span>Biblioteca</span>
+        </button>
       </div>
     </div>
 
@@ -140,6 +145,10 @@
       <button onclick="switchTab('participantes')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition" id="tab-btn-participantes">
         <i data-lucide="lock" class="w-4 h-4 text-amber-600"></i>
         <span>Fichas Individuales 🔒</span>
+      </button>
+      <button onclick="switchTab('biblioteca')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition" id="tab-btn-biblioteca">
+        <i data-lucide="book-open" class="w-4 h-4 text-emerald-700"></i>
+        <span>Biblioteca</span>
       </button>
     </div>
   </header>
@@ -775,6 +784,460 @@
 
     </section>
 
+      <!-- VISTA: BIBLIOTECA DE RECURSOS Y GUÍAS PEDAGÓGICAS -->
+    <section id="view-biblioteca" class="tab-view hidden space-y-6">
+      
+      <!-- Hero Banner -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-[#14532d] text-white p-6 sm:p-8 shadow-lg border border-slate-700/50">
+        <div class="relative z-10 max-w-3xl space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#88C23F]/20 text-[#88C23F] border border-[#88C23F]/30 text-xs font-bold tracking-wide uppercase">
+            <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+            <span>Centro de Recursos y Guías Pedagógicas</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-white">
+            Biblioteca de Aprendizajes e Intervención Escolar
+          </h2>
+          <p class="text-sm text-slate-200 leading-relaxed">
+            Accede a las <strong class="text-[#88C23F]">Guías de Intervención Docente PAC 2026</strong> diseñadas para nivelar brechas formativas, así como al acervo documental oficial (estudios biológicos, normativas ambientales, manuales de humedales y protección de cielos oscuros) con que fue diseñado, fundamentado y entrenado este proyecto.
+          </p>
+          <div class="flex items-center gap-3 pt-2 text-xs text-slate-300 flex-wrap">
+            <span class="inline-flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full"><i data-lucide="file-check-2" class="w-3.5 h-3.5 text-[#88C23F]"></i> 3 Guías Docentes PAC</span>
+            <span class="inline-flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full"><i data-lucide="database" class="w-3.5 h-3.5 text-[#00ADBB]"></i> 15 Documentos Base y Normativas</span>
+            <span class="inline-flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i> Metodología VERDICAL</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toolbar: Buscador y Filtros por Categoría -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 card-shadow flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="filterBiblioteca('all')" data-cat="all" class="biblioteca-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm transition">
+            Todos (18)
+          </button>
+          <button onclick="filterBiblioteca('guias')" data-cat="guias" class="biblioteca-pill px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition">
+            Guías Docentes PAC (3)
+          </button>
+          <button onclick="filterBiblioteca('hito3')" data-cat="hito3" class="biblioteca-pill px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition">
+            Biodiversidad y Humedales · Hito 3 (7)
+          </button>
+          <button onclick="filterBiblioteca('hito4')" data-cat="hito4" class="biblioteca-pill px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition">
+            Atmósfera y Cielos · Hito 4 (5)
+          </button>
+          <button onclick="filterBiblioteca('marco')" data-cat="marco" class="biblioteca-pill px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition">
+            Marco Metodológico (3)
+          </button>
+        </div>
+
+        <div class="relative w-full sm:w-72">
+          <input type="text" oninput="searchBiblioteca(this.value)" placeholder="Buscar documento, especie o tema..." class="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-full focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#88C23F]/40 transition">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2 pointer-events-none"></i>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 1: GUÍAS PEDAGÓGICAS DE INTERVENCIÓN DOCENTE PAC 2026 -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-6 bg-[#88C23F] rounded-full"></span>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">Guías Pedagógicas de Acción Docente (Línea Verde PAC)</h3>
+          </div>
+          <span class="text-xs font-semibold text-slate-500">Diseñadas para nivelar brechas identificadas en el diagnóstico</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          
+          <!-- Card Guía Hito 3 -->
+          <div class="biblioteca-card bg-white rounded-3xl p-5 border border-slate-200 card-shadow flex flex-col justify-between hover:border-[#88C23F] transition group" data-category="guias" data-title="Guía Docente Hito 3: Biodiversidad Marina y Humedales Costeros" data-desc="Orientaciones pedagógicas para afianzar tramas tróficas, especies descomponedoras y protección del Gaviotín chico en el humedal La Chimba" data-tags="hito 3 biodiversidad humedal la chimba gaviotin chico descomponedores cadenas troficas perros asilvestrados actividades">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#88C23F]/20 text-[#52801b] border border-[#88C23F]/40">Hito 3 · Biodiversidad</span>
+                <span class="text-[10px] font-semibold text-slate-400">PDF 833 KB · HTML</span>
+              </div>
+              <h4 class="text-base font-bold text-slate-900 group-hover:text-[#52801b] transition">
+                Biodiversidad Marina y Humedales Costeros de Antofagasta
+              </h4>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Orientaciones pedagógicas para afianzar tramas tróficas, el rol ecológico de los descomponedores y la protección del Gaviotín chico (<em>Sternula lorata</em>) en el humedal urbano La Chimba.
+              </p>
+              <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 text-[11px] text-slate-700 space-y-1">
+                <div class="font-bold text-slate-900 flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-[#88C23F]"></i> Incluye 3 Actividades Prácticas:</div>
+                <ul class="list-disc list-inside space-y-0.5 text-slate-600">
+                  <li>Taller de simulación de redes tróficas</li>
+                  <li>Dinámica de camuflaje de nidos costeros</li>
+                  <li>Auditoría escolar de tenencia responsable</li>
+                </ul>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100 flex items-center gap-2">
+              <a href="biblioteca/guias/Guia_Docente_Hito3_Biodiversidad_Costera.html" target="_blank" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full transition">
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                <span>Leer Online</span>
+              </a>
+              <a href="biblioteca/guias/Guia_Docente_Hito3_Biodiversidad_Costera.pdf" download target="_blank" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold text-white bg-[#52801b] hover:bg-[#3f6515] rounded-full transition shadow-sm">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Card Guía Hito 4 -->
+          <div class="biblioteca-card bg-white rounded-3xl p-5 border border-slate-200 card-shadow flex flex-col justify-between hover:border-[#00ADBB] transition group" data-category="guias" data-title="Guía Docente Hito 4: Atmósfera, Cielos Limpios y Contaminación Lumínica" data-desc="Orientaciones docentes para afianzar el rol de la atmósfera como escudo, efecto invernadero y la norma de emisión lumínica Decreto 1 MMA" data-tags="hito 4 atmosfera cielos limpios contaminacion luminica decreto 1 fvo efecto invernadero astronomia golondrinas de mar actividades">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#00ADBB]/20 text-[#00737d] border border-[#00ADBB]/40">Hito 4 · Atmósfera</span>
+                <span class="text-[10px] font-semibold text-slate-400">PDF 842 KB · HTML</span>
+              </div>
+              <h4 class="text-base font-bold text-slate-900 group-hover:text-[#00737d] transition">
+                Atmósfera, Cielos Limpios y Contaminación Lumínica
+              </h4>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Orientaciones docentes para clarificar la atmósfera como escudo regulador del clima, efecto invernadero y la aplicación de la norma de emisión lumínica (Decreto 1 MMA) protegiendo astronomía y aves marinas.
+              </p>
+              <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 text-[11px] text-slate-700 space-y-1">
+                <div class="font-bold text-slate-900 flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-[#00ADBB]"></i> Incluye 3 Actividades Prácticas:</div>
+                <ul class="list-disc list-inside space-y-0.5 text-slate-600">
+                  <li>Experimento de retención térmica en frasco</li>
+                  <li>Auditoría escolar de luminarias hacia el suelo</li>
+                  <li>Campaña de rescate de volantones de golondrinas</li>
+                </ul>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100 flex items-center gap-2">
+              <a href="biblioteca/guias/Guia_Docente_Hito4_Cielos_Atmosfera.html" target="_blank" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full transition">
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                <span>Leer Online</span>
+              </a>
+              <a href="biblioteca/guias/Guia_Docente_Hito4_Cielos_Atmosfera.pdf" download target="_blank" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold text-white bg-[#00737d] hover:bg-[#005a61] rounded-full transition shadow-sm">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Card Guía Climatón -->
+          <div class="biblioteca-card bg-white rounded-3xl p-5 border border-slate-200 card-shadow flex flex-col justify-between hover:border-amber-400 transition group" data-category="guias" data-title="Guía de Formulación de Proyectos Escolares de Acción Climática (Climatón 2026)" data-desc="Metodología paso a paso para transformar diagnósticos de aprendizaje en proyectos escolares de impacto para el Climatón 2026" data-tags="climaton 2026 proyectos escolares accion climatica formulacion de proyectos rubrica verdical innovacion escolar">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">Integración · Climatón</span>
+                <span class="text-[10px] font-semibold text-slate-400">PDF 861 KB · HTML</span>
+              </div>
+              <h4 class="text-base font-bold text-slate-900 group-hover:text-amber-800 transition">
+                Formulación de Proyectos Escolares de Acción Climática
+              </h4>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Metodología paso a paso en 4 fases (Exploración, Ideación, Prototipado y Comunicación) para formular iniciativas escolares de impacto territorial hacia el Climatón escolar 2026.
+              </p>
+              <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 text-[11px] text-slate-700 space-y-1">
+                <div class="font-bold text-slate-900 flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-amber-600"></i> Herramientas de Gestión Escolar:</div>
+                <ul class="list-disc list-inside space-y-0.5 text-slate-600">
+                  <li>Plantilla editable de Ficha de Idea Escolar</li>
+                  <li>Rúbrica formativa de evaluación en 5 dimensiones</li>
+                  <li>Guía de pitch de impacto comunitario</li>
+                </ul>
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-slate-100 flex items-center gap-2">
+              <a href="biblioteca/guias/Guia_Docente_Climaton_Accion_Climatica.html" target="_blank" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full transition">
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                <span>Leer Online</span>
+              </a>
+              <a href="biblioteca/guias/Guia_Docente_Climaton_Accion_Climatica.pdf" download target="_blank" class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-500 rounded-full transition shadow-sm">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECCIÓN 2: DOCUMENTOS BASE DE ENTRENAMIENTO Y FUNDAMENTO TÉCNICO -->
+      <div class="space-y-4 pt-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-6 bg-[#00ADBB] rounded-full"></span>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">Documentos Base, Normativas y Estudios del Territorio</h3>
+          </div>
+          <span class="text-xs font-semibold text-slate-500">15 documentos técnicos y normativos oficiales</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="biblioteca-base-grid">
+          
+          <!-- Doc 1 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="marco" data-title="Metodología Pedagógica VERDICAL para Acción Climática Escolar" data-desc="Fundamento pedagógico, competencias verdes y modelo de aprendizaje vivencial aplicado en la Región de Antofagasta" data-tags="verdical metodologia competencias verdes evaluacion pac educacion ambiental">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">Marco Metodológico</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 407 KB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">Metodología Pedagógica VERDICAL para Acción Climática Escolar</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Fundamento pedagógico, desarrollo de competencias verdes y modelo de aprendizaje vivencial aplicado por Grupo Verdical en la Región de Antofagasta.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/Metodologia_VERDICAL_PAC.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Doc 2 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="marco" data-title="Marco de Competencias Verdes PAC 2026" data-desc="Estructura de competencias ambientales, pensamiento crítico ecológico y habilidades ciudadanas para el cambio climático" data-tags="competencias verdes marco habilidades verdes pensamiento critico ciudadania">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">Marco Metodológico</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 158 KB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">Marco de Competencias Verdes PAC 2026</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Estructura curricular de competencias ambientales, pensamiento crítico socioecológico y habilidades de acción climática evaluadas en el proyecto.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/Competencias_Verdes_Marco_PAC.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Doc 3 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="hito3" data-title="Guía de Apoyo Docente en Humedales y Biodiversidad Acuática" data-desc="Material pedagógico oficial sobre el valor ecosistémico de humedales, avifauna costera y dinámicas hídricas" data-tags="hito 3 humedales chile guia docente mma biodiversidad acuatica aves costeras">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#88C23F]/15 text-[#52801b]">Biodiversidad · Hito 3</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 5.9 MB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">Guía de Apoyo Docente en Humedales y Biodiversidad Acuática</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Material pedagógico oficial del Ministerio del Medio Ambiente sobre el valor ecosistémico de humedales, avifauna costera y dinámicas hídricas.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/Guia_Apoyo_Docente_Humedales_Chile.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Doc 4 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="hito3" data-title="Estudio de la Biota y Flora/Fauna Nativa del Humedal La Chimba" data-desc="Inventario biológico y caracterización botánica y zoológica del humedal urbano La Chimba en Antofagasta" data-tags="hito 3 la chimba biota flora fauna humedal urbano antofagasta especies nativas">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#88C23F]/15 text-[#52801b]">Biodiversidad · Hito 3</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 5.9 MB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">Estudio de la Biota y Flora/Fauna del Humedal La Chimba</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Inventario biológico exhaustivo y caracterización botánica y zoológica del humedal urbano La Chimba en el borde costero de Antofagasta.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/Biota_Humedal_La_Chimba_Antofagasta.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Doc 5 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="hito3" data-title="Ficha Técnica y Ecosistemas del Monumento Natural La Portada" data-desc="Características geológicas, colonias de aves marinas nidificantes y medidas de conservación CONAF" data-tags="hito 3 la portada conaf aves marinas piquero guanay pelicano geologia monumento natural">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#88C23F]/15 text-[#52801b]">Biodiversidad · Hito 3</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 900 KB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">Ficha Técnica y Ecosistemas del Monumento Natural La Portada</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Características geomorfológicas, colonias de aves marinas nidificantes (piquero, guanay, pelícano) y medidas de protección oficial de CONAF.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/Monumento_Natural_La_Portada.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Doc 6 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="hito3" data-title="Diagnóstico y Conservación de Humedales Urbanos de Antofagasta" data-desc="Situación ambiental de los cuerpos de agua costeros, presiones antrópicas y estrategias de conservación comunitaria" data-tags="hito 3 humedales urbanos conservacion diagnostico ambiental desierto costero presiones">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#88C23F]/15 text-[#52801b]">Biodiversidad · Hito 3</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 928 KB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">Diagnóstico y Conservación de Humedales Urbanos de Antofagasta</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Situación ambiental de los cuerpos de agua costeros en el desierto, presiones antrópicas y estrategias de conservación comunitaria.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/Humedales_Urbanos_Antofagasta.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Doc 7 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="hito3" data-title="Ecología Trófica y Dieta del Gaviotín Chico (Sternula lorata)" data-desc="Análisis de presas, hábitos alimentarios y cadena trófica marina que sustenta al ave en peligro de extinción" data-tags="hito 3 gaviotin chico sternula lorata dieta ecologia trofica cadena alimentaria peligro extincion">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#88C23F]/15 text-[#52801b]">Biodiversidad · Hito 3</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 300 KB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">Ecología Trófica y Dieta del Gaviotín Chico (Sternula lorata)</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Estudio especializado sobre hábitos de forrajeo, dieta pelágica y dinámica trófica del ave playera emblemática del litoral de Antofagasta.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/Ecologia_Trofica_Gaviotin_Chico.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Doc 8 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="hito3" data-title="Monitoreo Poblacional y Amenazas del Gaviotín Chico en el Litoral Norte" data-desc="Censo reproductivo, sitios de anidación en planicies costeras y principales presiones antropogénicas" data-tags="hito 3 gaviotin chico monitoreo poblacional fundacion gaviotin nidos amenazas litoral">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#88C23F]/15 text-[#52801b]">Biodiversidad · Hito 3</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 2.8 MB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">Monitoreo Poblacional y Amenazas del Gaviotín Chico</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Informe de la Fundación Gaviotín Chico: censo reproductivo, sitios de anidación en planicies litorales y principales amenazas antrópicas.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/Estudio_Poblacional_Gaviotin_Chico.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Doc 9 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="hito3" data-title="Impacto de Perros Asilvestrados en Aves Migratorias y Costeras" data-desc="Consecuencias del hostigamiento y depredación de fauna marina nativa por canes sueltos en el borde costero" data-tags="hito 3 perros asilvestrados tenencia responsable aves migratorias depredacion amenazas costeras">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#88C23F]/15 text-[#52801b]">Biodiversidad · Hito 3</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 5.7 MB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">Impacto de Perros en Aves Migratorias y Costeras</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Díptico divulgativo sobre las graves consecuencias del acoso y depredación ejercida por perros sin supervisión sobre aves migratorias en Antofagasta.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/Diptico_Perros_Aves_Migratorias.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Doc 10 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="hito3" data-title="Protección de Nidos de Aves Litorales frente a Perros Asilvestrados" data-desc="Protocolos de protección de áreas de postura de huevos en la arena y llamado a la tenencia responsable" data-tags="hito 3 nidos aves nidificantes perros asilvestrados huevos arena litoral tenencia responsable">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#88C23F]/15 text-[#52801b]">Biodiversidad · Hito 3</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 5.3 MB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">Protección de Nidos de Aves Litorales frente a Perros</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Protocolos y medidas comunitarias para salvaguardar las áreas de nidificación y huevos en el suelo arenoso costero frente a animales domésticos sueltos.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/Diptico_Perros_Aves_Nidificantes.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Doc 11 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="hito4" data-title="La Importancia de la Protección de Cielos Nocturnos en Antofagasta" data-desc="Valor del cielo nortino como patrimonio científico mundial y refugio de biodiversidad nocturna" data-tags="hito 4 cielos limpios astronomia patrimonio cientifico antofagasta oscuridad nocturna observatorios">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#00ADBB]/15 text-[#00737d]">Atmósfera y Cielos · Hito 4</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 2.8 MB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">La Importancia de los Cielos Nocturnos de Antofagasta</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Documento de divulgación científica sobre la trascendencia de los cielos oscuros de la región para la astronomía mundial y la vida silvestre nocturna.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/La_Importancia_de_los_Cielos_Antofagasta.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Doc 12 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="hito4" data-title="Decreto Supremo Nº 1 MMA: Norma de Emisión para Regulación de Contaminación Lumínica" data-desc="Marco legal vinculante que exige luminarias dirigidas exclusivamente hacia el suelo y control del espectro azul" data-tags="hito 4 decreto 1 mma norma emision luminica flujo hemisferio superior fvo ley contaminacion luminica">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#00ADBB]/15 text-[#00737d]">Atmósfera y Cielos · Hito 4</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 238 KB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">Decreto Supremo Nº 1 MMA: Norma de Emisión Lumínica</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Publicación oficial del Diario Oficial con la norma ambiental chilena que regula el alumbrado de exteriores y prohíbe la emisión hacia el cielo.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/Decreto_1_Norma_Emision_Luminica.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Doc 13 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="hito4" data-title="Guía Rápida para la Protección del Cielo Nocturno Urbano" data-desc="Criterios prácticos para apantallamiento de focos, ahorro de energía y bienestar de personas y fauna" data-tags="hito 4 cielo nocturno diptico iluminacion eficiente apantallamiento ahorro energetico">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#00ADBB]/15 text-[#00737d]">Atmósfera y Cielos · Hito 4</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 978 KB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">Guía Rápida para la Protección del Cielo Nocturno</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Folleto explicativo con pautas visuales para apantallamiento de luminarias, temperatura de color cálida y reducción de luz intrusa en la ciudad.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/Diptico_Proteccion_Cielo_Nocturno.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Doc 14 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="hito4" data-title="Buenas Prácticas de Iluminación y Cuidado del Cielo en la Comunidad" data-desc="Consejos de iluminación amigable para hogares, colegios y empresas en ciudades litorales" data-tags="hito 4 contaminacion luminica triptico comunidad colegios iluminacion amigable">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#00ADBB]/15 text-[#00737d]">Atmósfera y Cielos · Hito 4</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 1.2 MB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">Buenas Prácticas de Iluminación Comunitaria</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Tríptico orientativo con consejos prácticos para hogares y establecimientos educacionales sobre el uso responsable de la luz artificial de noche.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/Triptico_Contaminacion_Luminica.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Doc 15 -->
+          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="hito3" data-title="Declaratoria Oficial del Santuario de la Naturaleza y Humedal La Chimba" data-desc="Resolución legal de protección oficial bajo la Ley de Humedales Urbanos Nº 21.202" data-tags="hito 3 declaratoria diario oficial santuario naturaleza humedal la chimba ley 21202 mma">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#88C23F]/15 text-[#52801b]">Biodiversidad · Hito 3</span>
+                <span class="text-[10px] text-slate-400 font-medium">PDF · 475 KB</span>
+              </div>
+              <h5 class="text-xs font-bold text-slate-900">Declaratoria Oficial del Humedal Urbano La Chimba</h5>
+              <p class="text-[11px] text-slate-500 line-clamp-3">Decreto del Diario Oficial que reconoce formalmente al Humedal de La Chimba como área protegida urbana bajo la Ley Nº 21.202.</p>
+            </div>
+            <div class="pt-3 mt-2 border-t border-slate-100">
+              <a href="biblioteca/documentos_base/Diario_Oficial_Humedal_La_Chimba.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Descargar PDF</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
   </main>
 
   <!-- MODAL: DETALLE INDIVIDUAL DE PARTICIPANTE -->
@@ -863,6 +1326,6 @@
     </div>
   </footer>
 
-  <script src="app.js?v=2.3"></script>
+  <script src="app.js?v=2.4"></script>
 </body>
 </html>
