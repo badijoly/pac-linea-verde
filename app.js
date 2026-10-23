@@ -4,7 +4,7 @@
  */
 
 let RAW_DATA = null;
-let CURRENT_HITO = 'Hito 4'; // Default a Hito 4
+let CURRENT_HITO = 'Global'; // Default a Resumen Global
 let ACTIVE_TAB = 'resumen';
 let CHARTS = {};
 
@@ -38,6 +38,17 @@ const ALL_LINEA_VERDE_SCHOOLS = new Set(LINEA_VERDE_SCHOOLS['Global']);
 
 // Inicialización resiliente al cargar el DOM o script
 function initApp() {
+  const filtersContainer = document.getElementById('filters-container');
+  if (filtersContainer) {
+    if (ACTIVE_TAB === 'resumen') {
+      filtersContainer.classList.remove('hidden');
+      filtersContainer.classList.add('flex');
+    } else {
+      filtersContainer.classList.add('hidden');
+      filtersContainer.classList.remove('flex');
+    }
+  }
+
   if (window.lucide) {
     lucide.createIcons();
   }
@@ -968,7 +979,21 @@ function switchTab(tabId) {
     targetBtn.className = 'nav-tab active-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm whitespace-nowrap transition';
   }
 
-  updateUI();
+  // Visibilidad del filtro: solo visible en la pestaña de resumen ejecutivo
+  const filtersContainer = document.getElementById('filters-container');
+  if (filtersContainer) {
+    if (tabId === 'resumen') {
+      filtersContainer.classList.remove('hidden');
+      filtersContainer.classList.add('flex');
+    } else {
+      filtersContainer.classList.add('hidden');
+      filtersContainer.classList.remove('flex');
+    }
+  }
+
+  // En todas las pestañas la vista por defecto debe ser con la información de Resumen Global
+  setHito('Global');
+
   if (window.lucide) lucide.createIcons();
 }
 
@@ -991,7 +1016,7 @@ function setHito(hito) {
     } else if (hito === 'Hito 3') {
       activeBtn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm transition';
     } else {
-      activeBtn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white shadow-sm transition';
+      activeBtn.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-[#00ADBB] text-white shadow-sm transition';
     }
   }
 
@@ -1008,15 +1033,25 @@ function getFilteredParticipants() {
   if (!RAW_DATA || !RAW_DATA.hitos) return [];
 
   const hitoKey = (CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global') ? 'Global' : CURRENT_HITO;
-  const hitoData = RAW_DATA.hitos[hitoKey] || RAW_DATA.hitos['Hito 4'];
+  const hitoData = RAW_DATA.hitos[hitoKey] || RAW_DATA.hitos['Global'] || RAW_DATA.hitos['Hito 4'];
   if (!hitoData) return [];
 
-  let list = hitoData.participants;
+  let list = hitoData.participants || [];
 
-  const schoolFilter = document.getElementById('filter-school').value;
-  const genderFilter = document.getElementById('filter-gender').value;
-  const statusFilter = document.getElementById('filter-status').value;
-  const searchFilter = document.getElementById('filter-search').value.toLowerCase().trim();
+  // Los filtros de colegio, género, evolución y búsqueda aplican exclusivamente en la pestaña de resumen
+  if (ACTIVE_TAB !== 'resumen') {
+    return list;
+  }
+
+  const schoolEl = document.getElementById('filter-school');
+  const genderEl = document.getElementById('filter-gender');
+  const statusEl = document.getElementById('filter-status');
+  const searchEl = document.getElementById('filter-search');
+
+  const schoolFilter = schoolEl ? schoolEl.value : 'ALL';
+  const genderFilter = genderEl ? genderEl.value : 'ALL';
+  const statusFilter = statusEl ? statusEl.value : 'ALL';
+  const searchFilter = searchEl ? searchEl.value.toLowerCase().trim() : '';
 
   if (schoolFilter !== 'ALL') {
     list = list.filter(p => p.school === schoolFilter);
@@ -2308,10 +2343,20 @@ function escapeHtml(str) {
 // 6. TAB: FICHAS INDIVIDUALES
 function renderParticipantsTab() {
   const isGlobal = CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global';
-  const filtered = getFilteredParticipants();
-  document.getElementById('participants-count-filtered').innerText = filtered.length;
+  let filtered = getFilteredParticipants();
+
+  // Búsqueda local de participantes en la ficha
+  const searchInput = document.getElementById('participant-search-input');
+  const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  if (searchVal) {
+    filtered = filtered.filter(p => (p.name && p.name.toLowerCase().includes(searchVal)) || (p.school && p.school.toLowerCase().includes(searchVal)));
+  }
+
+  const countEl = document.getElementById('participants-count-filtered');
+  if (countEl) countEl.innerText = filtered.length;
 
   const tbody = document.getElementById('participants-table-body');
+  if (!tbody) return;
   tbody.innerHTML = '';
 
   filtered.forEach((p, idx) => {

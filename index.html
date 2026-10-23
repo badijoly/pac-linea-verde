@@ -152,19 +152,19 @@
       
       <!-- Hito selection pills -->
       <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-full border border-slate-200">
-        <button onclick="setHito('Hito 4')" id="btn-hito-4" class="px-4 py-1.5 rounded-full text-xs font-bold bg-[#00ADBB] text-white shadow-sm transition">
+        <button onclick="setHito('Global')" id="btn-hito-global" class="px-4 py-1.5 rounded-full text-xs font-bold bg-[#00ADBB] text-white shadow-sm transition">
+          Resumen Global
+        </button>
+        <button onclick="setHito('Hito 4')" id="btn-hito-4" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 transition">
           Hito 4: Escudo Invisible
         </button>
         <button onclick="setHito('Hito 3')" id="btn-hito-3" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 transition">
           Hito 3: Otros Vecinos
         </button>
-        <button onclick="setHito('Global')" id="btn-hito-global" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 transition">
-          Resumen Global
-        </button>
       </div>
 
-      <!-- Filters: School, Gender, Status, Search -->
-      <div class="flex items-center gap-2 flex-wrap">
+      <!-- Filters: School, Gender, Status, Search (Solo visible en la pestaña de Resumen) -->
+      <div id="filters-container" class="flex items-center gap-2 flex-wrap">
         <!-- School Select -->
         <div class="flex items-center gap-1.5">
           <label class="text-slate-500 font-semibold">Colegio:</label>
@@ -213,10 +213,10 @@
       <!-- Challenge banner -->
       <div id="banner-desafio" class="p-6 rounded-3xl bg-white border border-slate-200 text-slate-900 card-shadow flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-[#00ADBB]">
         <div>
-          <span class="text-xs uppercase tracking-wider text-[#00ADBB] font-bold">Desafío Territorial Seleccionado</span>
-          <h2 id="banner-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-1">Proteger nuestro escudo invisible (Hito 4)</h2>
+          <span class="text-xs uppercase tracking-wider text-[#00737d] font-bold">Resumen Global del Programa</span>
+          <h2 id="banner-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-1">Resumen Global del Programa (Hito 3 y Hito 4)</h2>
           <p id="banner-desc" class="text-xs text-slate-600 mt-1.5 max-w-3xl leading-relaxed">
-            Evaluación del aprendizaje sobre la atmósfera como regulador climático, la contaminación lumínica en Antofagasta, la protección del cielo oscuro para la astronomía mundial y la fauna costera.
+            Consolidado general de aprendizajes en la Línea Verde del Programa de Acción Climática (PAC 2026), integrando tramas tróficas, biodiversidad aledaña a Antofagasta, atmósfera y preservación de cielos limpios.
           </p>
         </div>
         <div class="flex items-center gap-3 bg-cyan-50/70 border border-[#00ADBB]/40 px-5 py-3 rounded-2xl">
@@ -231,7 +231,7 @@
                 </span>
               </span>
             </div>
-            <div id="kpi-hake-val" class="text-xl font-extrabold text-slate-900">g = +0.255</div>
+            <div id="kpi-hake-val" class="text-xl font-extrabold text-slate-900">g = +0.214</div>
           </div>
         </div>
       </div>
@@ -678,8 +678,14 @@
             <h3 class="font-bold text-slate-900 text-lg">Fichas Individuales de Participantes</h3>
             <p class="text-xs text-slate-400 mt-0.5">Explora el rendimiento detallado de cada estudiante y haz clic para ver su expediente completo</p>
           </div>
-          <div class="text-xs text-slate-500 font-medium">
-            Mostrando <span id="participants-count-filtered" class="font-bold text-slate-800">0</span> participantes
+          <div class="flex items-center gap-3 flex-wrap">
+            <div class="relative">
+              <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400"></i>
+              <input type="text" id="participant-search-input" oninput="renderParticipantsTab()" placeholder="Buscar estudiante o colegio..." class="pl-8 pr-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#88C23F] w-56">
+            </div>
+            <div class="text-xs text-slate-500 font-medium">
+              Mostrando <span id="participants-count-filtered" class="font-bold text-slate-800">0</span> participantes
+            </div>
           </div>
         </div>
 
