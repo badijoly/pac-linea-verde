@@ -117,7 +117,7 @@
           <span>Actualizar</span>
         </button>
 
-        <button onclick="switchTab('biblioteca')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-slate-800 bg-[#88C23F]/25 hover:bg-[#88C23F]/40 border border-[#88C23F]/60 rounded-full transition shadow-sm" title="Biblioteca de Recursos y Guías Pedagógicas">
+        <button id="btn-header-biblioteca" onclick="switchTab('biblioteca')" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-slate-800 bg-[#88C23F]/25 hover:bg-[#88C23F]/40 border border-[#88C23F]/60 rounded-full transition shadow-sm" title="Biblioteca de Recursos y Guías Pedagógicas">
           <i data-lucide="book-open" class="w-3.5 h-3.5 text-emerald-800"></i>
           <span>Biblioteca</span>
         </button>
@@ -145,10 +145,6 @@
       <button onclick="switchTab('participantes')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition" id="tab-btn-participantes">
         <i data-lucide="lock" class="w-4 h-4 text-amber-600"></i>
         <span>Fichas Individuales 🔒</span>
-      </button>
-      <button onclick="switchTab('biblioteca')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap transition" id="tab-btn-biblioteca">
-        <i data-lucide="book-open" class="w-4 h-4 text-emerald-700"></i>
-        <span>Biblioteca</span>
       </button>
     </div>
   </header>
@@ -802,7 +798,7 @@
           </p>
           <div class="flex items-center gap-3 pt-2 text-xs text-slate-300 flex-wrap">
             <span class="inline-flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full"><i data-lucide="file-check-2" class="w-3.5 h-3.5 text-[#88C23F]"></i> 3 Guías Docentes PAC</span>
-            <span class="inline-flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full"><i data-lucide="database" class="w-3.5 h-3.5 text-[#00ADBB]"></i> 15 Documentos Base y Normativas</span>
+            <span class="inline-flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full"><i data-lucide="database" class="w-3.5 h-3.5 text-[#00ADBB]"></i> 13 Documentos Base y Normativas</span>
             <span class="inline-flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i> Metodología VERDICAL</span>
           </div>
         </div>
@@ -812,19 +808,16 @@
       <div class="bg-white p-4 rounded-2xl border border-slate-200 card-shadow flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2 flex-wrap">
           <button onclick="filterBiblioteca('all')" data-cat="all" class="biblioteca-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm transition">
-            Todos (18)
+            Todos (16)
           </button>
           <button onclick="filterBiblioteca('guias')" data-cat="guias" class="biblioteca-pill px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition">
             Guías Docentes PAC (3)
           </button>
           <button onclick="filterBiblioteca('hito3')" data-cat="hito3" class="biblioteca-pill px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition">
-            Biodiversidad y Humedales · Hito 3 (7)
+            Biodiversidad y Humedales · Hito 3 (8)
           </button>
           <button onclick="filterBiblioteca('hito4')" data-cat="hito4" class="biblioteca-pill px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition">
             Atmósfera y Cielos · Hito 4 (5)
-          </button>
-          <button onclick="filterBiblioteca('marco')" data-cat="marco" class="biblioteca-pill px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition">
-            Marco Metodológico (3)
           </button>
         </div>
 
@@ -850,7 +843,7 @@
           <div class="biblioteca-card bg-white rounded-3xl p-5 border border-slate-200 card-shadow flex flex-col justify-between hover:border-[#88C23F] transition group" data-category="guias" data-title="Guía Docente Hito 3: Biodiversidad Marina y Humedales Costeros" data-desc="Orientaciones pedagógicas para afianzar tramas tróficas, especies descomponedoras y protección del Gaviotín chico en el humedal La Chimba" data-tags="hito 3 biodiversidad humedal la chimba gaviotin chico descomponedores cadenas troficas perros asilvestrados actividades">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#88C23F]/20 text-[#52801b] border border-[#88C23F]/40">Hito 3 · Biodiversidad</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#88C23F]/20 text-[#52801b] border border-[#88C23F]/40">Hito 3</span>
                 <span class="text-[10px] font-semibold text-slate-400">PDF 833 KB · HTML</span>
               </div>
               <h4 class="text-base font-bold text-slate-900 group-hover:text-[#52801b] transition">
@@ -884,7 +877,7 @@
           <div class="biblioteca-card bg-white rounded-3xl p-5 border border-slate-200 card-shadow flex flex-col justify-between hover:border-[#00ADBB] transition group" data-category="guias" data-title="Guía Docente Hito 4: Atmósfera, Cielos Limpios y Contaminación Lumínica" data-desc="Orientaciones docentes para afianzar el rol de la atmósfera como escudo, efecto invernadero y la norma de emisión lumínica Decreto 1 MMA" data-tags="hito 4 atmosfera cielos limpios contaminacion luminica decreto 1 fvo efecto invernadero astronomia golondrinas de mar actividades">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#00ADBB]/20 text-[#00737d] border border-[#00ADBB]/40">Hito 4 · Atmósfera</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#00ADBB]/20 text-[#00737d] border border-[#00ADBB]/40">Hito 4</span>
                 <span class="text-[10px] font-semibold text-slate-400">PDF 842 KB · HTML</span>
               </div>
               <h4 class="text-base font-bold text-slate-900 group-hover:text-[#00737d] transition">
@@ -918,7 +911,7 @@
           <div class="biblioteca-card bg-white rounded-3xl p-5 border border-slate-200 card-shadow flex flex-col justify-between hover:border-amber-400 transition group" data-category="guias" data-title="Guía de Formulación de Proyectos Escolares de Acción Climática (Climatón 2026)" data-desc="Metodología paso a paso para transformar diagnósticos de aprendizaje en proyectos escolares de impacto para el Climatón 2026" data-tags="climaton 2026 proyectos escolares accion climatica formulacion de proyectos rubrica verdical innovacion escolar">
             <div class="space-y-3">
               <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">Integración · Climatón</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">Climatón 2026</span>
                 <span class="text-[10px] font-semibold text-slate-400">PDF 861 KB · HTML</span>
               </div>
               <h4 class="text-base font-bold text-slate-900 group-hover:text-amber-800 transition">
@@ -958,47 +951,10 @@
             <span class="w-2.5 h-6 bg-[#00ADBB] rounded-full"></span>
             <h3 class="text-base sm:text-lg font-bold text-slate-900">Documentos Base, Normativas y Estudios del Territorio</h3>
           </div>
-          <span class="text-xs font-semibold text-slate-500">15 documentos técnicos y normativos oficiales</span>
+          <span class="text-xs font-semibold text-slate-500">13 documentos técnicos y normativos oficiales</span>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="biblioteca-base-grid">
-          
-          <!-- Doc 1 -->
-          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="marco" data-title="Metodología Pedagógica VERDICAL para Acción Climática Escolar" data-desc="Fundamento pedagógico, competencias verdes y modelo de aprendizaje vivencial aplicado en la Región de Antofagasta" data-tags="verdical metodologia competencias verdes evaluacion pac educacion ambiental">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">Marco Metodológico</span>
-                <span class="text-[10px] text-slate-400 font-medium">PDF · 407 KB</span>
-              </div>
-              <h5 class="text-xs font-bold text-slate-900">Metodología Pedagógica VERDICAL para Acción Climática Escolar</h5>
-              <p class="text-[11px] text-slate-500 line-clamp-3">Fundamento pedagógico, desarrollo de competencias verdes y modelo de aprendizaje vivencial aplicado por Grupo Verdical en la Región de Antofagasta.</p>
-            </div>
-            <div class="pt-3 mt-2 border-t border-slate-100">
-              <a href="biblioteca/documentos_base/Metodologia_VERDICAL_PAC.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
-                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
-                <span>Descargar PDF</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- Doc 2 -->
-          <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="marco" data-title="Marco de Competencias Verdes PAC 2026" data-desc="Estructura de competencias ambientales, pensamiento crítico ecológico y habilidades ciudadanas para el cambio climático" data-tags="competencias verdes marco habilidades verdes pensamiento critico ciudadania">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">Marco Metodológico</span>
-                <span class="text-[10px] text-slate-400 font-medium">PDF · 158 KB</span>
-              </div>
-              <h5 class="text-xs font-bold text-slate-900">Marco de Competencias Verdes PAC 2026</h5>
-              <p class="text-[11px] text-slate-500 line-clamp-3">Estructura curricular de competencias ambientales, pensamiento crítico socioecológico y habilidades de acción climática evaluadas en el proyecto.</p>
-            </div>
-            <div class="pt-3 mt-2 border-t border-slate-100">
-              <a href="biblioteca/documentos_base/Competencias_Verdes_Marco_PAC.pdf" download target="_blank" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full transition">
-                <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
-                <span>Descargar PDF</span>
-              </a>
-            </div>
-          </div>
-
           <!-- Doc 3 -->
           <div class="biblioteca-card bg-white rounded-2xl p-4 border border-slate-200 card-shadow flex flex-col justify-between hover:border-slate-300 transition" data-category="hito3" data-title="Guía de Apoyo Docente en Humedales y Biodiversidad Acuática" data-desc="Material pedagógico oficial sobre el valor ecosistémico de humedales, avifauna costera y dinámicas hídricas" data-tags="hito 3 humedales chile guia docente mma biodiversidad acuatica aves costeras">
             <div class="space-y-2">
@@ -1326,6 +1282,6 @@
     </div>
   </footer>
 
-  <script src="app.js?v=2.4"></script>
+  <script src="app.js?v=2.5"></script>
 </body>
 </html>

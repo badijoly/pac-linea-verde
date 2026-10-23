@@ -1043,6 +1043,14 @@ function switchTab(tabId) {
 
   const targetView = document.getElementById(`view-${tabId}`);
   const targetBtn = document.getElementById(`tab-btn-${tabId}`);
+  const headerBiblioBtn = document.getElementById('btn-header-biblioteca');
+  if (headerBiblioBtn) {
+    if (tabId === 'biblioteca') {
+      headerBiblioBtn.className = 'inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-black text-slate-950 bg-[#88C23F] border border-[#88C23F] rounded-full transition shadow-sm';
+    } else {
+      headerBiblioBtn.className = 'inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-slate-800 bg-[#88C23F]/25 hover:bg-[#88C23F]/40 border border-[#88C23F]/60 rounded-full transition shadow-sm';
+    }
+  }
   if (targetView) targetView.classList.remove('hidden');
   if (targetBtn) {
     targetBtn.className = 'nav-tab active-tab flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-[#88C23F] text-slate-950 shadow-sm whitespace-nowrap transition';
