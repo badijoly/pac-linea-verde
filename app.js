@@ -2973,7 +2973,10 @@ function closeModal() {
 // Generación y descarga de la Ficha Individual en formato PDF
 function exportParticipantPDF() {
   const p = currentModalParticipant;
-  if (!p) return;
+  if (!p) {
+    alert('Por favor selecciona una ficha de estudiante primero.');
+    return;
+  }
 
   const btn = document.getElementById('btn-modal-pdf');
   const originalHtml = btn ? btn.innerHTML : '';
@@ -2988,55 +2991,50 @@ function exportParticipantPDF() {
     btn.disabled = true;
   }
 
-  const h3Data = p.h3;
-  const h4Data = p.h4;
-  const h3Meta = (RAW_DATA.hitos['Hito 3'] && RAW_DATA.hitos['Hito 3'].questions) || [];
-  const h4Meta = (RAW_DATA.hitos['Hito 4'] && RAW_DATA.hitos['Hito 4'].questions) || [];
+  // Asegurar resolución de datos para Hito 3 y Hito 4
+  const allData = getParticipantAllData(p.name);
+  let h3Data = p.h3 || allData.h3;
+  let h4Data = p.h4 || allData.h4;
+
+  if (!h3Data && !h4Data) {
+    if (p.hito === 'Hito 4' || (p.school && LINEA_VERDE_SCHOOLS['Hito 4'] && LINEA_VERDE_SCHOOLS['Hito 4'].includes(p.school))) {
+      h4Data = p;
+    } else {
+      h3Data = p;
+    }
+  }
+  if (!h3Data && p.hito === 'Hito 3') h3Data = p;
+  if (!h4Data && p.hito === 'Hito 4') h4Data = p;
+
+  const h3Meta = (RAW_DATA && RAW_DATA.hitos && RAW_DATA.hitos['Hito 3'] && RAW_DATA.hitos['Hito 3'].questions) || [];
+  const h4Meta = (RAW_DATA && RAW_DATA.hitos && RAW_DATA.hitos['Hito 4'] && RAW_DATA.hitos['Hito 4'].questions) || [];
+
+  // Remover cualquier elemento de impresión residual previo
+  const oldDoc = document.getElementById('pdf-printable-document');
+  if (oldDoc && oldDoc.parentNode) {
+    oldDoc.parentNode.removeChild(oldDoc);
+  }
 
   const printableDoc = document.createElement('div');
   printableDoc.id = 'pdf-printable-document';
   printableDoc.innerHTML = buildPDFDocumentHTML(p, h3Data, h4Data, currentModalMode, h3Meta, h4Meta);
 
-  // Ubicar elemento para renderizado fiel
-  printableDoc.style.position = 'fixed';
-  printableDoc.style.left = '-9999px';
-  printableDoc.style.top = '0';
+  // Ubicación precisa:
+  // IMPORTANTE: NO USAR left: -9999px (genera canvas blanco en html2canvas).
+  // Se ubica en posición absoluta top: 0, left: 0 con z-index negativo detrás del modal/backdrop.
+  printableDoc.style.position = 'absolute';
+  printableDoc.style.left = '0px';
+  printableDoc.style.top = '0px';
   printableDoc.style.width = '794px'; // Formato A4 a 96dpi aprox
   printableDoc.style.backgroundColor = '#ffffff';
+  printableDoc.style.zIndex = '-9999';
+  printableDoc.style.opacity = '1';
+  printableDoc.style.visibility = 'visible';
   document.body.appendChild(printableDoc);
 
   const cleanFileName = `Ficha_PAC_2026_${p.name.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]/g, '_')}.pdf`;
 
-  if (typeof html2pdf !== 'undefined') {
-    const opt = {
-      margin: [10, 10, 10, 10],
-      filename: cleanFileName,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(printableDoc).save().then(() => {
-      if (btn) {
-        btn.innerHTML = originalHtml;
-        btn.disabled = false;
-      }
-      if (document.body.contains(printableDoc)) {
-        document.body.removeChild(printableDoc);
-      }
-    }).catch(err => {
-      console.error('Error al generar PDF con html2pdf:', err);
-      if (btn) {
-        btn.innerHTML = originalHtml;
-        btn.disabled = false;
-      }
-      if (document.body.contains(printableDoc)) {
-        document.body.removeChild(printableDoc);
-      }
-      alert('Se abrirá la opción de impresión del navegador para guardar en PDF.');
-      window.print();
-    });
-  } else {
+  const restoreUI = () => {
     if (btn) {
       btn.innerHTML = originalHtml;
       btn.disabled = false;
@@ -3044,8 +3042,57 @@ function exportParticipantPDF() {
     if (document.body.contains(printableDoc)) {
       document.body.removeChild(printableDoc);
     }
-    window.print();
-  }
+  };
+
+  // Esperar a que las imágenes (logos) estén cargadas en el DOM antes de renderizar el canvas
+  const images = Array.from(printableDoc.querySelectorAll('img'));
+  const imagePromises = images.map(img => {
+    if (img.complete) return Promise.resolve();
+    return new Promise(res => {
+      img.onload = res;
+      img.onerror = res;
+    });
+  });
+
+  Promise.all(imagePromises).then(() => {
+    const prevScrollX = window.scrollX;
+    const prevScrollY = window.scrollY;
+    window.scrollTo(0, 0);
+
+    if (typeof html2pdf !== 'undefined') {
+      const opt = {
+        margin: [8, 8, 8, 8],
+        filename: cleanFileName,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          logging: false,
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: 794
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      };
+
+      html2pdf().set(opt).from(printableDoc).save().then(() => {
+        window.scrollTo(prevScrollX, prevScrollY);
+        restoreUI();
+      }).catch(err => {
+        console.warn('html2pdf falló, recurriendo a impresión nativa:', err);
+        window.scrollTo(prevScrollX, prevScrollY);
+        // Fallback a impresión nativa manteniendo printableDoc en el DOM
+        window.print();
+        setTimeout(restoreUI, 1200);
+      });
+    } else {
+      window.scrollTo(prevScrollX, prevScrollY);
+      window.print();
+      setTimeout(restoreUI, 1200);
+    }
+  });
 }
 
 // Construye la estructura HTML optimizada para impresión en PDF A4
@@ -3221,7 +3268,12 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${h3Data.delta >= 0 ? '#52801b' : '#e11d48'};">${h3Data.delta >= 0 ? '+' : ''}${h3Data.delta} pts</td>
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: 600;">${h3Data.status === 'Retrocedió' ? 'Requiere refuerzo' : (h3Data.status === 'Mantuvo' ? 'Consolidó' : h3Data.status)}</td>
               </tr>
-            ` : ''}
+            ` : `
+              <tr style="color: #94a3b8; font-style: italic;">
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0;">Hito 3: Los otros vecinos de Antofagasta (Biodiversidad)</td>
+                <td colspan="4" style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">No convocado a este hito (escuela asignada a Hito 4)</td>
+              </tr>
+            `}
             ${h4Data ? `
               <tr>
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; font-weight: bold;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos)</td>
@@ -3230,7 +3282,12 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: bold; color: ${h4Data.delta >= 0 ? '#00737d' : '#e11d48'};">${h4Data.delta >= 0 ? '+' : ''}${h4Data.delta} pts</td>
                 <td style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: 600;">${h4Data.status === 'Retrocedió' ? 'Requiere refuerzo' : (h4Data.status === 'Mantuvo' ? 'Consolidó' : h4Data.status)}</td>
               </tr>
-            ` : ''}
+            ` : `
+              <tr style="color: #94a3b8; font-style: italic;">
+                <td style="padding: 6px 8px; border: 1px solid #e2e8f0;">Hito 4: Proteger nuestro escudo invisible (Atmósfera y Cielos)</td>
+                <td colspan="4" style="padding: 6px 8px; border: 1px solid #e2e8f0; text-align: center;">No convocado a este hito (escuela asignada a Hito 3)</td>
+              </tr>
+            `}
             ${h3Data && h4Data ? `
               <tr style="background-color: #f1f9e9; font-weight: bold;">
                 <td style="padding: 6px 8px; border: 1px solid #cbd5e1; color: #3f6515;">Consolidado Combinado (10 preguntas cerradas)</td>

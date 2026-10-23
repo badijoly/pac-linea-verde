@@ -12,6 +12,11 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- html2pdf.js para exportar fichas individuales a PDF de manera 100% autónoma en navegador -->
   <script src="html2pdf.bundle.min.js"></script>
+  <script>
+    if (typeof html2pdf === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>');
+    }
+  </script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="icon" type="image/png" href="logo.png">
@@ -28,6 +33,7 @@
         display: block !important;
         position: static !important;
         width: 100% !important;
+        z-index: 99999 !important;
       }
     }
     .custom-scrollbar::-webkit-scrollbar {
