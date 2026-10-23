@@ -10,6 +10,32 @@ let CHARTS = {};
 
 const GOOGLE_SPREADSHEET_ID = '1tI7030zyCF16tAQ_HvlUSzrFkZ-aWSjVABZDInmHejY';
 
+// Lista blanca estricta y canónica de las escuelas de la Línea Verde
+const LINEA_VERDE_SCHOOLS = {
+  'Hito 3': [
+    'Escuela La Bandera',
+    'Escuela Presbiteriana',
+    'Escuela Héroes de la Concepción',
+    'Escuela Rómulo Peña'
+  ],
+  'Hito 4': [
+    'Liceo Bicentenario Andrés Sabella',
+    'Greenhill School',
+    'Colegio Bet-el'
+  ],
+  'Global': [
+    'Escuela La Bandera',
+    'Escuela Presbiteriana',
+    'Escuela Héroes de la Concepción',
+    'Escuela Rómulo Peña',
+    'Liceo Bicentenario Andrés Sabella',
+    'Greenhill School',
+    'Colegio Bet-el'
+  ]
+};
+
+const ALL_LINEA_VERDE_SCHOOLS = new Set(LINEA_VERDE_SCHOOLS['Global']);
+
 // Inicialización resiliente al cargar el DOM o script
 function initApp() {
   if (window.lucide) {
@@ -123,6 +149,7 @@ function getUniqueParticipants(data) {
     const p3 = h3Map.get(cleanName);
     const p4 = h4Map.get(cleanName);
     const baseP = p4 || p3;
+    if (!baseP || !ALL_LINEA_VERDE_SCHOOLS.has(baseP.school)) return;
 
     if (p3 && p4) {
       const preTot = p3.pre_score + p4.pre_score;
@@ -227,11 +254,21 @@ function getParticipantAllData(name) {
 function ensureGlobalHito(data) {
   if (!data || !data.hitos) return;
 
+  // Filtrar escuelas en todos los hitos para asegurar solo Línea Verde
+  for (const hname of Object.keys(data.hitos)) {
+    if (data.hitos[hname].schools) {
+      data.hitos[hname].schools = data.hitos[hname].schools.filter(s => ALL_LINEA_VERDE_SCHOOLS.has(s.school));
+    }
+  }
+
   const uniqueList = getUniqueParticipants(data);
 
   if (data.hitos['Global']) {
     data.hitos['Global'].unique_participants = uniqueList;
     data.hitos['Global'].participants = uniqueList;
+    if (data.hitos['Global'].schools) {
+      data.hitos['Global'].schools = data.hitos['Global'].schools.filter(s => ALL_LINEA_VERDE_SCHOOLS.has(s.school));
+    }
     return;
   }
 
@@ -239,8 +276,10 @@ function ensureGlobalHito(data) {
   ['Hito 3', 'Hito 4'].forEach(hname => {
     if (data.hitos[hname] && data.hitos[hname].participants) {
       data.hitos[hname].participants.forEach(p => {
-        const pCopy = Object.assign({}, p, { hito: p.hito || hname });
-        allPaired.push(pCopy);
+        if (ALL_LINEA_VERDE_SCHOOLS.has(p.school)) {
+          const pCopy = Object.assign({}, p, { hito: p.hito || hname });
+          allPaired.push(pCopy);
+        }
       });
     }
   });
@@ -393,14 +432,6 @@ function canonicalSchoolName(name) {
   if (nc.includes('presbiteriana')) return 'Escuela Presbiteriana';
   if (nc.includes('romulo')) return 'Escuela Rómulo Peña';
   if (nc.includes('greenhill')) return 'Greenhill School';
-  if (nc.includes('claudio matte')) return 'Escuela Claudio Matte Pérez';
-  if (nc.includes('humberto gonzalez')) return 'Escuela Ecológica Humberto González Echegoyen';
-  if (nc.includes('alberto hurtado')) return 'Escuela Ecológica Padre Alberto Hurtado';
-  if (nc.includes('republica de italia')) return 'Escuela República de Italia';
-  if (nc.includes('domingo herrera')) return 'Liceo Domingo Herrera Rivera';
-  if (nc.includes('estados unidos')) return 'Escuela República de Estados Unidos';
-  if (nc.includes('juan pablo')) return 'Escuela Juan Pablo II';
-  if (nc.includes('javiera carrera')) return 'Escuela Javiera Carrera';
   return n;
 }
 
@@ -411,7 +442,7 @@ const NON_INFORMATIVE = [
 ];
 
 function isNonInformative(text) {
-  if (!text) return True;
+  if (!text) return true;
   const t = stripAccents(text).replace(/[.,;:_\-]/g, '').trim();
   if (t.length < 2) return true;
   for (const b of NON_INFORMATIVE) {
@@ -550,6 +581,7 @@ function processWorkbookInBrowser(wb, fileName) {
         const row = rows[r];
         if (!row || !row[1]) continue;
         const sch = canonicalSchoolName(row[1]);
+        if (!ALL_LINEA_VERDE_SCHOOLS.has(sch)) continue;
         if (!schools[sch]) {
           schools[sch] = {
             nombre: sch,
@@ -576,6 +608,7 @@ function processWorkbookInBrowser(wb, fileName) {
         const row = rows[r];
         if (!row || !row[1]) continue;
         const sch = canonicalSchoolName(row[1]);
+        if (!ALL_LINEA_VERDE_SCHOOLS.has(sch)) continue;
         if (!schools[sch]) {
           schools[sch] = {
             nombre: sch,
@@ -621,6 +654,7 @@ function processWorkbookInBrowser(wb, fileName) {
         const name = cleanStr(row[0]);
         const role = cleanStr(row[1]) || 'Estudiante';
         const school = canonicalSchoolName(cleanStr(row[2]));
+        if (!ALL_LINEA_VERDE_SCHOOLS.has(school)) continue;
         const pp = cleanStr(row[3]).toUpperCase();
         if (pp !== 'PRE' && pp !== 'POST') continue;
 
@@ -753,61 +787,67 @@ function processWorkbookInBrowser(wb, fileName) {
       // Escuelas agrupadas
       const bySchool = {};
       pairedList.forEach(p => {
+        if (!ALL_LINEA_VERDE_SCHOOLS.has(p.school)) return;
         if (!bySchool[p.school]) bySchool[p.school] = [];
         bySchool[p.school].push(p);
       });
 
-      const schoolRankings = Object.entries(bySchool).map(([sname, plist]) => {
-        const sn = plist.length;
-        const spre = plist.reduce((a, p) => a + p.pre_score, 0) / sn;
-        const spost = plist.reduce((a, p) => a + p.post_score, 0) / sn;
-        const sdel = plist.reduce((a, p) => a + p.delta, 0) / sn;
-        const sst = { 'Mejoró': 0, 'Mantuvo': 0, 'Retrocedió': 0 };
-        plist.forEach(p => { sst[p.status] = (sst[p.status] || 0) + 1; });
-        const meta = schools[sname] || {};
-        return {
-          school: sname,
-          n: sn,
-          pre_avg: parseFloat(spre.toFixed(2)),
-          post_avg: parseFloat(spost.toFixed(2)),
-          delta_avg: parseFloat(sdel.toFixed(2)),
-          status_counts: sst,
-          pct_mejora: parseFloat(((sst['Mejoró'] / sn) * 100).toFixed(1)),
-          lider1: meta.lider1 || '',
-          email1: meta.email1 || '',
-          tel1: meta.tel1 || '',
-          lider2: meta.lider2 || '',
-          email2: meta.email2 || '',
-          tel2: meta.tel2 || '',
-          dependencia: meta.dependencia || 'Municipal',
-          certificacion: meta.certificacion || 'No',
-          has_data: true
-        };
-      });
-
-      // Incluir Colegio Bet-El explícitamente si no está en este hito
-      if (!bySchool['Colegio Bet-el']) {
-        const bMeta = schools['Colegio Bet-el'] || {};
-        schoolRankings.push({
-          school: 'Colegio Bet-el',
-          n: 0,
-          pre_avg: null,
-          post_avg: null,
-          delta_avg: 0.0,
-          status_counts: { 'Mejoró': 0, 'Mantuvo': 0, 'Retrocedió': 0 },
-          pct_mejora: 0.0,
-          lider1: bMeta.lider1 || 'Pamela Pizarro Juica',
-          email1: bMeta.email1 || 'pizarropamela2015@gmail.com',
-          tel1: bMeta.tel1 || '56995779316',
-          lider2: bMeta.lider2 || '',
-          email2: bMeta.email2 || '',
-          tel2: bMeta.tel2 || '',
-          dependencia: 'Particular Subvencionado',
-          certificacion: 'No',
-          has_data: false,
-          note: 'Sin datos registrados en este hito'
+      const schoolRankings = Object.entries(bySchool)
+        .filter(([sname]) => ALL_LINEA_VERDE_SCHOOLS.has(sname))
+        .map(([sname, plist]) => {
+          const sn = plist.length;
+          const spre = plist.reduce((a, p) => a + p.pre_score, 0) / sn;
+          const spost = plist.reduce((a, p) => a + p.post_score, 0) / sn;
+          const sdel = plist.reduce((a, p) => a + p.delta, 0) / sn;
+          const sst = { 'Mejoró': 0, 'Mantuvo': 0, 'Retrocedió': 0 };
+          plist.forEach(p => { sst[p.status] = (sst[p.status] || 0) + 1; });
+          const meta = schools[sname] || {};
+          return {
+            school: sname,
+            n: sn,
+            pre_avg: parseFloat(spre.toFixed(2)),
+            post_avg: parseFloat(spost.toFixed(2)),
+            delta_avg: parseFloat(sdel.toFixed(2)),
+            status_counts: sst,
+            pct_mejora: parseFloat(((sst['Mejoró'] / sn) * 100).toFixed(1)),
+            lider1: meta.lider1 || '',
+            email1: meta.email1 || '',
+            tel1: meta.tel1 || '',
+            lider2: meta.lider2 || '',
+            email2: meta.email2 || '',
+            tel2: meta.tel2 || '',
+            dependencia: meta.dependencia || (sname.includes('Escuela') || sname.includes('Liceo') ? 'Municipal' : 'Particular Subvencionado'),
+            certificacion: meta.certificacion || 'No',
+            has_data: true
+          };
         });
-      }
+
+      // Incluir colegios de la Línea Verde de este hito que no registren datos (ej. Bet-el en Hito 4)
+      const targetSchoolsHito = LINEA_VERDE_SCHOOLS[hitoName] || [];
+      targetSchoolsHito.forEach(targetSch => {
+        if (!bySchool[targetSch]) {
+          const bMeta = schools[targetSch] || {};
+          schoolRankings.push({
+            school: targetSch,
+            n: 0,
+            pre_avg: null,
+            post_avg: null,
+            delta_avg: 0.0,
+            status_counts: { 'Mejoró': 0, 'Mantuvo': 0, 'Retrocedió': 0 },
+            pct_mejora: 0.0,
+            lider1: bMeta.lider1 || (targetSch.includes('Bet-el') ? 'Pamela Pizarro Juica' : ''),
+            email1: bMeta.email1 || (targetSch.includes('Bet-el') ? 'pizarropamela2015@gmail.com' : ''),
+            tel1: bMeta.tel1 || (targetSch.includes('Bet-el') ? '56995779316' : ''),
+            lider2: bMeta.lider2 || '',
+            email2: bMeta.email2 || '',
+            tel2: bMeta.tel2 || '',
+            dependencia: bMeta.dependencia || (targetSch.includes('Escuela') || targetSch.includes('Liceo') ? 'Municipal' : 'Particular Subvencionado'),
+            certificacion: bMeta.certificacion || 'No',
+            has_data: false,
+            note: 'Sin datos registrados en este hito'
+          });
+        }
+      });
 
       schoolRankings.sort((a, b) => {
         if (a.has_data === false) return 1;
@@ -896,7 +936,7 @@ function populateFilterDropdowns() {
   if (RAW_DATA && RAW_DATA.hitos) {
     for (const h of Object.values(RAW_DATA.hitos)) {
       h.schools.forEach(s => {
-        if (s.has_data !== false) schoolsSet.add(s.school);
+        if (s.has_data !== false && ALL_LINEA_VERDE_SCHOOLS.has(s.school)) schoolsSet.add(s.school);
       });
     }
   }
@@ -1068,8 +1108,8 @@ function updateKPIs() {
   const deltaEl = document.getElementById('kpi-delta');
   const pctMejoraEl = document.getElementById('kpi-pct-mejora');
   const countMejoraEl = document.getElementById('kpi-count-mejora');
-  const pctEstancadosEl = document.getElementById('kpi-pct-estancados');
-  const countEstancadosEl = document.getElementById('kpi-count-estancados');
+  const pctFavorableEl = document.getElementById('kpi-pct-favorable') || document.getElementById('kpi-pct-estancados');
+  const countFavorableEl = document.getElementById('kpi-count-favorable') || document.getElementById('kpi-count-estancados');
 
   if (N === 0) {
     nEl.innerText = '0';
@@ -1078,8 +1118,8 @@ function updateKPIs() {
     deltaEl.innerText = '0.00';
     pctMejoraEl.innerText = '0%';
     countMejoraEl.innerText = '0 participantes';
-    pctEstancadosEl.innerText = '0%';
-    countEstancadosEl.innerText = '0 participantes';
+    if (pctFavorableEl) pctFavorableEl.innerText = '0%';
+    if (countFavorableEl) countFavorableEl.innerText = '0 participantes';
     return;
   }
 
@@ -1092,7 +1132,8 @@ function updateKPIs() {
   const nRetrocedio = filtered.filter(p => p.status === 'Retrocedió').length;
 
   const pctMejora = ((nMejora / N) * 100).toFixed(1);
-  const pctEstancados = (((nMantuvo + nRetrocedio) / N) * 100).toFixed(1);
+  const nFavorable = nMejora + nMantuvo;
+  const pctFavorable = ((nFavorable / N) * 100).toFixed(1);
 
   nEl.innerText = N;
   preEl.innerHTML = `${avgPre.toFixed(2)} <span class="text-xs font-normal text-slate-400">/ 5</span>`;
@@ -1103,8 +1144,8 @@ function updateKPIs() {
   pctMejoraEl.innerText = `${pctMejora}%`;
   countMejoraEl.innerText = `${nMejora} participantes subieron`;
 
-  pctEstancadosEl.innerText = `${pctEstancados}%`;
-  countEstancadosEl.innerText = `${nMantuvo} mantuvieron, ${nRetrocedio} bajaron`;
+  if (pctFavorableEl) pctFavorableEl.innerText = `${pctFavorable}%`;
+  if (countFavorableEl) countFavorableEl.innerText = `${nMejora} subieron, ${nMantuvo} consolidaron`;
 }
 
 // RENDER CHARTS CON CHART.JS (Estilo moderno y paleta oficial del logo PAC)
@@ -1123,7 +1164,7 @@ function renderCharts() {
   CHARTS['status'] = new Chart(ctxStatus, {
     type: 'doughnut',
     data: {
-      labels: ['Mejoró (+pts)', 'Mantuvo (0 pts)', 'Retrocedió (-pts)'],
+      labels: ['Mejoró (+pts)', 'Mantuvo (0 pts)', 'Requiere refuerzo (-pts)'],
       datasets: [{
         data: [nMejora, nMantuvo, nRetrocedio],
         backgroundColor: ['#88C23F', '#00ADBB', '#F8B04C'],
@@ -1164,7 +1205,7 @@ function renderCharts() {
         <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#F8B04C]"></span>
         <span class="font-bold text-slate-800">${nRetrocedio}</span>
       </div>
-      <div class="text-[10px] text-slate-400 font-medium mt-0.5">Retrocedió (${N ? ((nRetrocedio/N)*100).toFixed(0) : 0}%)</div>
+      <div class="text-[10px] text-slate-400 font-medium mt-0.5">Requiere refuerzo (${N ? ((nRetrocedio/N)*100).toFixed(0) : 0}%)</div>
     </div>
   `;
 
@@ -1260,7 +1301,8 @@ function renderCharts() {
 
   // 3. Schools Delta Bar Chart
   const hitoKey = isGlobal ? 'Global' : CURRENT_HITO;
-  const schoolsMeta = RAW_DATA.hitos[hitoKey].schools.filter(s => s.has_data !== false);
+  const targetSchoolNames = new Set(LINEA_VERDE_SCHOOLS[hitoKey] || LINEA_VERDE_SCHOOLS['Global']);
+  const schoolsMeta = (RAW_DATA.hitos[hitoKey].schools || []).filter(s => s.has_data !== false && targetSchoolNames.has(s.school));
   const schoolLabels = schoolsMeta.map(s => s.school.replace('Escuela ', 'Esc. ').replace('Colegio ', 'Col. '));
   const schoolDeltas = schoolsMeta.map(s => s.delta_avg);
 
@@ -1664,7 +1706,8 @@ function renderClimatonTab() {
 // 2. TAB: ESTABLECIMIENTOS TABLE & FICHAS INSTITUCIONALES
 function renderSchoolsTab() {
   const hitoKey = (CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global') ? 'Global' : CURRENT_HITO;
-  const schools = RAW_DATA.hitos[hitoKey].schools;
+  const targetSchoolNames = new Set(LINEA_VERDE_SCHOOLS[hitoKey] || LINEA_VERDE_SCHOOLS['Global']);
+  const schools = (RAW_DATA.hitos[hitoKey].schools || []).filter(s => targetSchoolNames.has(s.school));
   const tbody = document.getElementById('schools-table-body');
   if (tbody) tbody.innerHTML = '';
 
@@ -1980,7 +2023,7 @@ function renderQualitativeTab() {
       badgeText = 'Mantuvo Respuesta Informada =';
     } else if (qData.status === 'Retrocedió') {
       badgeClass = 'badge-regressed font-bold';
-      badgeText = 'Retroceso en Texto ↘';
+      badgeText = 'Requiere refuerzo en texto';
     }
 
     const reviewAlert = qData.requires_review ? 
@@ -2022,61 +2065,229 @@ function renderQualitativeTab() {
   });
 }
 
+// Generador pedagógico de actividades de aula (15-20 min) para eliminar brechas conceptuales
+function getSchoolPedagogicalRecommendation(s, hitoKey) {
+  const sch = s.school || '';
+  const lider = s.lider1 || 'Profesor/a Líder';
+  
+  if (s.has_data === false || s.n === 0) {
+    return {
+      type: 'pending',
+      badge: 'Evaluación Pendiente',
+      badgeClass: 'bg-amber-100 text-amber-800 border-amber-300',
+      boxClass: 'bg-[#fef9ed] border-[#fcd34d] text-amber-950',
+      title: 'Actividad de Activación y Nivelación Inicial (20 min)',
+      content: `<strong>Diagnóstico de Situación:</strong> El establecimiento no registra respuestas pareadas en este desafío.<br>
+      <strong>Actividad sugerida en aula (20 min):</strong> <em>"Nivelación Rápida de Entrada"</em>. Proyectar la infografía oficial del desafío y aplicar la encuesta PRE impresa o digital en 10 minutos, seguida de una lluvia de ideas guiada para nivelar conocimientos basales.<br>
+      <strong>Coordinación:</strong> Contactar directamente a la líder <strong>${lider}</strong> para coordinar la nivelación antes de la etapa de ideación del Climatón.`
+    };
+  }
+
+  // Recomendaciones específicas con actividades de aula de 15-20 min por escuela
+  if (sch.includes('La Bandera')) {
+    return {
+      type: 'action',
+      badge: 'Brecha de Hábitat Costero',
+      badgeClass: 'bg-amber-100 text-amber-800 border-amber-300',
+      boxClass: 'bg-[#fef9ed] border-[#fcd34d] text-amber-950',
+      title: 'Actividad de Aula (15-20 min): "Mapeo Territorial de Huellas"',
+      content: `<strong>Diagnóstico de Brecha:</strong> Los estudiantes identifican la fauna pero persiste confusión sobre el impacto directo del tránsito 4x4 y microbasurales sobre los nidos en planicies costeras.<br>
+      <strong>Paso a paso para el docente:</strong>
+      <ol class="list-decimal list-inside mt-1.5 space-y-1 text-slate-700">
+        <li><strong>Fase 1 (5 min):</strong> El docente proyecta un croquis simple del borde costero norte y divide al curso en grupos de 3 a 4 estudiantes.</li>
+        <li><strong>Fase 2 (8 min):</strong> Cada equipo marca con puntos rojos las amenazas antrópicas (vehículos no regulados, perros, basura) y con verde las zonas seguras de nidificación.</li>
+        <li><strong>Fase 3 (5 min):</strong> Pregunta clave para el Climatón: <em>"¿Cómo diseñar señalética disuasiva o cierres ecológicos sin alterar el paisaje natural?"</em>.</li>
+      </ol>
+      <div class="mt-2 text-[11px] text-emerald-800 font-semibold">Meta de aula: Vincular la conservación del gaviotín con soluciones territoriales concretas.</div>`
+    };
+  }
+
+  if (sch.includes('Presbiteriana')) {
+    return {
+      type: 'action',
+      badge: 'Brecha de Escala y Fragilidad',
+      badgeClass: 'bg-amber-100 text-amber-800 border-amber-300',
+      boxClass: 'bg-[#fef9ed] border-[#fcd34d] text-amber-950',
+      title: 'Actividad de Aula (15-20 min): "El Peso de la Fragilidad"',
+      content: `<strong>Diagnóstico de Brecha:</strong> Comprensión positiva de biodiversidad, pero se subestima la escala física y extrema vulnerabilidad de especies migratorias (ej. gaviotín chico: 50 gramos).<br>
+      <strong>Paso a paso para el docente:</strong>
+      <ol class="list-decimal list-inside mt-1.5 space-y-1 text-slate-700">
+        <li><strong>Fase 1 (4 min):</strong> El profesor hace circular objetos de ~50 gramos (ej. una caja pequeña de fósforos, un huevo) para calibrar el peso real en las manos de los estudiantes.</li>
+        <li><strong>Fase 2 (6 min):</strong> Pregunta disparadora: <em>"¿Cómo un ave tan liviana vuela miles de kilómetros y puede perder su nido por una simple pisada o una fogata en la playa?"</em>.</li>
+        <li><strong>Fase 3 (5 min):</strong> Redacción en post-it de 1 norma comunitaria escolar que los vecinos y familias deberían respetar al visitar las playas de Antofagasta.</li>
+      </ol>
+      <div class="mt-2 text-[11px] text-emerald-800 font-semibold">Meta de aula: Conectar el dato cuantitativo (50 gr) con empatía y protección cívica activa.</div>`
+    };
+  }
+
+  if (sch.includes('Héroes de la Concepción') || sch.includes('Heroes')) {
+    return {
+      type: 'action',
+      badge: 'Brecha de Redes Tróficas',
+      badgeClass: 'bg-[#f1f9e9] text-[#52801b] border-[#cbe99c]',
+      boxClass: 'bg-[#f1f9e9] border-[#cbe99c] text-emerald-950',
+      title: 'Actividad de Aula (15-20 min): "El Círculo de la Cadena Invisible"',
+      content: `<strong>Diagnóstico de Brecha:</strong> Sobresaliente asimilación (+0.95 pts), pero persisten dudas sobre el rol de microorganismos de salinas y humedales como base de la cadena biológica.<br>
+      <strong>Paso a paso para el docente:</strong>
+      <ol class="list-decimal list-inside mt-1.5 space-y-1 text-slate-700">
+        <li><strong>Fase 1 (3 min):</strong> Asignar roles en tarjetas: Bacterias extremófilas, fitoplancton, microcrustáceos, peces pequeños, aves marinas mayores (piqueros, pelícanos).</li>
+        <li><strong>Fase 2 (7 min):</strong> Los estudiantes se enlazan con una cuerda o lana que representa el flujo biológico del desierto y mar.</li>
+        <li><strong>Fase 3 (5 min):</strong> El docente "corta" la base por contaminación química y los estudiantes comprueban visualmente la caída de las especies superiores.</li>
+      </ol>
+      <div class="mt-2 text-[11px] text-emerald-800 font-semibold">Meta de aula: Fortalecer la visión ecosistémica para dotar de solidez científica las ideas del Climatón.</div>`
+    };
+  }
+
+  if (sch.includes('Rómulo Peña') || sch.includes('Romulo')) {
+    return {
+      type: 'action',
+      badge: 'Precisión de Conceptos Clave',
+      badgeClass: 'bg-amber-100 text-amber-800 border-amber-300',
+      boxClass: 'bg-[#fef9ed] border-[#fcd34d] text-amber-950',
+      title: 'Actividad de Aula (15-20 min): "Trivia Rápida: Mitos vs Evidencia"',
+      content: `<strong>Diagnóstico de Brecha:</strong> El grupo tiene entusiasmo e interés, pero en las opciones cerradas prefirieron distractores atractivos en vez de términos técnicos precisos.<br>
+      <strong>Paso a paso para el docente:</strong>
+      <ol class="list-decimal list-inside mt-1.5 space-y-1 text-slate-700">
+        <li><strong>Fase 1 (6 min):</strong> El profesor presenta 4 afirmaciones de Verdadero/Falso en tarjetas o pizarra sobre fauna nativa vs fauna invasora.</li>
+        <li><strong>Fase 2 (6 min):</strong> Desarmar en conjunto los distractores: aclarar la diferencia entre especie residente, migratoria y endémica de nuestra costa.</li>
+        <li><strong>Fase 3 (5 min):</strong> Cada dupla redacta en 1 titular el problema ambiental local que su equipo quiere resolver en el Climatón.</li>
+      </ol>
+      <div class="mt-2 text-[11px] text-emerald-800 font-semibold">Meta de aula: Pasar de opiniones generales a propuestas fundamentadas con conceptos sólidos.</div>`
+    };
+  }
+
+  if (sch.includes('Sabella')) {
+    return {
+      type: 'action',
+      badge: 'Brecha de Luz Cenital y Apantallamiento',
+      badgeClass: 'bg-amber-100 text-amber-800 border-amber-300',
+      boxClass: 'bg-[#fef9ed] border-[#fcd34d] text-amber-950',
+      title: 'Actividad de Aula (15-20 min): "Experimento de la Linterna Apantallada"',
+      content: `<strong>Diagnóstico de Brecha:</strong> Dominio de nociones atmosféricas, pero un segmento de estudiantes no vincula la orientación de luminarias con la dispersión de luz hacia el cénit.<br>
+      <strong>Paso a paso para el docente:</strong>
+      <ol class="list-decimal list-inside mt-1.5 space-y-1 text-slate-700">
+        <li><strong>Fase 1 (4 min):</strong> Con la sala en penumbra, encender una linterna apuntando hacia arriba e iluminando el techo (simulando postes mal orientados).</li>
+        <li><strong>Fase 2 (6 min):</strong> Colocar una campana o cono de cartulina que proyecta 100% de la luz hacia el piso: comparar el deslumbramiento y la visibilidad de puntos en la pared.</li>
+        <li><strong>Fase 3 (5 min):</strong> Discusión aplicada: <em>"¿Cómo podríamos auditar y readecuar las luces de nuestras canchas o colegios para proteger los cielos astronómicos?"</em>.</li>
+      </ol>
+      <div class="mt-2 text-[11px] text-emerald-800 font-semibold">Meta de aula: Comprender el principio físico de apantallamiento para diseñar soluciones tecnológicas viables.</div>`
+    };
+  }
+
+  if (sch.includes('Greenhill')) {
+    return {
+      type: 'action',
+      badge: 'Brecha de Espectro y Horarios',
+      badgeClass: 'bg-[#f1f9e9] text-[#52801b] border-[#cbe99c]',
+      boxClass: 'bg-[#f1f9e9] border-[#cbe99c] text-emerald-950',
+      title: 'Actividad de Aula (15-20 min): "Auditoría de Luz y Horarios"',
+      content: `<strong>Diagnóstico de Brecha:</strong> Rendimiento sobresaliente (+0.80 pts), con oportunidad de profundizar en cómo la temperatura de color (luz azul) y los horarios nocturnos afectan a las aves costeras.<br>
+      <strong>Paso a paso para el docente:</strong>
+      <ol class="list-decimal list-inside mt-1.5 space-y-1 text-slate-700">
+        <li><strong>Fase 1 (5 min):</strong> Mostrar fotografías comparativas de luminarias cálidas (ámbar) vs frías (blancas/azules) y proyectar el mapa satelital nocturno de Antofagasta.</li>
+        <li><strong>Fase 2 (6 min):</strong> Analizar por qué la luz blanca dispersa más en la atmósfera y cómo los horarios (ej. apagado de letreros 8 PM - 1 AM) salvan volantones de fardelas y gaviotines.</li>
+        <li><strong>Fase 3 (5 min):</strong> Redactar una propuesta escolar de gestión horaria de luminarias para incorporarla en las tarjetas del Climatón.</li>
+      </ol>
+      <div class="mt-2 text-[11px] text-emerald-800 font-semibold">Meta de aula: Integrar astronomía y biología marina en una sola propuesta de eficiencia lumínica.</div>`
+    };
+  }
+
+  if (sch.includes('Bet-el') || sch.includes('Bet-El')) {
+    return {
+      type: 'action',
+      badge: 'Nivelación Inicial: Escudo Invisible',
+      badgeClass: 'bg-amber-100 text-amber-800 border-amber-300',
+      boxClass: 'bg-[#fef9ed] border-[#fcd34d] text-amber-950',
+      title: 'Actividad de Aula (15-20 min): "Capa a Capa: Nuestro Escudo Invisible"',
+      content: `<strong>Diagnóstico de Brecha:</strong> Establecimiento con evaluaciones pendientes en Hito 4. Requiere nivelación formativa en atmósfera, radiación UV y cielos limpios.<br>
+      <strong>Paso a paso para el docente:</strong>
+      <ol class="list-decimal list-inside mt-1.5 space-y-1 text-slate-700">
+        <li><strong>Fase 1 (5 min):</strong> Dibujar en pizarra las capas atmosféricas y explicar por qué actúa como un escudo térmico y filtro de radiación perjudicial.</li>
+        <li><strong>Fase 2 (7 min):</strong> Explicar por qué Antofagasta alberga los observatorios más avanzados del mundo y cómo la luz artificial no controlada "ciega" a los telescopios.</li>
+        <li><strong>Fase 3 (6 min):</strong> Aplicación guiada de la evaluación diagnóstica para registrar a los estudiantes e iniciar la ideación del Climatón.</li>
+      </ol>
+      <div class="mt-2 text-[11px] text-emerald-800 font-semibold">Meta de aula: Nivelar los conceptos basales para que el equipo participe en igualdad de condiciones formativas.</div>`
+    };
+  }
+
+  return {
+    type: 'action',
+    badge: 'Consolidación Pedagógica',
+    badgeClass: 'bg-slate-100 text-slate-800 border-slate-300',
+    boxClass: 'bg-slate-50 border-slate-200 text-slate-800',
+    title: 'Actividad de Aula (15-20 min): "Plenario de Ideación Sostenible"',
+    content: `<strong>Diagnóstico:</strong> Desempeño promedio con variación de ${s.delta_avg >= 0 ? '+' : ''}${s.delta_avg} pts.<br>
+    <strong>Actividad sugerida:</strong> Plenario de 15 minutos repasando las 5 preguntas basales para afianzar el vocabulario técnico antes de pasar a la formulación de proyectos en el Climatón.`
+  };
+}
+
 // 5. TAB: CASOS CRÍTICOS Y ORIENTACIONES PEDAGÓGICAS
 function renderPedagogicalTab() {
   const hitoKey = (CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global') ? 'Global' : CURRENT_HITO;
-  const schools = RAW_DATA.hitos[hitoKey].schools;
+  const rawSchools = (RAW_DATA.hitos[hitoKey] && RAW_DATA.hitos[hitoKey].schools) || [];
+  
+  // Filtrar estrictamente a las escuelas de la Línea Verde para el hito seleccionado
+  const targetSchoolNames = new Set(LINEA_VERDE_SCHOOLS[hitoKey] || LINEA_VERDE_SCHOOLS['Global']);
+  const schools = rawSchools.filter(s => targetSchoolNames.has(s.school));
+  
   const container = document.getElementById('pedagogical-cards');
   container.innerHTML = '';
 
   schools.forEach(s => {
     const card = document.createElement('div');
-    card.className = 'border border-slate-100 rounded-2xl p-5 bg-white card-shadow space-y-3.5';
+    card.className = 'border border-slate-100 rounded-3xl p-5 bg-white card-shadow space-y-3.5 flex flex-col justify-between';
 
-    let recomendacion = '';
-    let statusClass = 'bg-[#f1f9e9] border-[#cbe99c] text-[#3f6515]';
-
-    if (s.has_data === false || s.n === 0) {
-      recomendacion = `<strong>Sin evaluaciones registradas en este hito:</strong> Este establecimiento no registra respuestas PRE ni POST para este desafío. Se sugiere coordinar directamente con el profesor/a líder (<strong>${s.lider1 || 'Coordinador'}</strong>) para verificar la ejecución de la actividad en terreno o aplicar la evaluación de manera diferida.`;
-      statusClass = 'bg-[#fef7ed] border-[#fcd397] text-[#944f00]';
-    } else if (s.delta_avg > 0.7) {
-      recomendacion = `<strong>Consolidación e Ideación:</strong> Este equipo demostró una comprensión sobresaliente de los conceptos de la intervención (+${s.delta_avg} pts). Se sugiere a la líder <strong>${s.lider1 || 'Docente Líder'}</strong> canalizar este entusiasmo directamente hacia la etapa de ideación (ej. iniciativas escolares de protección de cielos oscuros o conservación de la biodiversidad local).`;
-      statusClass = 'bg-[#f1f9e9] border-[#cbe99c] text-[#3f6515]';
-    } else if (s.delta_avg >= 0.2) {
-      recomendacion = `<strong>Refuerzo de conceptos intermedios:</strong> El equipo tiene una asimilación positiva pero heterogénea (+${s.delta_avg} pts). Se recomienda a la líder <strong>${s.lider1 || 'Docente Líder'}</strong> realizar un plenario corto de 15 minutos repasando las diferencias conceptuales clave, antes de pasar a la etapa de ideación.`;
-      statusClass = 'bg-[#fef7ed] border-[#fcd397] text-[#944f00]';
-    } else {
-      recomendacion = `<strong>Atención a 'Efecto Techo' y Distractores:</strong> El puntaje basal fue muy elevado o se registraron confusiones sutiles en las opciones cerradas (${s.delta_avg} pts). No interpretar esto como falta de aprendizaje: cualitativamente los estudiantes manejan la terminología. Se aconseja pedirles que expliquen con sus propias palabras el impacto en la fauna local para afianzar la seguridad en sus conocimientos antes de la etapa de ideación.`;
-      statusClass = 'bg-slate-50 border-slate-200 text-slate-800';
-    }
+    const rec = getSchoolPedagogicalRecommendation(s, hitoKey);
 
     card.innerHTML = `
-      <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-        <div>
-          <h4 class="font-extrabold text-slate-900 text-sm">${s.school}</h4>
-          <span class="text-[11px] text-slate-500 font-medium">Líder: ${s.lider1 || 'Coordinador del equipo'} ${s.lider2 ? '/ ' + s.lider2 : ''}</span>
+      <div class="space-y-3">
+        <!-- Encabezado de la escuela -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h4 class="font-extrabold text-slate-900 text-sm sm:text-base">${escapeHtml(s.school)}</h4>
+            <span class="text-[11px] text-slate-500 font-medium">Docente Líder: <strong>${escapeHtml(s.lider1 || 'Coordinador del equipo')}</strong> ${s.lider2 ? ' / ' + escapeHtml(s.lider2) : ''}</span>
+          </div>
+          <div class="text-right shrink-0">
+            ${s.has_data !== false ? `
+              <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${s.delta_avg >= 0 ? 'bg-[#f1f9e9] text-[#52801b] border border-[#cbe99c]' : 'bg-amber-50 text-amber-800 border border-amber-200'}">Delta: ${s.delta_avg >= 0 ? '+' : ''}${s.delta_avg}</span>
+              <div class="text-[10px] text-slate-400 font-medium mt-0.5">${s.pct_mejora}% de mejora</div>
+            ` : `
+              <span class="text-xs font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200">Evaluación Pendiente</span>
+            `}
+          </div>
         </div>
-        <div class="text-right">
-          ${s.has_data !== false ? `
-            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${s.delta_avg >= 0 ? 'bg-[#f1f9e9] text-[#52801b] border border-[#cbe99c]' : 'bg-rose-50 text-rose-600'}">Delta: ${s.delta_avg >= 0 ? '+' : ''}${s.delta_avg}</span>
-            <div class="text-[10px] text-slate-400 font-medium mt-0.5">${s.pct_mejora}% mejoró</div>
-          ` : `
-            <span class="text-xs font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full">Sin datos</span>
-          `}
+
+        <!-- Insignias de contexto -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${rec.badgeClass}">${rec.badge}</span>
+          <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">${escapeHtml(s.dependencia || 'Municipal')}</span>
+        </div>
+
+        <!-- Cuadro de Actividad de Aula (15-20 min) -->
+        <div class="p-4 rounded-2xl border text-xs leading-relaxed ${rec.boxClass} space-y-2">
+          <div class="font-extrabold text-slate-900 text-xs flex items-center gap-1.5 border-b border-amber-200/60 pb-1.5">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-700 shrink-0"></i>
+            <span>${rec.title}</span>
+          </div>
+          <div class="text-[11.5px] leading-relaxed">${rec.content}</div>
         </div>
       </div>
 
-      <div class="p-3.5 rounded-xl border text-xs leading-relaxed ${statusClass}">
-        ${recomendacion}
-      </div>
-
-      <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1">
-        <span>Estudiantes evaluados: <strong>${s.n}</strong></span>
-        <span>${s.email1 ? '✉ ' + s.email1 : ''} ${s.tel1 ? '· Tel: ' + s.tel1 : ''}</span>
+      <!-- Pie de tarjeta responsivo (garantiza no quebrar números ni contacto) -->
+      <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-[11px] text-slate-500">
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full font-semibold bg-slate-100 text-slate-700 whitespace-nowrap w-fit">
+          <i data-lucide="users" class="w-3.5 h-3.5 mr-1.5 text-slate-400"></i> ${s.n} estudiantes evaluados
+        </span>
+        <div class="flex items-center gap-2 flex-wrap font-medium">
+          ${s.email1 ? `<a href="mailto:${escapeHtml(s.email1)}" class="hover:text-emerald-700 underline decoration-slate-300">✉ ${escapeHtml(s.email1)}</a>` : ''}
+          ${s.tel1 ? `<span>· Tel: ${escapeHtml(s.tel1)}</span>` : ''}
+        </div>
       </div>
     `;
     container.appendChild(card);
   });
+
+  if (window.lucide) lucide.createIcons();
 }
 
 // Helper para sanitizar texto HTML
@@ -2106,6 +2317,11 @@ function renderParticipantsTab() {
 
     const deltaSign = p.delta >= 0 ? '+' : '';
     const badgeClass = p.status === 'Mejoró' ? 'badge-improved' : (p.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained');
+    const statusLabel = p.status === 'Retrocedió' ? 'Requiere refuerzo' : p.status;
+    let realStatusLabel = p.real_status || '';
+    if (realStatusLabel.includes('Dificultad Conceptual')) {
+      realStatusLabel = 'Refuerzo conceptual sugerido';
+    }
 
     let hitoBadge = '';
     if (isGlobal) {
@@ -2135,10 +2351,10 @@ function renderParticipantsTab() {
       <td class="py-3.5 px-3 text-slate-500 text-[11px]">${escapeHtml(p.gender)}</td>
       <td class="py-3.5 px-3 text-center">${preDisplay}</td>
       <td class="py-3.5 px-3 text-center">${postDisplay}</td>
-      <td class="py-3.5 px-3 text-center font-bold ${p.delta >= 0 ? 'text-[#52801b]' : 'text-rose-600'}">${deltaSign}${p.delta}</td>
+      <td class="py-3.5 px-3 text-center font-bold ${p.delta >= 0 ? 'text-[#52801b]' : 'text-amber-700'}">${deltaSign}${p.delta}</td>
       <td class="py-3.5 px-3 text-center">
-        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${badgeClass}">${p.status}</span>
-        <div class="text-[10px] text-slate-400 mt-0.5 font-medium">${escapeHtml(p.real_status || '')}</div>
+        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${badgeClass}">${statusLabel}</span>
+        <div class="text-[10px] text-slate-400 mt-0.5 font-medium">${escapeHtml(realStatusLabel)}</div>
       </td>
       <td class="py-3.5 px-4 text-center">
         <button onclick="event.stopPropagation(); openModal(window.currentFiltered[${idx}])" class="px-3.5 py-1 text-xs font-bold text-slate-900 bg-[#88C23F] hover:bg-[#78ad35] rounded-full transition shadow-sm">
@@ -2292,7 +2508,7 @@ function renderModalContent(mode) {
       <div class="p-2.5 bg-white rounded-xl border border-slate-100 shadow-sm">
         <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Diagnóstico de Aprendizajes</div>
         <div class="mt-1">
-          <span class="inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${p.status === 'Mejoró' ? 'badge-improved' : (p.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${p.status}</span>
+          <span class="inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${p.status === 'Mejoró' ? 'badge-improved' : (p.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${p.status === 'Retrocedió' ? 'Requiere refuerzo' : p.status}</span>
         </div>
         <div class="text-[10px] text-slate-500 font-semibold mt-1">${escapeHtml(p.real_status || 'Rendimiento Registrado')}</div>
       </div>
@@ -2349,11 +2565,11 @@ function renderModalContent(mode) {
       </div>
       <div>
         <div class="text-[10px] text-slate-400 font-bold uppercase">Diferencia</div>
-        <div class="text-xl font-extrabold ${dataH.delta >= 0 ? 'text-[#52801b]' : 'text-rose-600'} mt-0.5">${deltaSign}${dataH.delta} pts</div>
+        <div class="text-xl font-extrabold ${dataH.delta >= 0 ? 'text-[#52801b]' : 'text-amber-700'} mt-0.5">${deltaSign}${dataH.delta} pts</div>
       </div>
       <div>
         <div class="text-[10px] text-slate-400 font-bold uppercase">Condición</div>
-        <span class="mt-1 inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${dataH.status === 'Mejoró' ? 'badge-improved' : (dataH.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${dataH.status}</span>
+        <span class="mt-1 inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${dataH.status === 'Mejoró' ? 'badge-improved' : (dataH.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${dataH.status === 'Retrocedió' ? 'Requiere refuerzo' : dataH.status}</span>
       </div>
     `;
     container.appendChild(kpiH3);
@@ -2394,11 +2610,11 @@ function renderModalContent(mode) {
       </div>
       <div>
         <div class="text-[10px] text-slate-400 font-bold uppercase">Diferencia</div>
-        <div class="text-xl font-extrabold ${dataH.delta >= 0 ? 'text-[#00737d]' : 'text-rose-600'} mt-0.5">${deltaSign}${dataH.delta} pts</div>
+        <div class="text-xl font-extrabold ${dataH.delta >= 0 ? 'text-[#00737d]' : 'text-amber-700'} mt-0.5">${deltaSign}${dataH.delta} pts</div>
       </div>
       <div>
         <div class="text-[10px] text-slate-400 font-bold uppercase">Condición</div>
-        <span class="mt-1 inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${dataH.status === 'Mejoró' ? 'badge-improved' : (dataH.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${dataH.status}</span>
+        <span class="mt-1 inline-block font-bold px-2.5 py-0.5 rounded-full text-[11px] ${dataH.status === 'Mejoró' ? 'badge-improved' : (dataH.status === 'Retrocedió' ? 'badge-regressed' : 'badge-maintained')}">${dataH.status === 'Retrocedió' ? 'Requiere refuerzo' : dataH.status}</span>
       </div>
     `;
     container.appendChild(kpiH4);
@@ -2446,22 +2662,24 @@ function buildHitoMCBlock(title, hData, questionsMeta, theme) {
 
     let evoBadgeClass = 'bg-slate-100 text-slate-700';
     if (evo === 'Mejoró') evoBadgeClass = 'badge-improved font-bold';
-    else if (evo === 'Retrocedió') evoBadgeClass = 'bg-rose-100 text-rose-800 font-bold';
+    else if (evo === 'Retrocedió') evoBadgeClass = 'badge-regressed font-bold';
     else if (evo === 'Mantuvo Correcto') evoBadgeClass = 'badge-maintained font-medium';
 
+    const evoText = evo === 'Retrocedió' ? 'Requiere refuerzo' : evo;
+
     itemsHtml += `
-      <div class="p-3.5 rounded-2xl border ${isCorrectPost ? 'bg-[#f1f9e9]/40 border-[#cbe99c]' : 'bg-rose-50/30 border-rose-200'} text-xs flex flex-wrap items-center justify-between gap-2">
+      <div class="p-3.5 rounded-2xl border ${isCorrectPost ? 'bg-[#f1f9e9]/40 border-[#cbe99c]' : 'bg-amber-50/30 border-amber-200'} text-xs flex flex-wrap items-center justify-between gap-2">
         <div class="space-y-0.5 max-w-[75%]">
           <span class="font-bold text-slate-800">Q${idx + 1}: ${escapeHtml(qMeta[idx].title)}</span>
           <div class="text-[11px] text-slate-500 font-medium">
             PRE: <span class="font-bold ${isCorrectPre ? 'text-[#52801b]' : 'text-slate-700'}">${(hData.pre_mc[idx] || 'N/A').toUpperCase()}</span> ➔ 
-            POST: <span class="font-bold ${isCorrectPost ? 'text-[#52801b]' : 'text-rose-600'}">${(hData.post_mc[idx] || 'N/A').toUpperCase()}</span>
+            POST: <span class="font-bold ${isCorrectPost ? 'text-[#52801b]' : 'text-amber-700'}">${(hData.post_mc[idx] || 'N/A').toUpperCase()}</span>
             <span class="text-slate-400 font-normal ml-1">(Correcta: ${(key[idx] || '').toUpperCase()})</span>
           </div>
         </div>
         <div>
           <span class="text-[10px] px-3 py-1 rounded-full font-bold ${evoBadgeClass}">
-            ${evo}
+            ${evoText}
           </span>
         </div>
       </div>
@@ -2507,7 +2725,7 @@ function buildHitoOpenBlock(title, hData, theme) {
       oBadgeText = 'Mejora Cualitativa ↗';
     } else if (oq.status === 'Retrocedió') {
       oBadge = 'badge-regressed font-bold';
-      oBadgeText = 'Retroceso en Texto ↘';
+      oBadgeText = 'Requiere refuerzo en texto';
     } else if (oq.status === 'Mantuvo') {
       oBadge = 'bg-blue-50 text-blue-700 border border-blue-200 font-semibold';
       oBadgeText = 'Mantuvo Respuesta =';
@@ -2705,7 +2923,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
         <div style="margin-bottom: 8px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #fafafa; page-break-inside: avoid;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <strong style="font-size: 11px; color: #0f172a;">P${idx + 1}: ${escapeHtml(oq.question)}</strong>
-            <span style="font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 12px; background-color: ${oq.status === 'Mejoró' ? '#f1f9e9' : (oq.status === 'Retrocedió' ? '#fff1f2' : '#f1f5f9')}; color: ${oq.status === 'Mejoró' ? '#52801b' : (oq.status === 'Retrocedió' ? '#e11d48' : '#475569')};">${oq.status}</span>
+            <span style="font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 12px; background-color: ${oq.status === 'Mejoró' ? '#f1f9e9' : (oq.status === 'Retrocedió' ? '#fef9ed' : '#f1f5f9')}; color: ${oq.status === 'Mejoró' ? '#52801b' : (oq.status === 'Retrocedió' ? '#b45309' : '#475569')};">${oq.status === 'Retrocedió' ? 'Requiere refuerzo' : oq.status}</span>
           </div>
           <div style="font-size: 10px; color: #64748b; margin-bottom: 6px;">Diagnóstico: <strong>${escapeHtml(oq.detail)}</strong></div>
           <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
@@ -2734,7 +2952,7 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
         <div style="margin-bottom: 8px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #fafafa; page-break-inside: avoid;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <strong style="font-size: 11px; color: #0f172a;">P${idx + 1}: ${escapeHtml(oq.question)}</strong>
-            <span style="font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 12px; background-color: ${oq.status === 'Mejoró' ? '#e6f9fa' : (oq.status === 'Retrocedió' ? '#fff1f2' : '#f1f5f9')}; color: ${oq.status === 'Mejoró' ? '#00737d' : (oq.status === 'Retrocedió' ? '#e11d48' : '#475569')};">${oq.status}</span>
+            <span style="font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 12px; background-color: ${oq.status === 'Mejoró' ? '#e6f9fa' : (oq.status === 'Retrocedió' ? '#fef9ed' : '#f1f5f9')}; color: ${oq.status === 'Mejoró' ? '#00737d' : (oq.status === 'Retrocedió' ? '#b45309' : '#475569')};">${oq.status === 'Retrocedió' ? 'Requiere refuerzo' : oq.status}</span>
           </div>
           <div style="font-size: 10px; color: #64748b; margin-bottom: 6px;">Diagnóstico: <strong>${escapeHtml(oq.detail)}</strong></div>
           <table style="width: 100%; border-collapse: collapse; font-size: 10px;">

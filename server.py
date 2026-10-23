@@ -15,6 +15,8 @@ from parser import parse_excel_data
 PORT = 8085
 BASE_DIR = Path(__file__).resolve().parent
 EXCEL_PATH = BASE_DIR.parent / "datos_evaluacion" / "Participantes PAC 2026.xlsx"
+if not EXCEL_PATH.exists() and (BASE_DIR / "ParticipantesPAC2026_live.xlsx").exists():
+    EXCEL_PATH = BASE_DIR / "ParticipantesPAC2026_live.xlsx"
 
 class DashboardHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):

@@ -20,6 +20,30 @@ def strip_accents(s):
         return ''
     return ''.join(c for c in unicodedata.normalize('NFD', str(s)) if unicodedata.category(c) != 'Mn').strip().lower()
 
+LINEA_VERDE_SCHOOLS = {
+    'Hito 3': [
+        'Escuela La Bandera',
+        'Escuela Presbiteriana',
+        'Escuela Héroes de la Concepción',
+        'Escuela Rómulo Peña'
+    ],
+    'Hito 4': [
+        'Liceo Bicentenario Andrés Sabella',
+        'Greenhill School',
+        'Colegio Bet-el'
+    ],
+    'Global': [
+        'Escuela La Bandera',
+        'Escuela Presbiteriana',
+        'Escuela Héroes de la Concepción',
+        'Escuela Rómulo Peña',
+        'Liceo Bicentenario Andrés Sabella',
+        'Greenhill School',
+        'Colegio Bet-el'
+    ]
+}
+ALL_LINEA_VERDE = set(LINEA_VERDE_SCHOOLS['Global'])
+
 def canonical_school_name(name):
     if not name:
         return ''
@@ -39,22 +63,6 @@ def canonical_school_name(name):
         return 'Escuela Rómulo Peña'
     if 'greenhill' in nc:
         return 'Greenhill School'
-    if 'claudio matte' in nc:
-        return 'Escuela Claudio Matte Pérez'
-    if 'humberto gonzalez' in nc:
-        return 'Escuela Ecológica Humberto González Echegoyen'
-    if 'alberto hurtado' in nc:
-        return 'Escuela Ecológica Padre Alberto Hurtado'
-    if 'republica de italia' in nc:
-        return 'Escuela República de Italia'
-    if 'domingo herrera' in nc:
-        return 'Liceo Domingo Herrera Rivera'
-    if 'estados unidos' in nc:
-        return 'Escuela República de Estados Unidos'
-    if 'juan pablo' in nc:
-        return 'Escuela Juan Pablo II'
-    if 'javiera carrera' in nc:
-        return 'Escuela Javiera Carrera'
     return n
 
 FEMALE_NAMES = {
@@ -206,6 +214,8 @@ def parse_excel_data(file_path):
             if not raw_sch:
                 continue
             sch = canonical_school_name(raw_sch)
+            if sch not in ALL_LINEA_VERDE:
+                continue
             if sch not in schools:
                 schools[sch] = {
                     'nombre': sch,
@@ -230,6 +240,8 @@ def parse_excel_data(file_path):
             if not raw_sch:
                 continue
             sch = canonical_school_name(raw_sch)
+            if sch not in ALL_LINEA_VERDE:
+                continue
             if sch not in schools:
                 schools[sch] = {
                     'nombre': sch,
@@ -279,6 +291,8 @@ def parse_excel_data(file_path):
                 continue
             role = clean_str(ws.cell(r, 2).value) or 'Estudiante'
             school = canonical_school_name(clean_str(ws.cell(r, 3).value))
+            if school not in ALL_LINEA_VERDE:
+                continue
                 
             pp = clean_str(ws.cell(r, 4).value).upper()
             if pp not in ['PRE', 'POST']:
@@ -455,32 +469,30 @@ def parse_excel_data(file_path):
                 'has_data': True
             })
             
-        # Manejo explícito de colegios sin evaluaciones en este hito (ej. Colegio Bet-El en Hito 4)
+        # Manejo de colegios de la Línea Verde sin evaluaciones en este hito específico (ej. Colegio Bet-el en Hito 4)
         active_school_names = set(by_school.keys())
-        for sname, smeta in schools.items():
-            # Si el colegio participó en el otro hito o está en el programa pero no en este hito
+        for sname in LINEA_VERDE_SCHOOLS.get(hito_name, []):
             if sname not in active_school_names:
-                # Si es Bet-el o colegios clave del programa
-                if sname in ['Colegio Bet-el', 'Escuela Claudio Matte Pérez', 'Escuela República de Italia']:
-                    school_rankings.append({
-                        'school': sname,
-                        'n': 0,
-                        'pre_avg': None,
-                        'post_avg': None,
-                        'delta_avg': 0.0,
-                        'status_counts': {'Mejoró': 0, 'Mantuvo': 0, 'Retrocedió': 0},
-                        'pct_mejora': 0.0,
-                        'lider1': smeta.get('lider1', ''),
-                        'email1': smeta.get('email1', ''),
-                        'tel1': smeta.get('tel1', ''),
-                        'lider2': smeta.get('lider2', ''),
-                        'email2': smeta.get('email2', ''),
-                        'tel2': smeta.get('tel2', ''),
-                        'dependencia': smeta.get('dependencia', 'Particular Subvencionado'),
-                        'certificacion': smeta.get('certificacion', 'No'),
-                        'has_data': False,
-                        'note': 'Sin datos registrados en este hito'
-                    })
+                smeta = schools.get(sname, {})
+                school_rankings.append({
+                    'school': sname,
+                    'n': 0,
+                    'pre_avg': None,
+                    'post_avg': None,
+                    'delta_avg': 0.0,
+                    'status_counts': {'Mejoró': 0, 'Mantuvo': 0, 'Retrocedió': 0},
+                    'pct_mejora': 0.0,
+                    'lider1': smeta.get('lider1', ''),
+                    'email1': smeta.get('email1', ''),
+                    'tel1': smeta.get('tel1', ''),
+                    'lider2': smeta.get('lider2', ''),
+                    'email2': smeta.get('email2', ''),
+                    'tel2': smeta.get('tel2', ''),
+                    'dependencia': smeta.get('dependencia', 'Particular Subvencionado'),
+                    'certificacion': smeta.get('certificacion', 'No'),
+                    'has_data': False,
+                    'note': 'Sin datos registrados en este hito'
+                })
                     
         school_rankings.sort(key=lambda x: (-1 if not x.get('has_data', True) else 0, -x['delta_avg']))
         
@@ -639,7 +651,9 @@ def parse_excel_data(file_path):
 if __name__ == '__main__':
     import json
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    excel_path = os.path.join(current_dir, '..', 'datos_evaluacion', 'Participantes PAC 2026.xlsx')
+    excel_path = os.path.join(current_dir, 'ParticipantesPAC2026_live.xlsx')
+    if not os.path.exists(excel_path):
+        excel_path = os.path.join(current_dir, '..', 'datos_evaluacion', 'Participantes PAC 2026.xlsx')
     parsed = parse_excel_data(excel_path)
     out_file = os.path.join(current_dir, 'data.json')
     with open(out_file, 'w', encoding='utf-8') as f:

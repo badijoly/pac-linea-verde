@@ -43,7 +43,12 @@
     }
     .badge-improved { background-color: #f1f9e9; color: #52801b; border: 1px solid #cbe99c; }
     .badge-maintained { background-color: #e6f9fa; color: #00737d; border: 1px solid #99e1e7; }
-    .badge-regressed { background-color: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; }
+    .badge-regressed { background-color: #fef9ed; color: #b45309; border: 1px solid #fcd34d; }
+    .group:hover .group-hover\:block,
+    .group:focus-within .group-hover\:block,
+    .group:focus .group-hover\:block {
+      display: block !important;
+    }
     .card-shadow {
       box-shadow: 0 12px 30px -6px rgba(10, 22, 34, 0.15), 0 4px 10px -3px rgba(10, 22, 34, 0.08);
     }
@@ -185,7 +190,7 @@
             <option value="ALL">Todos los estados</option>
             <option value="Mejoró">Mejoró (+pts)</option>
             <option value="Mantuvo">Mantuvo (0 pts)</option>
-            <option value="Retrocedió">Retrocedió (-pts)</option>
+            <option value="Retrocedió">Requiere refuerzo (-pts)</option>
           </select>
         </div>
 
@@ -217,7 +222,15 @@
         <div class="flex items-center gap-3 bg-cyan-50/70 border border-[#00ADBB]/40 px-5 py-3 rounded-2xl">
           <i data-lucide="award" class="w-7 h-7 text-[#00ADBB]"></i>
           <div>
-            <div class="text-[10px] uppercase text-[#00737d] font-bold tracking-wider">Ganancia Normalizada (Hake)</div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] uppercase text-[#00737d] font-bold tracking-wider">Ganancia Normalizada (Hake)</span>
+              <span class="relative group inline-flex items-center cursor-help" tabindex="0">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5 text-[#00737d] hover:text-[#005a61] transition"></i>
+                <span class="absolute bottom-full right-0 sm:left-1/2 sm:-translate-x-1/2 mb-2 hidden group-hover:block group-focus:block w-64 p-2.5 bg-slate-900 text-white text-[11px] rounded-xl shadow-xl z-50 pointer-events-none leading-relaxed text-center font-normal normal-case">
+                  Medida estadística que evalúa la efectividad de un método de enseñanza, calcula qué proporción del conocimiento fue efectivamente aprendida al final de un proceso.
+                </span>
+              </span>
+            </div>
             <div id="kpi-hake-val" class="text-xl font-extrabold text-slate-900">g = +0.255</div>
           </div>
         </div>
@@ -228,7 +241,15 @@
         <!-- KPI 1 -->
         <div class="bg-white p-5 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between hover:translate-y-[-2px] transition duration-200">
           <div>
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Muestra Evaluada</div>
+            <div class="flex items-center justify-between">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Muestra Evaluada</div>
+              <span class="relative group inline-flex items-center cursor-help" tabindex="0">
+                <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition"></i>
+                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block group-focus:block w-56 p-2 bg-slate-900 text-white text-[11px] rounded-xl shadow-xl z-50 pointer-events-none leading-relaxed text-center font-normal normal-case">
+                  Estudiantes con registros pareados completos en las evaluaciones inicial (PRE) y final (POST).
+                </span>
+              </span>
+            </div>
             <div id="kpi-n" class="text-3xl font-extrabold text-slate-900 tracking-tight mt-1.5">61</div>
           </div>
           <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
@@ -240,7 +261,15 @@
         <!-- KPI 2 -->
         <div class="bg-white p-5 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between hover:translate-y-[-2px] transition duration-200">
           <div>
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Promedio PRE</div>
+            <div class="flex items-center justify-between">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Promedio PRE</div>
+              <span class="relative group inline-flex items-center cursor-help" tabindex="0">
+                <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition"></i>
+                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block group-focus:block w-56 p-2 bg-slate-900 text-white text-[11px] rounded-xl shadow-xl z-50 pointer-events-none leading-relaxed text-center font-normal normal-case">
+                  Puntaje promedio obtenido antes de iniciar las actividades formativas en terreno (máximo 5 pts).
+                </span>
+              </span>
+            </div>
             <div id="kpi-pre" class="text-3xl font-extrabold text-slate-700 tracking-tight mt-1.5">2.82 <span class="text-xs font-normal text-slate-400">/ 5</span></div>
           </div>
           <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
@@ -254,7 +283,15 @@
         <!-- KPI 3 -->
         <div class="bg-white p-5 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between hover:translate-y-[-2px] transition duration-200">
           <div>
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Promedio POST</div>
+            <div class="flex items-center justify-between">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Promedio POST</div>
+              <span class="relative group inline-flex items-center cursor-help" tabindex="0">
+                <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition"></i>
+                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block group-focus:block w-56 p-2 bg-slate-900 text-white text-[11px] rounded-xl shadow-xl z-50 pointer-events-none leading-relaxed text-center font-normal normal-case">
+                  Puntaje promedio alcanzado al concluir los talleres y experiencias de campo (máximo 5 pts).
+                </span>
+              </span>
+            </div>
             <div id="kpi-post" class="text-3xl font-extrabold text-[#52801b] tracking-tight mt-1.5">3.51 <span class="text-xs font-normal text-slate-400">/ 5</span></div>
           </div>
           <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-[#52801b] font-semibold">
@@ -268,7 +305,15 @@
         <!-- KPI 4 -->
         <div class="bg-white p-5 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between hover:translate-y-[-2px] transition duration-200">
           <div>
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Variación Neta</div>
+            <div class="flex items-center justify-between">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Variación Neta</div>
+              <span class="relative group inline-flex items-center cursor-help" tabindex="0">
+                <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition"></i>
+                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block group-focus:block w-56 p-2 bg-slate-900 text-white text-[11px] rounded-xl shadow-xl z-50 pointer-events-none leading-relaxed text-center font-normal normal-case">
+                  Diferencia directa entre el puntaje final y el basal (POST - PRE), reflejando la ganancia neta.
+                </span>
+              </span>
+            </div>
             <div id="kpi-delta" class="text-3xl font-extrabold text-[#52801b] tracking-tight mt-1.5">+0.69</div>
           </div>
           <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-[#52801b] font-semibold">
@@ -280,7 +325,15 @@
         <!-- KPI 5 -->
         <div class="bg-white p-5 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between hover:translate-y-[-2px] transition duration-200">
           <div>
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tasa de Mejora</div>
+            <div class="flex items-center justify-between">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tasa de Mejora</div>
+              <span class="relative group inline-flex items-center cursor-help" tabindex="0">
+                <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition"></i>
+                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block group-focus:block w-56 p-2 bg-slate-900 text-white text-[11px] rounded-xl shadow-xl z-50 pointer-events-none leading-relaxed text-center font-normal normal-case">
+                  Porcentaje de estudiantes que aumentaron su puntaje respecto al diagnóstico inicial.
+                </span>
+              </span>
+            </div>
             <div id="kpi-pct-mejora" class="text-3xl font-extrabold text-[#52801b] tracking-tight mt-1.5">54.1%</div>
           </div>
           <div id="kpi-count-mejora" class="mt-3 pt-2.5 border-t border-slate-100 text-[11px] text-slate-500">
@@ -291,11 +344,19 @@
         <!-- KPI 6 -->
         <div class="bg-white p-5 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between hover:translate-y-[-2px] transition duration-200">
           <div>
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Estancados / Menor</div>
-            <div id="kpi-pct-estancados" class="text-3xl font-extrabold text-[#b36605] tracking-tight mt-1.5">45.9%</div>
+            <div class="flex items-center justify-between">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Rendimiento Favorable</div>
+              <span class="relative group inline-flex items-center cursor-help" tabindex="0">
+                <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition"></i>
+                <span class="absolute bottom-full right-0 sm:left-1/2 sm:-translate-x-1/2 mb-2 hidden group-hover:block group-focus:block w-60 p-2.5 bg-slate-900 text-white text-[11px] rounded-xl shadow-xl z-50 pointer-events-none leading-relaxed text-center font-normal normal-case">
+                  Estudiantes que aumentaron su puntaje o consolidaron sus aprendizajes previos en niveles altos sin retroceder.
+                </span>
+              </span>
+            </div>
+            <div id="kpi-pct-favorable" class="text-3xl font-extrabold text-[#00737d] tracking-tight mt-1.5">78.7%</div>
           </div>
-          <div id="kpi-count-estancados" class="mt-3 pt-2.5 border-t border-slate-100 text-[11px] text-slate-500">
-            15 mantuvieron, 13 bajaron
+          <div id="kpi-count-favorable" class="mt-3 pt-2.5 border-t border-slate-100 text-[11px] text-slate-500">
+            48 avanzaron o consolidaron
           </div>
         </div>
       </div>
@@ -305,7 +366,15 @@
         <!-- Distribution Donut Chart -->
         <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between">
           <div>
-            <h3 class="font-bold text-slate-900 text-base">Distribución de Resultados</h3>
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-1.5">
+              <span>Distribución de Resultados</span>
+              <span class="relative group inline-flex items-center cursor-help" tabindex="0">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition"></i>
+                <span class="absolute bottom-full left-0 mb-2 hidden group-hover:block group-focus:block w-60 p-2 bg-slate-900 text-white text-[11px] rounded-xl shadow-xl z-50 pointer-events-none leading-relaxed font-normal normal-case">
+                  Clasificación de estudiantes según la variación neta de sus puntajes: Mayor puntaje (+pts), Mantuvo su nivel (0 pts) o Requiere refuerzo conceptual (-pts).
+                </span>
+              </span>
+            </h3>
             <p class="text-xs text-slate-400 mt-0.5">Clasificación según variación de puntaje PRE vs POST</p>
           </div>
           <div class="h-64 my-auto flex items-center justify-center relative">
@@ -320,7 +389,15 @@
         <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow lg:col-span-2 flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="font-bold text-slate-900 text-base">Evolución de Aciertos por Pregunta (% Correctas)</h3>
+              <h3 class="font-bold text-slate-900 text-base flex items-center gap-1.5">
+                <span>Evolución de Aciertos por Pregunta (% Correctas)</span>
+                <span class="relative group inline-flex items-center cursor-help" tabindex="0">
+                  <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition"></i>
+                  <span class="absolute bottom-full left-0 mb-2 hidden group-hover:block group-focus:block w-64 p-2 bg-slate-900 text-white text-[11px] rounded-xl shadow-xl z-50 pointer-events-none leading-relaxed font-normal normal-case">
+                    Comparación del porcentaje de aciertos en cada pregunta antes (PRE) y después (POST) de la intervención pedagógica.
+                  </span>
+                </span>
+              </h3>
               <p class="text-xs text-slate-400 mt-0.5">Comparativa directa antes (PRE) y después (POST) de la actividad en terreno</p>
             </div>
             <span class="text-xs font-bold px-3 py-1 rounded-full bg-[#f1f9e9] text-[#52801b] border border-[#cbe99c]">5 Ítems Evaluados</span>
@@ -339,7 +416,15 @@
         <!-- Schools Delta Bar Chart -->
         <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between">
           <div class="mb-4">
-            <h3 class="font-bold text-slate-900 text-base">Impacto Pedagógico por Establecimiento (Delta Promedio)</h3>
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-1.5">
+              <span>Impacto Pedagógico por Establecimiento (Delta Promedio)</span>
+              <span class="relative group inline-flex items-center cursor-help" tabindex="0">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition"></i>
+                <span class="absolute bottom-full left-0 mb-2 hidden group-hover:block group-focus:block w-64 p-2 bg-slate-900 text-white text-[11px] rounded-xl shadow-xl z-50 pointer-events-none leading-relaxed font-normal normal-case">
+                  Ganancia neta promedio de puntaje (Delta = POST - PRE) obtenida por los estudiantes de cada colegio de la Línea Verde.
+                </span>
+              </span>
+            </h3>
             <p class="text-xs text-slate-400 mt-0.5">Ganancia neta en puntos obtenida por cada colegio participante</p>
           </div>
           <div class="h-64">
@@ -350,7 +435,15 @@
         <!-- Gender Comparison -->
         <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow flex flex-col justify-between">
           <div class="mb-4">
-            <h3 class="font-bold text-slate-900 text-base">Evolución Diferenciada por Género</h3>
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-1.5">
+              <span>Evolución Diferenciada por Género</span>
+              <span class="relative group inline-flex items-center cursor-help" tabindex="0">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition"></i>
+                <span class="absolute bottom-full left-0 mb-2 hidden group-hover:block group-focus:block w-64 p-2 bg-slate-900 text-white text-[11px] rounded-xl shadow-xl z-50 pointer-events-none leading-relaxed font-normal normal-case">
+                  Puntajes promedio iniciales (PRE) y finales (POST) comparados entre mujeres y hombres para verificar equidad formativa.
+                </span>
+              </span>
+            </h3>
             <p class="text-xs text-slate-400 mt-0.5">Puntajes basales y finales según género de los participantes</p>
           </div>
           <div class="h-64">
@@ -534,10 +627,10 @@
     <section id="view-pedagogico" class="tab-view hidden space-y-6">
       <!-- Diagnostic header -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div class="bg-white p-6 rounded-3xl border border-rose-100 bg-rose-50/20 card-shadow">
-          <div class="flex items-center gap-2 text-rose-700 font-bold text-sm mb-2.5">
-            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
-            <span>¿Por qué ocurren retrocesos?</span>
+        <div class="bg-white p-6 rounded-3xl border border-amber-100 bg-amber-50/20 card-shadow">
+          <div class="flex items-center gap-2 text-amber-700 font-bold text-sm mb-2.5">
+            <i data-lucide="help-circle" class="w-4 h-4"></i>
+            <span>¿Por qué algunos estudiantes requieren refuerzo?</span>
           </div>
           <ul class="text-xs text-slate-600 space-y-2 list-disc list-inside leading-relaxed">
             <li><strong>Efecto distractor atractivo:</strong> En el post-test, opciones con términos técnicos nuevos pero incorrectos atraen respuestas intuitivas.</li>
@@ -568,8 +661,8 @@
 
       <!-- Specific Recommendations for Leaders Table -->
       <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow">
-        <h3 class="font-bold text-slate-900 text-lg mb-1">Recomendaciones Pedagógicas Personalizadas por Establecimiento</h3>
-        <p class="text-xs text-slate-400 mb-5">Pautas concretas para el profesor líder de cada escuela según los resultados de su equipo</p>
+        <h3 class="font-bold text-slate-900 text-lg mb-1">Recomendaciones y Actividades de Aula por Establecimiento</h3>
+        <p class="text-xs text-slate-400 mb-5">Actividades prácticas de 15 a 20 minutos diseñadas para que los profesores superen brechas conceptuales antes de la ideación del Climatón</p>
 
         <div id="pedagogical-cards" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Dynamically populated via JS -->
