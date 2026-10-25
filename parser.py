@@ -44,6 +44,171 @@ LINEA_VERDE_SCHOOLS = {
 }
 ALL_LINEA_VERDE = set(LINEA_VERDE_SCHOOLS['Global'])
 
+SNCAE_OFFICIAL_REGISTRY = {
+    'Liceo Bicentenario Andrés Sabella': {
+        'rbd': '304-2',
+        'nivel': 'Excelencia',
+        'estado': 'Certificado Vigente',
+        'periodo': '2023 - 2027',
+        'vigente': True,
+        'badge_color': 'emerald',
+        'detalles': 'Acreditado con Nivel Excelencia por el Ministerio del Medio Ambiente (MMA). Vigencia cuatrienal 2023-2027 con comité ambiental escolar activo e integración curricular en ciencias y sustentabilidad.'
+    },
+    'Escuela Presbiteriana': {
+        'rbd': '343-3',
+        'nivel': 'Excelencia',
+        'estado': 'Excelencia (En Revalidación)',
+        'periodo': '2022 - 2026',
+        'vigente': True,
+        'badge_color': 'emerald',
+        'detalles': 'Certificación de Excelencia otorgada por el MMA (2022-2026). Registra expediente en proceso de revalidación 2026 en el portal oficial SNCAE.'
+    },
+    'Escuela Héroes de la Concepción': {
+        'rbd': '315-8',
+        'nivel': 'Medio',
+        'estado': 'Certificado Vigente',
+        'periodo': '2025 - 2027',
+        'vigente': True,
+        'badge_color': 'teal',
+        'detalles': 'Certificación Nivel Medio adjudicada por el MMA con vigencia bienal 2025-2027, tras revalidar su gestión de residuos y salidas pedagógicas ambientales.'
+    },
+    'Escuela La Bandera': {
+        'rbd': '281-0',
+        'nivel': 'Sin Certificación',
+        'estado': 'No Registra en SNCAE',
+        'periodo': '-',
+        'vigente': False,
+        'badge_color': 'slate',
+        'detalles': 'Establecimiento municipal sin acreditación ambiental en el registro ministerial SNCAE. Su participación en la Línea Verde PAC constituye el principal hito de educación ambiental escolar.'
+    },
+    'Escuela Rómulo Peña': {
+        'rbd': '278-0',
+        'nivel': 'Sin Certificación',
+        'estado': 'No Registra en SNCAE (Antofagasta)',
+        'periodo': '-',
+        'vigente': False,
+        'badge_color': 'slate',
+        'detalles': 'La Escuela D-68 Dr. Antonio Rendic / Rómulo Peña de Antofagasta no figura certificada en el SNCAE (el registro ministerial homónimo corresponde a la escuela de Arica).'
+    },
+    'Greenhill School': {
+        'rbd': 'Particular Pagado',
+        'nivel': 'Sin Certificación',
+        'estado': 'No Registra en SNCAE',
+        'periodo': '-',
+        'vigente': False,
+        'badge_color': 'slate',
+        'detalles': 'Colegio particular sin postulación ni certificación ambiental en el registro oficial del Ministerio del Medio Ambiente.'
+    },
+    'Colegio Bet-el': {
+        'rbd': 'Particular Subv.',
+        'nivel': 'Sin Certificación',
+        'estado': 'No Registra en SNCAE',
+        'periodo': '-',
+        'vigente': False,
+        'badge_color': 'slate',
+        'detalles': 'Establecimiento particular subvencionado sin registro de certificación ambiental en el SNCAE.'
+    }
+}
+
+INCIDENCIAS_INITIAL = [
+    {
+        "caso": "Maximiliano Bernal",
+        "establecimiento": "Liceo Bicentenario Andrés Sabella",
+        "incidencia": "Registro huérfano",
+        "comentario": "No figura en la nómina de inscripción inicial. El docente tampoco informó su participación o cambio de estudiante."
+    },
+    {
+        "caso": "Daniela Parada",
+        "establecimiento": "Escuela Rómulo Peña",
+        "incidencia": "Registro huérfano",
+        "comentario": "Para el hito 4 la profesora lleva más alumnos de los inscritos, entre ellos Daniela Parada que responde la encuesta también. No queda en la nómina final y definitiva de participantes."
+    },
+    {
+        "caso": "Demian Araya",
+        "establecimiento": "Escuela Rómulo Peña",
+        "incidencia": "Registro huérfano",
+        "comentario": "Para el hito 4 la profesora lleva más alumnos de los inscritos, entre ellos Demian Araya que responde la encuesta también. No queda en la nómina final y definitiva de participantes."
+    },
+    {
+        "caso": "Fabrianny Rivero",
+        "establecimiento": "Escuela Rómulo Peña",
+        "incidencia": "Registro huérfano",
+        "comentario": "Para el hito 4 la profesora lleva más alumnos de los inscritos, entre ellos Fabrianny Rivero que responde la encuesta también. No queda en la nómina final y definitiva de participantes."
+    },
+    {
+        "caso": "Fernanda Parada",
+        "establecimiento": "Escuela Rómulo Peña",
+        "incidencia": "Responde encuesta sin estar inscrita al comienzo",
+        "comentario": "Se incorpora en el hito 4 y queda en la nómina definitiva de estudiantes. Participa en la Climatón."
+    },
+    {
+        "caso": "Susy Roca",
+        "establecimiento": "Escuela Rómulo Peña",
+        "incidencia": "Responde encuesta sin estar inscrita al comienzo",
+        "comentario": "Se incorpora en el hito 4 y queda en la nómina definitiva de estudiantes. Participa en la Climatón."
+    },
+    {
+        "caso": "Said Miranda",
+        "establecimiento": "Colegio Bet-el",
+        "incidencia": "No responde encuestas",
+        "comentario": "Verificar asistencia o si se retiró del equipo: sólo faltó a un hito. Asiste a la Climatón y a la actividad en el establecimiento."
+    },
+    {
+        "caso": "Sofía Panesso",
+        "establecimiento": "Escuela Héroes de la Concepción",
+        "incidencia": "No responde encuestas",
+        "comentario": "Verificar asistencia o si fue reemplazada: se confirma que no asiste a los dos primeros hitos pero no fue reemplazada. Ella asiste a la climatón."
+    },
+    {
+        "caso": "Julieta Plata",
+        "establecimiento": "Escuela Presbiteriana",
+        "incidencia": "No responde encuestas",
+        "comentario": "Verificar justificación de inasistencia: la alumna se retira del programa porque no cuenta con el apoyo de sus apoderados. El equipo se queda con un integrante menos."
+    },
+    {
+        "caso": "Daztan Núñez",
+        "establecimiento": "Escuela Rómulo Peña",
+        "incidencia": "No responde encuestas",
+        "comentario": "Verificar si fue reemplazado: se confirma que no asiste al primer hito y fue reemplazado."
+    },
+    {
+        "caso": "Fabián Porcel",
+        "establecimiento": "Escuela Rómulo Peña",
+        "incidencia": "No responde encuestas",
+        "comentario": "Verificar si fue reemplazado: se confirma que no asiste al primer hito y fue reemplazado."
+    },
+    {
+        "caso": "Gian Ardaya",
+        "establecimiento": "Escuela Rómulo Peña",
+        "incidencia": "No responde encuestas",
+        "comentario": "Verificar si fue reemplazado: se confirma que no asiste al primer hito y fue reemplazado."
+    },
+    {
+        "caso": "Matías Olate",
+        "establecimiento": "Greenhill School",
+        "incidencia": "No responde encuestas",
+        "comentario": "Verificar inasistencia: se confirma que no asiste al hito 3. Confirmar con profesor si él es Matías Falconi."
+    },
+    {
+        "caso": "Pablo Humberto Rojas",
+        "establecimiento": "Liceo Bicentenario Andrés Sabella",
+        "incidencia": "Registro huérfano",
+        "comentario": "Docente asiste en reemplazo de ambos líderes principales. Ellos no pudieron asistir."
+    },
+    {
+        "caso": "Sergio Castillo",
+        "establecimiento": "Liceo Bicentenario Andrés Sabella",
+        "incidencia": "No responde encuestas",
+        "comentario": "El docente líder no responde la encuesta del primer hito porque no alcanzaron las hojas."
+    },
+    {
+        "caso": "Isidora Cabrera",
+        "establecimiento": "Escuela La Bandera",
+        "incidencia": "No responde encuestas",
+        "comentario": "La alumna reemplaza al estudiante Bajou por lo que no tiene la primera encuesta."
+    }
+]
+
 def canonical_school_name(name):
     if not name:
         return ''
@@ -636,6 +801,11 @@ def parse_excel_data(file_path):
             'participants': all_paired_glob
         }
 
+    # Enriquecer escuelas con Acreditación SNCAE e Incidencias de Terreno
+    for sch, s_obj in schools.items():
+        s_obj['sncae'] = SNCAE_OFFICIAL_REGISTRY.get(sch, {'nivel': 'Sin Certificación', 'estado': 'No Registra'})
+        s_obj['incidencias'] = [inc for inc in INCIDENCIAS_INITIAL if strip_accents(inc['establecimiento']) in strip_accents(sch) or strip_accents(sch) in strip_accents(inc['establecimiento'])]
+
     return {
         'metadata': {
             'programa': 'Programa de Acción Climática (PAC) 2026',
@@ -645,7 +815,9 @@ def parse_excel_data(file_path):
         },
         'schools_directory': schools,
         'hitos': hitos_data,
-        'all_participants': list(all_participants.values())
+        'all_participants': list(all_participants.values()),
+        'incidencias': INCIDENCIAS_INITIAL,
+        'sncae_registry': SNCAE_OFFICIAL_REGISTRY
     }
 
 if __name__ == '__main__':

@@ -8,7 +8,7 @@
   "schools_directory": {
     "Escuela Rómulo Peña": {
       "nombre": "Escuela Rómulo Peña",
-      "equipo": 1.0,
+      "equipo": 1,
       "direccion": "Solin Juica, 3194",
       "dependencia": "Municipal",
       "certificacion": "No",
@@ -18,11 +18,16 @@
       "tel1": "56965168476.0",
       "lider2": "Mariel Rodríguez Guerrero",
       "email2": "marielrodriguezg@gmail.com",
-      "tel2": "56952663182.0"
+      "tel2": "56952663182.0",
+      "sncae": {
+        "nivel": "Sin Certificaci�n",
+        "estado": "No Registra"
+      },
+      "incidencias": []
     },
     "Escuela Héroes de la Concepción": {
       "nombre": "Escuela Héroes de la Concepción",
-      "equipo": 2.0,
+      "equipo": 2,
       "direccion": "Calbuco, 5031",
       "dependencia": "Municipal",
       "certificacion": "Si",
@@ -32,11 +37,16 @@
       "tel1": "56995499052.0",
       "lider2": "Kathleen Véliz Goles",
       "email2": "kathleen.veliz.e81@cmdsantofagasta.cl",
-      "tel2": "56945118834.0"
+      "tel2": "56945118834.0",
+      "sncae": {
+        "nivel": "Sin Certificaci�n",
+        "estado": "No Registra"
+      },
+      "incidencias": []
     },
     "Escuela Presbiteriana": {
       "nombre": "Escuela Presbiteriana",
-      "equipo": 4.0,
+      "equipo": 4,
       "direccion": "Uribe, 1070",
       "dependencia": "Particular Subvencionado",
       "certificacion": "Si",
@@ -46,11 +56,28 @@
       "tel1": "56933776595.0",
       "lider2": "Guisselle Barañado Olguín",
       "email2": "profesora.guisselle@escuelapresbiteriana.com",
-      "tel2": "56966135849.0"
+      "tel2": "56966135849.0",
+      "sncae": {
+        "rbd": "343-3",
+        "nivel": "Excelencia",
+        "estado": "Excelencia (En Revalidaci�n)",
+        "periodo": "2022 - 2026",
+        "vigente": true,
+        "badge_color": "emerald",
+        "detalles": "Certificaci�n de Excelencia otorgada por el MMA (2022-2026). Registra expediente en proceso de revalidaci�n 2026 en el portal oficial SNCAE."
+      },
+      "incidencias": [
+        {
+          "caso": "Julieta Plata",
+          "establecimiento": "Escuela Presbiteriana",
+          "incidencia": "No responde encuestas",
+          "comentario": "Verificar justificaci�n de inasistencia: la alumna se retira del programa porque no cuenta con el apoyo de sus apoderados. El equipo se queda con un integrante menos."
+        }
+      ]
     },
     "Escuela La Bandera": {
       "nombre": "Escuela La Bandera",
-      "equipo": 6.0,
+      "equipo": 6,
       "direccion": "Avenida Oscar Bonilla  7648",
       "dependencia": "Municipal",
       "certificacion": "No",
@@ -60,11 +87,28 @@
       "tel1": "56963422871.0",
       "lider2": "Estefanía Seura",
       "email2": "profesora.estefania.seura@cmdsantofagasta.cl",
-      "tel2": "56984874675.0"
+      "tel2": "56984874675.0",
+      "sncae": {
+        "rbd": "281-0",
+        "nivel": "Sin Certificaci�n",
+        "estado": "No Registra en SNCAE",
+        "periodo": "-",
+        "vigente": false,
+        "badge_color": "slate",
+        "detalles": "Establecimiento municipal sin acreditaci�n ambiental en el registro ministerial SNCAE. Su participaci�n en la L�nea Verde PAC constituye el principal hito de educaci�n ambiental escolar."
+      },
+      "incidencias": [
+        {
+          "caso": "Isidora Cabrera",
+          "establecimiento": "Escuela La Bandera",
+          "incidencia": "No responde encuestas",
+          "comentario": "La alumna reemplaza al estudiante Bajou por lo que no tiene la primera encuesta."
+        }
+      ]
     },
     "Colegio Bet-el": {
       "nombre": "Colegio Bet-el",
-      "equipo": 7.0,
+      "equipo": 7,
       "direccion": "Bonilla, Pasaje Oscar Bonila, 9539",
       "dependencia": "Particular Subvencionado",
       "certificacion": "No",
@@ -74,11 +118,28 @@
       "tel1": "56995779316.0",
       "lider2": "Rubyth Saavedra Riquelme",
       "email2": "r.saavedra@betelianos.cl",
-      "tel2": "56982056616.0"
+      "tel2": "56982056616.0",
+      "sncae": {
+        "rbd": "Particular Subv.",
+        "nivel": "Sin Certificaci�n",
+        "estado": "No Registra en SNCAE",
+        "periodo": "-",
+        "vigente": false,
+        "badge_color": "slate",
+        "detalles": "Establecimiento particular subvencionado sin registro de certificaci�n ambiental en el SNCAE."
+      },
+      "incidencias": [
+        {
+          "caso": "Said Miranda",
+          "establecimiento": "Colegio Bet-el",
+          "incidencia": "No responde encuestas",
+          "comentario": "Verificar asistencia o si se retir� del equipo: s�lo falt� a un hito. Asiste a la Climat�n y a la actividad en el establecimiento."
+        }
+      ]
     },
     "Liceo Bicentenario Andrés Sabella": {
       "nombre": "Liceo Bicentenario Andrés Sabella",
-      "equipo": 11.0,
+      "equipo": 11,
       "direccion": "José Blumell, 264",
       "dependencia": "Municipal",
       "certificacion": "No",
@@ -88,11 +149,16 @@
       "tel1": "56957991440.0",
       "lider2": "Paola Perdic Maldonado",
       "email2": "paolaperdic.lbas@cmdsantofagasta.cl",
-      "tel2": "56992086173.0"
+      "tel2": "56992086173.0",
+      "sncae": {
+        "nivel": "Sin Certificaci�n",
+        "estado": "No Registra"
+      },
+      "incidencias": []
     },
     "Greenhill School": {
       "nombre": "Greenhill School",
-      "equipo": 14.0,
+      "equipo": 14,
       "direccion": "Prat, 1033",
       "dependencia": "Particular",
       "certificacion": "No",
@@ -102,7 +168,24 @@
       "tel1": "56963403412.0",
       "lider2": "Bárbara Madrid Cisterna",
       "email2": "utp@aghs.cl",
-      "tel2": "56942951857.0"
+      "tel2": "56942951857.0",
+      "sncae": {
+        "rbd": "Particular Pagado",
+        "nivel": "Sin Certificaci�n",
+        "estado": "No Registra en SNCAE",
+        "periodo": "-",
+        "vigente": false,
+        "badge_color": "slate",
+        "detalles": "Colegio particular sin postulaci�n ni certificaci�n ambiental en el registro oficial del Ministerio del Medio Ambiente."
+      },
+      "incidencias": [
+        {
+          "caso": "Mat�as Olate",
+          "establecimiento": "Greenhill School",
+          "incidencia": "No responde encuestas",
+          "comentario": "Verificar inasistencia: se confirma que no asiste al hito 3. Confirmar con profesor si �l es Mat�as Falconi."
+        }
+      ]
     }
   },
   "hitos": {
@@ -232,14 +315,14 @@
           "school": "Escuela Héroes de la Concepción",
           "n": 10,
           "pre_avg": 3.1,
-          "post_avg": 4.0,
+          "post_avg": 4,
           "delta_avg": 0.9,
           "status_counts": {
             "Mejoró": 6,
             "Mantuvo": 3,
             "Retrocedió": 1
           },
-          "pct_mejora": 60.0,
+          "pct_mejora": 60,
           "lider1": "Paulina Pimentel Alfaro",
           "email1": "paulina.pimentel.e81@cmdsantofagasta.cl",
           "tel1": "56995499052.0",
@@ -248,7 +331,12 @@
           "tel2": "56945118834.0",
           "dependencia": "Municipal",
           "certificacion": "Si",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra"
+          },
+          "incidencias": []
         },
         {
           "school": "Escuela Presbiteriana",
@@ -261,7 +349,7 @@
             "Retrocedió": 1,
             "Mejoró": 6
           },
-          "pct_mejora": 60.0,
+          "pct_mejora": 60,
           "lider1": "Pía Villalobos Villanueva",
           "email1": "profesora.pia@escuelapresbiteriana.com",
           "tel1": "56933776595.0",
@@ -270,13 +358,30 @@
           "tel2": "56966135849.0",
           "dependencia": "Particular Subvencionado",
           "certificacion": "Si",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "rbd": "343-3",
+            "nivel": "Excelencia",
+            "estado": "Excelencia (En Revalidaci�n)",
+            "periodo": "2022 - 2026",
+            "vigente": true,
+            "badge_color": "emerald",
+            "detalles": "Certificaci�n de Excelencia otorgada por el MMA (2022-2026). Registra expediente en proceso de revalidaci�n 2026 en el portal oficial SNCAE."
+          },
+          "incidencias": [
+            {
+              "caso": "Julieta Plata",
+              "establecimiento": "Escuela Presbiteriana",
+              "incidencia": "No responde encuestas",
+              "comentario": "Verificar justificaci�n de inasistencia: la alumna se retira del programa porque no cuenta con el apoyo de sus apoderados. El equipo se queda con un integrante menos."
+            }
+          ]
         },
         {
           "school": "Escuela Rómulo Peña",
           "n": 7,
           "pre_avg": 3.57,
-          "post_avg": 4.0,
+          "post_avg": 4,
           "delta_avg": 0.43,
           "status_counts": {
             "Retrocedió": 1,
@@ -292,7 +397,12 @@
           "tel2": "56952663182.0",
           "dependencia": "Municipal",
           "certificacion": "No",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra"
+          },
+          "incidencias": []
         },
         {
           "school": "Liceo Bicentenario Andrés Sabella",
@@ -305,7 +415,7 @@
             "Mejoró": 4,
             "Mantuvo": 4
           },
-          "pct_mejora": 40.0,
+          "pct_mejora": 40,
           "lider1": "Sergio Castillo Flores",
           "email1": "sergiocastillo.lbas@cmdsantofagasta.cl",
           "tel1": "56957991440.0",
@@ -314,7 +424,12 @@
           "tel2": "56992086173.0",
           "dependencia": "Municipal",
           "certificacion": "No",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra"
+          },
+          "incidencias": []
         },
         {
           "school": "Escuela La Bandera",
@@ -336,7 +451,24 @@
           "tel2": "56984874675.0",
           "dependencia": "Municipal",
           "certificacion": "No",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "rbd": "281-0",
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra en SNCAE",
+            "periodo": "-",
+            "vigente": false,
+            "badge_color": "slate",
+            "detalles": "Establecimiento municipal sin acreditaci�n ambiental en el registro ministerial SNCAE. Su participaci�n en la L�nea Verde PAC constituye el principal hito de educaci�n ambiental escolar."
+          },
+          "incidencias": [
+            {
+              "caso": "Isidora Cabrera",
+              "establecimiento": "Escuela La Bandera",
+              "incidencia": "No responde encuestas",
+              "comentario": "La alumna reemplaza al estudiante Bajou por lo que no tiene la primera encuesta."
+            }
+          ]
         },
         {
           "school": "Colegio Bet-el",
@@ -358,7 +490,24 @@
           "tel2": "56982056616.0",
           "dependencia": "Particular Subvencionado",
           "certificacion": "No",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "rbd": "Particular Subv.",
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra en SNCAE",
+            "periodo": "-",
+            "vigente": false,
+            "badge_color": "slate",
+            "detalles": "Establecimiento particular subvencionado sin registro de certificaci�n ambiental en el SNCAE."
+          },
+          "incidencias": [
+            {
+              "caso": "Said Miranda",
+              "establecimiento": "Colegio Bet-el",
+              "incidencia": "No responde encuestas",
+              "comentario": "Verificar asistencia o si se retir� del equipo: s�lo falt� a un hito. Asiste a la Climat�n y a la actividad en el establecimiento."
+            }
+          ]
         },
         {
           "school": "Greenhill School",
@@ -371,7 +520,7 @@
             "Mejoró": 2,
             "Retrocedió": 3
           },
-          "pct_mejora": 25.0,
+          "pct_mejora": 25,
           "lider1": "Sergio Verdejo Díaz",
           "email1": "sergio.verdejo.diaz@gmail.com",
           "tel1": "56963403412.0",
@@ -380,21 +529,38 @@
           "tel2": "56942951857.0",
           "dependencia": "Particular",
           "certificacion": "No",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "rbd": "Particular Pagado",
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra en SNCAE",
+            "periodo": "-",
+            "vigente": false,
+            "badge_color": "slate",
+            "detalles": "Colegio particular sin postulaci�n ni certificaci�n ambiental en el registro oficial del Ministerio del Medio Ambiente."
+          },
+          "incidencias": [
+            {
+              "caso": "Mat�as Olate",
+              "establecimiento": "Greenhill School",
+              "incidencia": "No responde encuestas",
+              "comentario": "Verificar inasistencia: se confirma que no asiste al hito 3. Confirmar con profesor si �l es Mat�as Falconi."
+            }
+          ]
         }
       ],
       "gender": {
         "Masculino": {
           "n": 20,
           "pre_avg": 3.9,
-          "post_avg": 4.0,
+          "post_avg": 4,
           "delta_avg": 0.1,
           "status_counts": {
             "Mejoró": 7,
             "Mantuvo": 8,
             "Retrocedió": 5
           },
-          "pct_mejora": 35.0
+          "pct_mejora": 35
         },
         "Femenino": {
           "n": 46,
@@ -406,7 +572,7 @@
             "Mantuvo": 21,
             "Mejoró": 17
           },
-          "pct_mejora": 37.0
+          "pct_mejora": 37
         }
       },
       "participants": [
@@ -5336,7 +5502,7 @@
           "pre_correct": 39,
           "pre_pct": 63.9,
           "post_correct": 47,
-          "post_pct": 77.0,
+          "post_pct": 77,
           "diff": 8,
           "transitions": {
             "Mejoró": 11,
@@ -5364,13 +5530,13 @@
           "n": 0,
           "pre_avg": null,
           "post_avg": null,
-          "delta_avg": 0.0,
+          "delta_avg": 0,
           "status_counts": {
             "Mejoró": 0,
             "Mantuvo": 0,
             "Retrocedió": 0
           },
-          "pct_mejora": 0.0,
+          "pct_mejora": 0,
           "lider1": "Pamela Pizarro Juica",
           "email1": "pizarropamela2015@gmail.com",
           "tel1": "56995779316.0",
@@ -5380,7 +5546,24 @@
           "dependencia": "Particular Subvencionado",
           "certificacion": "No",
           "has_data": false,
-          "note": "Sin datos registrados en este hito"
+          "note": "Sin datos registrados en este hito",
+          "sncae": {
+            "rbd": "Particular Subv.",
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra en SNCAE",
+            "periodo": "-",
+            "vigente": false,
+            "badge_color": "slate",
+            "detalles": "Establecimiento particular subvencionado sin registro de certificaci�n ambiental en el SNCAE."
+          },
+          "incidencias": [
+            {
+              "caso": "Said Miranda",
+              "establecimiento": "Colegio Bet-el",
+              "incidencia": "No responde encuestas",
+              "comentario": "Verificar asistencia o si se retir� del equipo: s�lo falt� a un hito. Asiste a la Climat�n y a la actividad en el establecimiento."
+            }
+          ]
         },
         {
           "school": "Escuela Héroes de la Concepción",
@@ -5402,7 +5585,12 @@
           "tel2": "56945118834.0",
           "dependencia": "Municipal",
           "certificacion": "Si",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra"
+          },
+          "incidencias": []
         },
         {
           "school": "Escuela La Bandera",
@@ -5423,12 +5611,29 @@
           "tel2": "56984874675.0",
           "dependencia": "Municipal",
           "certificacion": "No",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "rbd": "281-0",
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra en SNCAE",
+            "periodo": "-",
+            "vigente": false,
+            "badge_color": "slate",
+            "detalles": "Establecimiento municipal sin acreditaci�n ambiental en el registro ministerial SNCAE. Su participaci�n en la L�nea Verde PAC constituye el principal hito de educaci�n ambiental escolar."
+          },
+          "incidencias": [
+            {
+              "caso": "Isidora Cabrera",
+              "establecimiento": "Escuela La Bandera",
+              "incidencia": "No responde encuestas",
+              "comentario": "La alumna reemplaza al estudiante Bajou por lo que no tiene la primera encuesta."
+            }
+          ]
         },
         {
           "school": "Escuela Rómulo Peña",
           "n": 11,
-          "pre_avg": 2.0,
+          "pre_avg": 2,
           "post_avg": 2.82,
           "delta_avg": 0.82,
           "status_counts": {
@@ -5445,7 +5650,12 @@
           "tel2": "56952663182.0",
           "dependencia": "Municipal",
           "certificacion": "No",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra"
+          },
+          "incidencias": []
         },
         {
           "school": "Escuela Presbiteriana",
@@ -5467,7 +5677,24 @@
           "tel2": "56966135849.0",
           "dependencia": "Particular Subvencionado",
           "certificacion": "Si",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "rbd": "343-3",
+            "nivel": "Excelencia",
+            "estado": "Excelencia (En Revalidaci�n)",
+            "periodo": "2022 - 2026",
+            "vigente": true,
+            "badge_color": "emerald",
+            "detalles": "Certificaci�n de Excelencia otorgada por el MMA (2022-2026). Registra expediente en proceso de revalidaci�n 2026 en el portal oficial SNCAE."
+          },
+          "incidencias": [
+            {
+              "caso": "Julieta Plata",
+              "establecimiento": "Escuela Presbiteriana",
+              "incidencia": "No responde encuestas",
+              "comentario": "Verificar justificaci�n de inasistencia: la alumna se retira del programa porque no cuenta con el apoyo de sus apoderados. El equipo se queda con un integrante menos."
+            }
+          ]
         },
         {
           "school": "Liceo Bicentenario Andrés Sabella",
@@ -5489,7 +5716,12 @@
           "tel2": "56992086173.0",
           "dependencia": "Municipal",
           "certificacion": "No",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra"
+          },
+          "incidencias": []
         },
         {
           "school": "Greenhill School",
@@ -5502,7 +5734,7 @@
             "Mantuvo": 3,
             "Mejoró": 3
           },
-          "pct_mejora": 30.0,
+          "pct_mejora": 30,
           "lider1": "Sergio Verdejo Díaz",
           "email1": "sergio.verdejo.diaz@gmail.com",
           "tel1": "56963403412.0",
@@ -5511,7 +5743,24 @@
           "tel2": "56942951857.0",
           "dependencia": "Particular",
           "certificacion": "No",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "rbd": "Particular Pagado",
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra en SNCAE",
+            "periodo": "-",
+            "vigente": false,
+            "badge_color": "slate",
+            "detalles": "Colegio particular sin postulaci�n ni certificaci�n ambiental en el registro oficial del Ministerio del Medio Ambiente."
+          },
+          "incidencias": [
+            {
+              "caso": "Mat�as Olate",
+              "establecimiento": "Greenhill School",
+              "incidencia": "No responde encuestas",
+              "comentario": "Verificar inasistencia: se confirma que no asiste al hito 3. Confirmar con profesor si �l es Mat�as Falconi."
+            }
+          ]
         }
       ],
       "gender": {
@@ -10212,7 +10461,7 @@
           "pre_correct": 39,
           "pre_pct": 63.9,
           "post_correct": 47,
-          "post_pct": 77.0,
+          "post_pct": 77,
           "diff": 8,
           "transitions": {
             "Mejoró": 11,
@@ -10260,7 +10509,12 @@
           "tel2": "56945118834.0",
           "dependencia": "Municipal",
           "certificacion": "Si",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra"
+          },
+          "incidencias": []
         },
         {
           "school": "Escuela Presbiteriana",
@@ -10282,7 +10536,24 @@
           "tel2": "56966135849.0",
           "dependencia": "Particular Subvencionado",
           "certificacion": "Si",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "rbd": "343-3",
+            "nivel": "Excelencia",
+            "estado": "Excelencia (En Revalidaci�n)",
+            "periodo": "2022 - 2026",
+            "vigente": true,
+            "badge_color": "emerald",
+            "detalles": "Certificaci�n de Excelencia otorgada por el MMA (2022-2026). Registra expediente en proceso de revalidaci�n 2026 en el portal oficial SNCAE."
+          },
+          "incidencias": [
+            {
+              "caso": "Julieta Plata",
+              "establecimiento": "Escuela Presbiteriana",
+              "incidencia": "No responde encuestas",
+              "comentario": "Verificar justificaci�n de inasistencia: la alumna se retira del programa porque no cuenta con el apoyo de sus apoderados. El equipo se queda con un integrante menos."
+            }
+          ]
         },
         {
           "school": "Escuela Rómulo Peña",
@@ -10304,7 +10575,12 @@
           "tel2": "56952663182.0",
           "dependencia": "Municipal",
           "certificacion": "No",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra"
+          },
+          "incidencias": []
         },
         {
           "school": "Escuela La Bandera",
@@ -10326,7 +10602,24 @@
           "tel2": "56984874675.0",
           "dependencia": "Municipal",
           "certificacion": "No",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "rbd": "281-0",
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra en SNCAE",
+            "periodo": "-",
+            "vigente": false,
+            "badge_color": "slate",
+            "detalles": "Establecimiento municipal sin acreditaci�n ambiental en el registro ministerial SNCAE. Su participaci�n en la L�nea Verde PAC constituye el principal hito de educaci�n ambiental escolar."
+          },
+          "incidencias": [
+            {
+              "caso": "Isidora Cabrera",
+              "establecimiento": "Escuela La Bandera",
+              "incidencia": "No responde encuestas",
+              "comentario": "La alumna reemplaza al estudiante Bajou por lo que no tiene la primera encuesta."
+            }
+          ]
         },
         {
           "school": "Liceo Bicentenario Andrés Sabella",
@@ -10348,7 +10641,12 @@
           "tel2": "56992086173.0",
           "dependencia": "Municipal",
           "certificacion": "No",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra"
+          },
+          "incidencias": []
         },
         {
           "school": "Greenhill School",
@@ -10370,7 +10668,24 @@
           "tel2": "56942951857.0",
           "dependencia": "Particular",
           "certificacion": "No",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "rbd": "Particular Pagado",
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra en SNCAE",
+            "periodo": "-",
+            "vigente": false,
+            "badge_color": "slate",
+            "detalles": "Colegio particular sin postulaci�n ni certificaci�n ambiental en el registro oficial del Ministerio del Medio Ambiente."
+          },
+          "incidencias": [
+            {
+              "caso": "Mat�as Olate",
+              "establecimiento": "Greenhill School",
+              "incidencia": "No responde encuestas",
+              "comentario": "Verificar inasistencia: se confirma que no asiste al hito 3. Confirmar con profesor si �l es Mat�as Falconi."
+            }
+          ]
         },
         {
           "school": "Colegio Bet-el",
@@ -10392,7 +10707,24 @@
           "tel2": "56982056616.0",
           "dependencia": "Particular Subvencionado",
           "certificacion": "No",
-          "has_data": true
+          "has_data": true,
+          "sncae": {
+            "rbd": "Particular Subv.",
+            "nivel": "Sin Certificaci�n",
+            "estado": "No Registra en SNCAE",
+            "periodo": "-",
+            "vigente": false,
+            "badge_color": "slate",
+            "detalles": "Establecimiento particular subvencionado sin registro de certificaci�n ambiental en el SNCAE."
+          },
+          "incidencias": [
+            {
+              "caso": "Said Miranda",
+              "establecimiento": "Colegio Bet-el",
+              "incidencia": "No responde encuestas",
+              "comentario": "Verificar asistencia o si se retir� del equipo: s�lo falt� a un hito. Asiste a la Climat�n y a la actividad en el establecimiento."
+            }
+          ]
         }
       ],
       "gender": {
@@ -28746,6 +29078,12 @@
             }
           ]
         }
+      },
+      "incidencia": {
+        "caso": "Daniela Parada",
+        "establecimiento": "Escuela R�mulo Pe�a",
+        "incidencia": "Registro hu�rfano",
+        "comentario": "Para el hito 4 la profesora lleva m�s alumnos de los inscritos, entre ellos Daniela Parada que responde la encuesta tambi�n. No queda en la n�mina final y definitiva de participantes."
       }
     },
     {
@@ -28908,6 +29246,12 @@
             }
           ]
         }
+      },
+      "incidencia": {
+        "caso": "Fabrianny Rivero",
+        "establecimiento": "Escuela R�mulo Pe�a",
+        "incidencia": "Registro hu�rfano",
+        "comentario": "Para el hito 4 la profesora lleva m�s alumnos de los inscritos, entre ellos Fabrianny Rivero que responde la encuesta tambi�n. No queda en la n�mina final y definitiva de participantes."
       }
     },
     {
@@ -28989,6 +29333,12 @@
             }
           ]
         }
+      },
+      "incidencia": {
+        "caso": "Fernanda Parada",
+        "establecimiento": "Escuela R�mulo Pe�a",
+        "incidencia": "Responde encuesta sin estar inscrita al comienzo",
+        "comentario": "Se incorpora en el hito 4 y queda en la n�mina definitiva de estudiantes. Participa en la Climat�n."
       }
     },
     {
@@ -29070,6 +29420,12 @@
             }
           ]
         }
+      },
+      "incidencia": {
+        "caso": "Susy Roca",
+        "establecimiento": "Escuela R�mulo Pe�a",
+        "incidencia": "Responde encuesta sin estar inscrita al comienzo",
+        "comentario": "Se incorpora en el hito 4 y queda en la n�mina definitiva de estudiantes. Participa en la Climat�n."
       }
     },
     {
@@ -29563,7 +29919,13 @@
       "role": "Estudiante",
       "school": "Liceo Bicentenario Andrés Sabella",
       "gender": "Masculino",
-      "hitos": {}
+      "hitos": {},
+      "incidencia": {
+        "caso": "Maximiliano Bernal",
+        "establecimiento": "Liceo Bicentenario Andr�s Sabella",
+        "incidencia": "Registro hu�rfano",
+        "comentario": "No figura en la n�mina de inscripci�n inicial. El docente tampoco inform� su participaci�n o cambio de estudiante."
+      }
     },
     {
       "name": "Pablo Humberto Rojas Rios",
@@ -29645,6 +30007,169 @@
           ]
         }
       }
+    }
+  ],
+  "sncae_registry": {
+    "Liceo Bicentenario Andr�s Sabella": {
+      "rbd": "304-2",
+      "nivel": "Excelencia",
+      "estado": "Certificado Vigente",
+      "periodo": "2023 - 2027",
+      "vigente": true,
+      "badge_color": "emerald",
+      "detalles": "Acreditado con Nivel Excelencia por el Ministerio del Medio Ambiente (MMA). Vigencia 2023-2027 con comit� ambiental escolar activo e integraci�n curricular en ciencias y sustentabilidad."
+    },
+    "Escuela Presbiteriana": {
+      "rbd": "343-3",
+      "nivel": "Excelencia",
+      "estado": "Excelencia (En Revalidaci�n)",
+      "periodo": "2022 - 2026",
+      "vigente": true,
+      "badge_color": "emerald",
+      "detalles": "Certificaci�n de Excelencia otorgada por el MMA (2022-2026). Registra expediente en proceso de revalidaci�n 2026 en el portal oficial SNCAE."
+    },
+    "Escuela H�roes de la Concepci�n": {
+      "rbd": "315-8",
+      "nivel": "Medio",
+      "estado": "Certificado Vigente",
+      "periodo": "2025 - 2027",
+      "vigente": true,
+      "badge_color": "teal",
+      "detalles": "Certificaci�n Nivel Medio adjudicada por el MMA con vigencia bienal 2025-2027, tras revalidar su gesti�n de residuos y salidas pedag�gicas ambientales."
+    },
+    "Escuela La Bandera": {
+      "rbd": "281-0",
+      "nivel": "Sin Certificaci�n",
+      "estado": "No Registra en SNCAE",
+      "periodo": "-",
+      "vigente": false,
+      "badge_color": "slate",
+      "detalles": "Establecimiento municipal sin acreditaci�n ambiental en el registro ministerial SNCAE. Su participaci�n en la L�nea Verde PAC constituye el principal hito de educaci�n ambiental escolar."
+    },
+    "Escuela R�mulo Pe�a": {
+      "rbd": "278-0",
+      "nivel": "Sin Certificaci�n",
+      "estado": "No Registra en SNCAE (Antofagasta)",
+      "periodo": "-",
+      "vigente": false,
+      "badge_color": "slate",
+      "detalles": "La Escuela D-68 Dr. Antonio Rendic / R�mulo Pe�a de Antofagasta no figura certificada en el SNCAE (el registro ministerial hom�nimo corresponde a la escuela de Arica)."
+    },
+    "Greenhill School": {
+      "rbd": "Particular Pagado",
+      "nivel": "Sin Certificaci�n",
+      "estado": "No Registra en SNCAE",
+      "periodo": "-",
+      "vigente": false,
+      "badge_color": "slate",
+      "detalles": "Colegio particular sin postulaci�n ni certificaci�n ambiental en el registro oficial del Ministerio del Medio Ambiente."
+    },
+    "Colegio Bet-el": {
+      "rbd": "Particular Subv.",
+      "nivel": "Sin Certificaci�n",
+      "estado": "No Registra en SNCAE",
+      "periodo": "-",
+      "vigente": false,
+      "badge_color": "slate",
+      "detalles": "Establecimiento particular subvencionado sin registro de certificaci�n ambiental en el SNCAE."
+    }
+  },
+  "incidencias": [
+    {
+      "caso": "Maximiliano Bernal",
+      "establecimiento": "Liceo Bicentenario Andr�s Sabella",
+      "incidencia": "Registro hu�rfano",
+      "comentario": "No figura en la n�mina de inscripci�n inicial. El docente tampoco inform� su participaci�n o cambio de estudiante."
+    },
+    {
+      "caso": "Daniela Parada",
+      "establecimiento": "Escuela R�mulo Pe�a",
+      "incidencia": "Registro hu�rfano",
+      "comentario": "Para el hito 4 la profesora lleva m�s alumnos de los inscritos, entre ellos Daniela Parada que responde la encuesta tambi�n. No queda en la n�mina final y definitiva de participantes."
+    },
+    {
+      "caso": "Demian Araya",
+      "establecimiento": "Escuela R�mulo Pe�a",
+      "incidencia": "Registro hu�rfano",
+      "comentario": "Para el hito 4 la profesora lleva m�s alumnos de los inscritos, entre ellos Demian Araya que responde la encuesta tambi�n. No queda en la n�mina final y definitiva de participantes."
+    },
+    {
+      "caso": "Fabrianny Rivero",
+      "establecimiento": "Escuela R�mulo Pe�a",
+      "incidencia": "Registro hu�rfano",
+      "comentario": "Para el hito 4 la profesora lleva m�s alumnos de los inscritos, entre ellos Fabrianny Rivero que responde la encuesta tambi�n. No queda en la n�mina final y definitiva de participantes."
+    },
+    {
+      "caso": "Fernanda Parada",
+      "establecimiento": "Escuela R�mulo Pe�a",
+      "incidencia": "Responde encuesta sin estar inscrita al comienzo",
+      "comentario": "Se incorpora en el hito 4 y queda en la n�mina definitiva de estudiantes. Participa en la Climat�n."
+    },
+    {
+      "caso": "Susy Roca",
+      "establecimiento": "Escuela R�mulo Pe�a",
+      "incidencia": "Responde encuesta sin estar inscrita al comienzo",
+      "comentario": "Se incorpora en el hito 4 y queda en la n�mina definitiva de estudiantes. Participa en la Climat�n."
+    },
+    {
+      "caso": "Said Miranda",
+      "establecimiento": "Colegio Bet-el",
+      "incidencia": "No responde encuestas",
+      "comentario": "Verificar asistencia o si se retir� del equipo: s�lo falt� a un hito. Asiste a la Climat�n y a la actividad en el establecimiento."
+    },
+    {
+      "caso": "Sof�a Panesso",
+      "establecimiento": "Escuela H�roes de la Concepci�n",
+      "incidencia": "No responde encuestas",
+      "comentario": "Verificar asistencia o si fue reemplazada: se confirma que no asiste a los dos primeros hitos pero no fue reemplazada. Ella asiste a la climat�n."
+    },
+    {
+      "caso": "Julieta Plata",
+      "establecimiento": "Escuela Presbiteriana",
+      "incidencia": "No responde encuestas",
+      "comentario": "Verificar justificaci�n de inasistencia: la alumna se retira del programa porque no cuenta con el apoyo de sus apoderados. El equipo se queda con un integrante menos."
+    },
+    {
+      "caso": "Daztan N��ez",
+      "establecimiento": "Escuela R�mulo Pe�a",
+      "incidencia": "No responde encuestas",
+      "comentario": "Verificar si fue reemplazado: se confirma que no asiste al primer hito y fue reemplazado."
+    },
+    {
+      "caso": "Fabi�n Porcel",
+      "establecimiento": "Escuela R�mulo Pe�a",
+      "incidencia": "No responde encuestas",
+      "comentario": "Verificar si fue reemplazado: se confirma que no asiste al primer hito y fue reemplazado."
+    },
+    {
+      "caso": "Gian Ardaya",
+      "establecimiento": "Escuela R�mulo Pe�a",
+      "incidencia": "No responde encuestas",
+      "comentario": "Verificar si fue reemplazado: se confirma que no asiste al primer hito y fue reemplazado."
+    },
+    {
+      "caso": "Mat�as Olate",
+      "establecimiento": "Greenhill School",
+      "incidencia": "No responde encuestas",
+      "comentario": "Verificar inasistencia: se confirma que no asiste al hito 3. Confirmar con profesor si �l es Mat�as Falconi."
+    },
+    {
+      "caso": "Pablo Humberto Rojas",
+      "establecimiento": "Liceo Bicentenario Andr�s Sabella",
+      "incidencia": "Registro hu�rfano",
+      "comentario": "Docente asiste en reemplazo de ambos l�deres principales. Ellos no pudieron asistir."
+    },
+    {
+      "caso": "Sergio Castillo",
+      "establecimiento": "Liceo Bicentenario Andr�s Sabella",
+      "incidencia": "No responde encuestas",
+      "comentario": "El docente l�der no responde la encuesta del primer hito porque no alcanzaron las hojas."
+    },
+    {
+      "caso": "Isidora Cabrera",
+      "establecimiento": "Escuela La Bandera",
+      "incidencia": "No responde encuestas",
+      "comentario": "La alumna reemplaza al estudiante Bajou por lo que no tiene la primera encuesta."
     }
   ]
 }
