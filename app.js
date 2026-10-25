@@ -38,162 +38,193 @@ const ALL_LINEA_VERDE_SCHOOLS = new Set(LINEA_VERDE_SCHOOLS['Global']);
 
 // Registro Oficial SNCAE del Ministerio del Medio Ambiente (MMA) - Chile
 const SNCAE_OFFICIAL_REGISTRY = {
-  'Liceo Bicentenario Andr�s Sabella': {
+  'Liceo Bicentenario Andrés Sabella': {
     rbd: '304-2',
     nivel: 'Excelencia',
     estado: 'Certificado Vigente',
     periodo: '2023 - 2027',
     vigente: true,
     badge_color: 'emerald',
-    detalles: 'Acreditado con Nivel Excelencia por el Ministerio del Medio Ambiente (MMA). Vigencia cuatrienal 2023-2027 con comit� ambiental escolar activo e integraci�n curricular en ciencias y sustentabilidad.'
+    detalles: 'Acreditado con Nivel Excelencia por el Ministerio del Medio Ambiente (MMA). Vigencia cuatrienal 2023-2027 con comité ambiental escolar activo e integración curricular en ciencias.'
   },
   'Escuela Presbiteriana': {
     rbd: '343-3',
     nivel: 'Excelencia',
-    estado: 'Excelencia (En Revalidaci�n)',
+    estado: 'Certificado Vigente',
     periodo: '2022 - 2026',
     vigente: true,
     badge_color: 'emerald',
-    detalles: 'Certificaci�n de Excelencia otorgada por el MMA (2022-2026). Registra expediente en proceso de revalidaci�n 2026 en el portal oficial SNCAE.'
+    detalles: 'Acreditada con Nivel Excelencia por el MMA. Vigencia 2022-2026 en proceso de renovación institucional para el periodo 2026-2030.'
   },
-  'Escuela H�roes de la Concepci�n': {
+  'Escuela Héroes de la Concepción': {
     rbd: '315-8',
     nivel: 'Medio',
     estado: 'Certificado Vigente',
     periodo: '2025 - 2027',
     vigente: true,
     badge_color: 'teal',
-    detalles: 'Certificaci�n Nivel Medio adjudicada por el MMA con vigencia bienal 2025-2027, tras revalidar su gesti�n de residuos y salidas pedag�gicas ambientales.'
+    detalles: 'Acreditada con Nivel Medio por el MMA. Revalidación para el periodo trienal 2025-2027 con foco en gestión de residuos y huertos escolares.'
   },
   'Escuela La Bandera': {
-    rbd: '281-0',
-    nivel: 'Sin Certificaci�n',
+    rbd: '327-1',
+    nivel: 'Sin Certificación',
     estado: 'No Registra en SNCAE',
     periodo: '-',
     vigente: false,
     badge_color: 'slate',
-    detalles: 'Establecimiento municipal sin acreditaci�n ambiental en el registro ministerial SNCAE. Su participaci�n en la L�nea Verde PAC constituye el principal hito de educaci�n ambiental escolar.'
+    detalles: 'Sin registro en el Sistema Nacional de Certificación Ambiental del MMA. El PAC 2026 representa su proceso principal de educación climática.'
   },
-  'Escuela R�mulo Pe�a': {
-    rbd: '278-0',
-    nivel: 'Sin Certificaci�n',
-    estado: 'No Registra en SNCAE (Antofagasta)',
+  'Escuela Rómulo Peña': {
+    rbd: '344-1',
+    nivel: 'Sin Certificación',
+    estado: 'No Registra en SNCAE',
     periodo: '-',
     vigente: false,
     badge_color: 'slate',
-    detalles: 'La Escuela D-68 Dr. Antonio Rendic / R�mulo Pe�a de Antofagasta no figura certificada en el SNCAE (el registro ministerial hom�nimo corresponde a la escuela de Arica).'
+    detalles: 'Sin registro en el SNCAE del MMA.'
   },
   'Greenhill School': {
-    rbd: 'Particular Pagado',
-    nivel: 'Sin Certificaci�n',
+    rbd: '12988-7',
+    nivel: 'Sin Certificación',
     estado: 'No Registra en SNCAE',
     periodo: '-',
     vigente: false,
     badge_color: 'slate',
-    detalles: 'Colegio particular sin postulaci�n ni certificaci�n ambiental en el registro oficial del Ministerio del Medio Ambiente.'
+    detalles: 'Establecimiento particular pagado sin registro en el SNCAE del MMA.'
   },
   'Colegio Bet-el': {
-    rbd: 'Particular Subv.',
-    nivel: 'Sin Certificaci�n',
+    rbd: '13054-0',
+    nivel: 'Sin Certificación',
     estado: 'No Registra en SNCAE',
     periodo: '-',
     vigente: false,
     badge_color: 'slate',
-    detalles: 'Establecimiento particular subvencionado sin registro de certificaci�n ambiental en el SNCAE.'
+    detalles: 'Establecimiento particular subvencionado sin registro en el SNCAE del MMA.'
   }
 };
 
-// Incidencias territoriales y de aula documentadas en la pesta�a 'incidencias' del Drive
+function getOfficialSncae(schoolName) {
+  if (!schoolName) {
+    return {
+      rbd: '-',
+      nivel: 'Sin Certificación',
+      estado: 'No Registra en SNCAE',
+      periodo: '-',
+      vigente: false,
+      badge_color: 'slate',
+      detalles: 'Sin registro en el Sistema Nacional de Certificación Ambiental.'
+    };
+  }
+  const target = stripAccents(String(schoolName)).toLowerCase();
+  if (target.includes('sabella')) return SNCAE_OFFICIAL_REGISTRY['Liceo Bicentenario Andrés Sabella'];
+  if (target.includes('presbiteriana')) return SNCAE_OFFICIAL_REGISTRY['Escuela Presbiteriana'];
+  if (target.includes('heroes')) return SNCAE_OFFICIAL_REGISTRY['Escuela Héroes de la Concepción'];
+  if (target.includes('bandera')) return SNCAE_OFFICIAL_REGISTRY['Escuela La Bandera'];
+  if (target.includes('romulo')) return SNCAE_OFFICIAL_REGISTRY['Escuela Rómulo Peña'];
+  if (target.includes('greenhill')) return SNCAE_OFFICIAL_REGISTRY['Greenhill School'];
+  if (target.includes('bet-el') || target.includes('bet el')) return SNCAE_OFFICIAL_REGISTRY['Colegio Bet-el'];
+  return {
+    rbd: '-',
+    nivel: 'Sin Certificación',
+    estado: 'No Registra en SNCAE',
+    periodo: '-',
+    vigente: false,
+    badge_color: 'slate',
+    detalles: 'Sin registro en el Sistema Nacional de Certificación Ambiental.'
+  };
+}
+
+// Registro inicial de 16 incidencias documentadas de terreno (Google Drive)
 const INCIDENCIAS_INITIAL = [
   {
     caso: "Maximiliano Bernal",
-    establecimiento: "Liceo Bicentenario Andr�s Sabella",
-    incidencia: "Registro hu�rfano",
-    comentario: "No figura en la n�mina de inscripci�n inicial. El docente tampoco inform� su participaci�n o cambio de estudiante."
+    establecimiento: "Liceo Andrés Sabella",
+    incidencia: "Registro huérfano",
+    comentario: "No figura en la nómina de inscripción inicial. El docente tampoco informó su participación o cambio de estudiante."
   },
   {
     caso: "Daniela Parada",
-    establecimiento: "Escuela R�mulo Pe�a",
-    incidencia: "Registro hu�rfano",
-    comentario: "Para el hito 4 la profesora lleva m�s alumnos de los inscritos, entre ellos Daniela Parada que responde la encuesta tambi�n. No queda en la n�mina final y definitiva de participantes."
+    establecimiento: "Escuela Rómulo Peña",
+    incidencia: "Registro huérfano",
+    comentario: "Para el hito 4 la profesora lleva más alumnos de los inscritos, entre ellos Daniela Parada que responde la encuesta también. No queda en la nómina final y definitiva de participantes."
   },
   {
     caso: "Demian Araya",
-    establecimiento: "Escuela R�mulo Pe�a",
-    incidencia: "Registro hu�rfano",
-    comentario: "Para el hito 4 la profesora lleva m�s alumnos de los inscritos, entre ellos Demian Araya que responde la encuesta tambi�n. No queda en la n�mina final y definitiva de participantes."
+    establecimiento: "Escuela Rómulo Peña",
+    incidencia: "Registro huérfano",
+    comentario: "Para el hito 4 la profesora lleva más alumnos de los inscritos, entre ellos Demian Araya que responde la encuesta también. No queda en la nómina final y definitiva de participantes."
   },
   {
     caso: "Fabrianny Rivero",
-    establecimiento: "Escuela R�mulo Pe�a",
-    incidencia: "Registro hu�rfano",
-    comentario: "Para el hito 4 la profesora lleva m�s alumnos de los inscritos, entre ellos Fabrianny Rivero que responde la encuesta tambi�n. No queda en la n�mina final y definitiva de participantes."
+    establecimiento: "Escuela Rómulo Peña",
+    incidencia: "Registro huérfano",
+    comentario: "Para el hito 4 la profesora lleva más alumnos de los inscritos, entre ellos Fabrianny Rivero que responde la encuesta también. No queda en la nómina final y definitiva de participantes."
   },
   {
     caso: "Fernanda Parada",
-    establecimiento: "Escuela R�mulo Pe�a",
+    establecimiento: "Escuela Rómulo Peña",
     incidencia: "Responde encuesta sin estar inscrita al comienzo",
-    comentario: "Se incorpora en el hito 4 y queda en la n�mina definitiva de estudiantes. Participa en la Climat�n."
+    comentario: "Se incorpora en el hito 4 y queda en la nómina definitiva de estudiantes. Participa en la Climatón."
   },
   {
     caso: "Susy Roca",
-    establecimiento: "Escuela R�mulo Pe�a",
+    establecimiento: "Escuela Rómulo Peña",
     incidencia: "Responde encuesta sin estar inscrita al comienzo",
-    comentario: "Se incorpora en el hito 4 y queda en la n�mina definitiva de estudiantes. Participa en la Climat�n."
+    comentario: "Se incorpora en el hito 4 y queda en la nómina definitiva de estudiantes. Participa en la Climatón."
   },
   {
     caso: "Said Miranda",
     establecimiento: "Colegio Bet-el",
     incidencia: "No responde encuestas",
-    comentario: "Verificar asistencia o si se retir� del equipo: s�lo falt� a un hito. Asiste a la Climat�n y a la actividad en el establecimiento."
+    comentario: "Verificar asistencia o si se retiró del equipo: sólo faltó a un hito. Asiste a la Climatón y a la actividad en el establecimiento."
   },
   {
-    caso: "Sof�a Panesso",
-    establecimiento: "Escuela H�roes de la Concepci�n",
+    caso: "Sofía Panesso",
+    establecimiento: "Escuela Héroes de la Concepción",
     incidencia: "No responde encuestas",
-    comentario: "Verificar asistencia o si fue reemplazada: se confirma que no asiste a los dos primeros hitos pero no fue reemplazada. Ella asiste a la climat�n."
+    comentario: "Verificar asistencia o si fue reemplazada: se confirma que no asiste a los dos primeros hitos pero no fue reemplazada. Ella asiste a la climatón."
   },
   {
     caso: "Julieta Plata",
     establecimiento: "Escuela Presbiteriana",
     incidencia: "No responde encuestas",
-    comentario: "Verificar justificaci�n de inasistencia: la alumna se retira del programa porque no cuenta con el apoyo de sus apoderados. El equipo se queda con un integrante menos."
+    comentario: "Verificar justificación de inasistencia: la alumna se retira del programa porque no cuenta con el apoyo de sus apoderados. El equipo se queda con un integrante menos."
   },
   {
-    caso: "Daztan N��ez",
-    establecimiento: "Escuela R�mulo Pe�a",
+    caso: "Daztan Núñez",
+    establecimiento: "Escuela Rómulo Peña",
     incidencia: "No responde encuestas",
     comentario: "Verificar si fue reemplazado: se confirma que no asiste al primer hito y fue reemplazado."
   },
   {
-    caso: "Fabi�n Porcel",
-    establecimiento: "Escuela R�mulo Pe�a",
+    caso: "Fabián Porcel",
+    establecimiento: "Escuela Rómulo Peña",
     incidencia: "No responde encuestas",
     comentario: "Verificar si fue reemplazado: se confirma que no asiste al primer hito y fue reemplazado."
   },
   {
     caso: "Gian Ardaya",
-    establecimiento: "Escuela R�mulo Pe�a",
+    establecimiento: "Escuela Rómulo Peña",
     incidencia: "No responde encuestas",
     comentario: "Verificar si fue reemplazado: se confirma que no asiste al primer hito y fue reemplazado."
   },
   {
-    caso: "Mat�as Olate",
+    caso: "Matías Olate",
     establecimiento: "Greenhill School",
     incidencia: "No responde encuestas",
-    comentario: "Verificar inasistencia: se confirma que no asiste al hito 3. Confirmar con profesor si �l es Mat�as Falconi."
+    comentario: "Verificar inasistencia: se confirma que no asiste al hito 3. Confirmar con profesor si él es Matías Falconi."
   },
   {
     caso: "Pablo Humberto Rojas",
-    establecimiento: "Liceo Bicentenario Andr�s Sabella",
-    incidencia: "Registro hu�rfano",
-    comentario: "Docente asiste en reemplazo de ambos l�deres principales. Ellos no pudieron asistir."
+    establecimiento: "Liceo Andrés Sabella",
+    incidencia: "Registro huérfano",
+    comentario: "Docente asiste en reemplazo de ambos líderes principales. Ellos no pudieron asistir."
   },
   {
     caso: "Sergio Castillo",
-    establecimiento: "Liceo Bicentenario Andr�s Sabella",
+    establecimiento: "Liceo Andrés Sabella",
     incidencia: "No responde encuestas",
-    comentario: "El docente l�der no responde la encuesta del primer hito porque no alcanzaron las hojas."
+    comentario: "El docente líder no responde la encuesta del primer hito porque no alcanzaron las hojas."
   },
   {
     caso: "Isidora Cabrera",
@@ -202,6 +233,128 @@ const INCIDENCIAS_INITIAL = [
     comentario: "La alumna reemplaza al estudiante Bajou por lo que no tiene la primera encuesta."
   }
 ];
+
+// Funciones para gestión del Modal de Bitácora de Incidencias
+function openIncidenciasModal(selectedSchool = 'ALL') {
+  const modal = document.getElementById('modal-incidencias');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+
+  const schoolSelect = document.getElementById('incidencias-filter-school');
+  if (schoolSelect) {
+    schoolSelect.innerHTML = '<option value="ALL">Todos los Establecimientos</option>';
+    const schoolList = Array.from(ALL_LINEA_VERDE_SCHOOLS);
+    schoolList.forEach(sch => {
+      const opt = document.createElement('option');
+      opt.value = sch;
+      opt.textContent = sch;
+      schoolSelect.appendChild(opt);
+    });
+    if (selectedSchool && selectedSchool !== 'ALL') {
+      const matchOpt = Array.from(schoolSelect.options).find(o => {
+        const s1 = stripAccents(o.value).toLowerCase();
+        const s2 = stripAccents(selectedSchool).toLowerCase();
+        return s1.includes(s2) || s2.includes(s1);
+      });
+      if (matchOpt) schoolSelect.value = matchOpt.value;
+    } else {
+      schoolSelect.value = 'ALL';
+    }
+  }
+
+  const typeSelect = document.getElementById('incidencias-filter-type');
+  if (typeSelect) typeSelect.value = 'ALL';
+
+  filterIncidenciasModal();
+}
+
+function closeIncidenciasModal() {
+  const modal = document.getElementById('modal-incidencias');
+  if (modal) modal.classList.add('hidden');
+}
+
+function filterIncidenciasModal() {
+  const schoolSelect = document.getElementById('incidencias-filter-school');
+  const typeSelect = document.getElementById('incidencias-filter-type');
+  const container = document.getElementById('incidencias-list-container');
+  const countBadge = document.getElementById('incidencias-count-badge');
+  if (!container) return;
+
+  const schoolFilter = schoolSelect ? schoolSelect.value : 'ALL';
+  const typeFilter = typeSelect ? typeSelect.value : 'ALL';
+
+  const allIncs = (RAW_DATA && RAW_DATA.incidencias) || INCIDENCIAS_INITIAL;
+
+  const filtered = allIncs.filter(inc => {
+    if (schoolFilter !== 'ALL') {
+      const s1 = stripAccents(inc.establecimiento).toLowerCase();
+      const s2 = stripAccents(schoolFilter).toLowerCase();
+      if (!s1.includes(s2) && !s2.includes(s1)) return false;
+    }
+    if (typeFilter !== 'ALL') {
+      const t1 = stripAccents(inc.incidencia).toLowerCase();
+      const t2 = stripAccents(typeFilter).toLowerCase();
+      if (!t1.includes(t2)) return false;
+    }
+    return true;
+  });
+
+  if (countBadge) {
+    countBadge.textContent = `${filtered.length} ${filtered.length === 1 ? 'Caso' : 'Casos'}`;
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="py-12 text-center text-slate-400 space-y-2">
+        <i data-lucide="check-circle-2" class="w-10 h-10 mx-auto text-emerald-500"></i>
+        <p class="text-sm font-semibold text-slate-700">Sin incidencias para el filtro seleccionado</p>
+        <p class="text-xs text-slate-400">La nómina y asistencia para este criterio no registra contingencias de terreno.</p>
+      </div>
+    `;
+    if (window.lucide) lucide.createIcons();
+    return;
+  }
+
+  container.innerHTML = filtered.map(inc => {
+    let catClass = 'bg-amber-100 text-amber-900 border-amber-300';
+    let iconName = 'alert-circle';
+    if (inc.incidencia.includes('huérfano')) {
+      catClass = 'bg-rose-50 text-rose-800 border-rose-200';
+      iconName = 'user-x';
+    } else if (inc.incidencia.includes('sin estar inscrita')) {
+      catClass = 'bg-blue-50 text-blue-800 border-blue-200';
+      iconName = 'user-plus';
+    } else if (inc.incidencia.includes('No responde')) {
+      catClass = 'bg-amber-50 text-amber-800 border-amber-200';
+      iconName = 'file-question';
+    }
+
+    return `
+      <div class="py-3.5 space-y-1.5 hover:bg-slate-50/50 transition px-2 rounded-xl">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="w-7 h-7 rounded-lg ${catClass} flex items-center justify-center font-bold shrink-0">
+              <i data-lucide="${iconName}" class="w-3.5 h-3.5"></i>
+            </span>
+            <div>
+              <span class="font-extrabold text-slate-900 text-sm">${escapeHtml(inc.caso)}</span>
+              <span class="text-xs text-slate-400 ml-1.5 font-medium">· ${escapeHtml(inc.establecimiento)}</span>
+            </div>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${catClass}">
+            ${escapeHtml(inc.incidencia)}
+          </span>
+        </div>
+        <p class="text-xs text-slate-600 pl-9 leading-relaxed">
+          ${escapeHtml(inc.comentario)}
+        </p>
+      </div>
+    `;
+  }).join('');
+
+  if (window.lucide) lucide.createIcons();
+}
+
 
 // Inicialización resiliente al cargar el DOM o script
 function initApp() {
@@ -262,6 +415,29 @@ async function loadFromGoogleDrive() {
     const ws = tempWb.Sheets[tempWb.SheetNames[0]];
     XLSX.utils.book_append_sheet(wb, ws, sheetName);
   }));
+
+  // Carga dinámica de la pestaña incidencias desde Drive en vivo
+  try {
+    for (const incSheet of ['incidencias', 'Incidencias', 'INCIDENCIAS']) {
+      try {
+        const incUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(incSheet)}&t=${Date.now()}`;
+        const incRes = await fetch(incUrl);
+        if (incRes.ok) {
+          const incCsv = await incRes.text();
+          if (incCsv && incCsv.length > 50 && !incCsv.includes('<!DOCTYPE')) {
+            const incWb = XLSX.read(incCsv, { type: 'string' });
+            const incWs = incWb.Sheets[incWb.SheetNames[0]];
+            XLSX.utils.book_append_sheet(wb, incWs, 'incidencias');
+            break;
+          }
+        }
+      } catch (e) {
+        // Ignorar y probar siguiente variante
+      }
+    }
+  } catch (err) {
+    console.warn('No se pudo cargar la pestaña de incidencias desde Drive en vivo:', err);
+  }
 
   processWorkbookInBrowser(wb, 'Google Drive (En vivo)');
 }
@@ -1078,6 +1254,36 @@ function processWorkbookInBrowser(wb, fileName) {
       };
     }
 
+    // Extraer incidencias si la pestaña existe en el libro
+    let parsedIncidencias = [...INCIDENCIAS_INITIAL];
+    const incSheetName = wb.SheetNames.find(n => n.toLowerCase() === 'incidencias');
+    if (incSheetName) {
+      try {
+        const incSheet = wb.Sheets[incSheetName];
+        const rawIncRows = XLSX.utils.sheet_to_json(incSheet);
+        if (rawIncRows && rawIncRows.length > 0) {
+          parsedIncidencias = rawIncRows.map(r => ({
+            caso: cleanStr(r['Caso'] || r['caso'] || r['Estudiante'] || r['Nombre'] || ''),
+            establecimiento: cleanStr(r['Establecimiento'] || r['establecimiento'] || r['Colegio'] || ''),
+            incidencia: cleanStr(r['Incidencia'] || r['incidencia'] || r['Tipo'] || ''),
+            comentario: cleanStr(r['Comentario'] || r['comentario'] || r['Detalle'] || r['Observación'] || '')
+          })).filter(i => i.caso && i.establecimiento);
+        }
+      } catch (err) {
+        console.warn('Error parseando hoja de incidencias:', err);
+      }
+    }
+
+    // Asociar datos SNCAE y de incidencias a cada colegio
+    for (const [schName, schObj] of Object.entries(schools)) {
+      schObj.sncae = getOfficialSncae(schName);
+      schObj.incidencias = parsedIncidencias.filter(inc => {
+        const s1 = stripAccents(inc.establecimiento).toLowerCase();
+        const s2 = stripAccents(schName).toLowerCase();
+        return s1.includes(s2) || s2.includes(s1);
+      });
+    }
+
     RAW_DATA = {
       metadata: {
         programa: 'Programa de Acción Climática (PAC) 2026',
@@ -1086,6 +1292,8 @@ function processWorkbookInBrowser(wb, fileName) {
         total_participantes: Object.keys(allParticipants).length
       },
       schools_directory: schools,
+      sncae_registry: SNCAE_OFFICIAL_REGISTRY,
+      incidencias: parsedIncidencias,
       hitos: hitosData,
       all_participants: Object.values(allParticipants)
     };
@@ -2058,19 +2266,10 @@ function renderSchoolsTab() {
     const meta = (RAW_DATA.schools_directory && RAW_DATA.schools_directory[s.school]) || {};
     const climData = getSchoolClimaton(s.school);
     const eqNum = meta.equipo || s.equipo || (climData && climData.equipo) || null;
-    const cert = meta.certificacion || s.certificacion || 'No';
     const hasData = s.has_data !== false && s.n > 0;
 
-    // Metadatos oficiales SNCAE del Ministerio del Medio Ambiente
-    const sncaeInfo = s.sncae || meta.sncae || SNCAE_OFFICIAL_REGISTRY[s.school] || {
-      rbd: '-',
-      nivel: 'Sin Certificaci�n',
-      estado: 'No Registra en SNCAE',
-      periodo: '-',
-      vigente: false,
-      badge_color: 'slate',
-      detalles: 'Sin registro en el Sistema Nacional de Certificaci�n Ambiental.'
-    };
+    // Metadatos oficiales SNCAE del Ministerio del Medio Ambiente (MMA)
+    const sncaeInfo = getOfficialSncae(s.school);
 
     let sncaeBadge = '';
     if (sncaeInfo.nivel === 'Excelencia') {
@@ -2082,9 +2281,9 @@ function renderSchoolsTab() {
     }
 
     // Incidencias de terreno vinculadas a este establecimiento
-    const schoolIncs = s.incidencias || meta.incidencias || (RAW_DATA.incidencias || INCIDENCIAS_INITIAL).filter(inc => {
-      const s1 = stripAccents(inc.establecimiento);
-      const s2 = stripAccents(s.school);
+    const schoolIncs = (RAW_DATA.incidencias || INCIDENCIAS_INITIAL).filter(inc => {
+      const s1 = stripAccents(inc.establecimiento).toLowerCase();
+      const s2 = stripAccents(s.school).toLowerCase();
       return s1.includes(s2) || s2.includes(s1);
     });
     const incCount = schoolIncs.length;
@@ -2105,7 +2304,7 @@ function renderSchoolsTab() {
         `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#88C23F]/15 text-[#52801b] border border-[#88C23F]/35 mr-1.5 shrink-0">Eq. ${parseInt(eqNum)}</span>` : '';
 
       const climatonBtn = climData ? 
-        `<button onclick="openSchoolInClimaton('${escapeHtml(s.school)}')" class="px-3 py-1 rounded-full text-xs font-bold bg-[#88C23F]/15 text-[#52801b] border border-[#88C23F]/35 hover:bg-[#88C23F]/25 transition inline-flex items-center gap-1.5 shadow-xs" title="Ver las 5 ideas formuladas por este colegio en el Climat�n">
+        `<button onclick="openSchoolInClimaton('${escapeHtml(s.school)}')" class="px-3 py-1 rounded-full text-xs font-bold bg-[#88C23F]/15 text-[#52801b] border border-[#88C23F]/35 hover:bg-[#88C23F]/25 transition inline-flex items-center gap-1.5 shadow-xs" title="Ver las 5 ideas formuladas por este colegio en el Climatón">
           <i data-lucide="sparkles" class="w-3 h-3 text-[#88C23F]"></i>
           <span>5 Ideas</span>
         </button>` : 
@@ -2129,17 +2328,18 @@ function renderSchoolsTab() {
           <td class="py-3.5 px-3 text-center">${incBadge}</td>
           <td class="py-3.5 px-3">
             <div class="text-slate-800 font-medium">${escapeHtml(s.lider1 || 'Coordinador del equipo')}</div>
-            <div class="text-[10px] text-slate-400">${s.email1 || ''} ${s.tel1 ? '� Tel: ' + s.tel1 : ''}</div>
+            <div class="text-[10px] text-slate-400">${s.email1 || ''} ${s.tel1 ? '· Tel: ' + s.tel1 : ''}</div>
           </td>
           <td class="py-3.5 px-4 text-center">${climatonBtn}</td>
         `;
       } else {
-        const deltaSign = s.delta_avg >= 0 ? '+' : '';
         const deltaBadge = s.delta_avg > 0 ? 
           `<span class="px-3 py-1 rounded-full text-xs font-bold bg-[#f1f9e9] text-[#52801b] border border-[#cbe99c]">+${s.delta_avg.toFixed(2)}</span>` : 
           (s.delta_avg === 0 ? 
             `<span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">0.00</span>` : 
             `<span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">${s.delta_avg.toFixed(2)}</span>`);
+
+        const distHtml = `<div class="flex items-center gap-1.5 text-[11px] font-bold"><span class="text-emerald-600" title="Mejora">${s.n_mejora || 0}↗</span> <span class="text-slate-400" title="Mantiene">${s.n_mantiene || 0}=</span> <span class="text-rose-500" title="Retroceso">${s.n_retroceso || 0}↘</span></div>`;
 
         tr.innerHTML = `
           <td class="py-3.5 px-4 font-bold text-slate-800 flex items-center">${eqBadge} <span>${escapeHtml(s.school)}</span></td>
@@ -2152,23 +2352,13 @@ function renderSchoolsTab() {
           <td class="py-3.5 px-3 text-center text-[#52801b] font-bold">${s.post_avg !== null ? s.post_avg.toFixed(2) : '-'}</td>
           <td class="py-3.5 px-3 text-center">${deltaBadge}</td>
           <td class="py-3.5 px-3 text-center">
-            <span class="px-3 py-1 rounded-full text-xs font-bold ${s.pct_mejora >= 50 ? 'bg-[#f1f9e9] text-[#52801b]' : 'bg-slate-100 text-slate-700'}">
-              ${s.pct_mejora}%
-            </span>
+            <span class="px-3 py-1 rounded-full text-xs font-bold ${s.pct_mejora >= 50 ? 'bg-[#f1f9e9] text-[#52801b]' : 'bg-slate-100 text-slate-600'}">${s.pct_mejora !== null ? s.pct_mejora + '%' : '-'}</span>
           </td>
-          <td class="py-3.5 px-3">
-            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 border border-slate-100 text-[11px]">
-              <span class="text-[#52801b] font-bold" title="Mejor�">${s.status_counts['Mejor�'] || 0}?</span>
-              <span class="text-slate-300">�</span>
-              <span class="text-[#00737d] font-semibold" title="Consolid�">${s.status_counts['Mantuvo'] || 0}=</span>
-              <span class="text-slate-300">�</span>
-              <span class="text-amber-700 font-bold" title="Requiere refuerzo">${s.status_counts['Retrocedi�'] || 0}?</span>
-            </div>
-          </td>
+          <td class="py-3.5 px-3">${distHtml}</td>
           <td class="py-3.5 px-3 text-center">${incBadge}</td>
           <td class="py-3.5 px-3">
             <div class="text-slate-800 font-medium">${escapeHtml(s.lider1 || 'Coordinador del equipo')}</div>
-            <div class="text-[10px] text-slate-400">${s.email1 || ''} ${s.tel1 ? '� Tel: ' + s.tel1 : ''}</div>
+            <div class="text-[10px] text-slate-400">${s.email1 || ''} ${s.tel1 ? '· Tel: ' + s.tel1 : ''}</div>
           </td>
           <td class="py-3.5 px-4 text-center">${climatonBtn}</td>
         `;
@@ -2181,46 +2371,37 @@ function renderSchoolsTab() {
       const card = document.createElement('div');
       card.className = 'bg-white p-6 rounded-3xl border border-slate-100 card-shadow space-y-5';
 
-      // Bloque Climat�n Ideas
-      let climatonSectionHTML = '';
-      if (climData && climData.ideas) {
-        const miniCards = climData.ideas.map(id => `
-          <div class="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-200/70 hover:border-[#88C23F] transition space-y-1.5 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                <span>Idea ${id.numero}</span>
-                <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold ${climData.desafio_codigo === 'V1' ? 'bg-[#f1f9e9] text-[#52801b]' : 'bg-[#e6f9fa] text-[#00737d]'}>${climData.desafio_codigo}</span>
-              </div>
-              <p class="text-xs font-bold text-slate-800 leading-snug">"${escapeHtml(id.titulo)}"</p>
+      // Bloque SNCAE Oficial
+      const sncaeBox = `
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-slate-50 via-white to-slate-50/50 border border-slate-200/80 space-y-2 text-xs">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <i data-lucide="award" class="w-4 h-4 ${sncaeInfo.vigente ? 'text-emerald-600' : 'text-slate-400'}"></i>
+              <span class="text-[10px] uppercase font-extrabold tracking-wider text-slate-500">Acreditación Ambiental SNCAE (Ministerio del Medio Ambiente)</span>
             </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${sncaeInfo.nivel === 'Excelencia' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : (sncaeInfo.nivel === 'Medio' ? 'bg-teal-100 text-teal-800 border border-teal-300' : 'bg-slate-100 text-slate-600 border border-slate-200')}">
+              ${sncaeInfo.nivel === 'Sin Certificación' ? 'Sin Certificación SNCAE' : `Nivel ${sncaeInfo.nivel} (${sncaeInfo.periodo})`}
+            </span>
           </div>
-        `).join('');
-
-        climatonSectionHTML = `
-          <div class="pt-4 border-t border-slate-100 space-y-3">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <i data-lucide="sparkles" class="w-4 h-4 text-[#88C23F]"></i>
-                <h5 class="text-xs font-bold uppercase tracking-wider text-slate-800">Propuestas Climat�n 2026 (${climData.desafio_codigo} � ${climData.desafio_nombre})</h5>
-              </div>
-              <button onclick="openSchoolInClimaton('${escapeHtml(s.school)}')" class="text-[11px] font-bold text-[#52801b] hover:underline inline-flex items-center gap-1">
-                <span>Ver en Muro Digital</span>
-                <i data-lucide="arrow-right" class="w-3 h-3"></i>
-              </button>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-              ${miniCards}
-            </div>
+          <p class="text-slate-700 text-[11px] leading-relaxed">
+            ${escapeHtml(sncaeInfo.detalles)}
+          </p>
+          <div class="flex items-center gap-3 text-[10px] text-slate-400 pt-1.5 border-t border-slate-100 flex-wrap">
+            <span>RBD / Rol: <strong>${escapeHtml(sncaeInfo.rbd)}</strong></span>
+            <span>·</span>
+            <span>Estado Ministerial: <strong>${escapeHtml(sncaeInfo.estado)}</strong></span>
+            <span>·</span>
+            <span>Vigencia: <strong>${escapeHtml(sncaeInfo.periodo)}</strong></span>
           </div>
-        `;
-      }
+        </div>
+      `;
 
       // Bloque Incidencias de Terreno
       let incidenciasSectionHTML = '';
       if (schoolIncs.length > 0) {
         const incCards = schoolIncs.map(inc => {
           let catColor = 'bg-amber-100 text-amber-900 border-amber-300';
-          if (inc.incidencia.includes('hu�rfano')) catColor = 'bg-rose-50 text-rose-800 border-rose-200';
+          if (inc.incidencia.includes('huérfano')) catColor = 'bg-rose-50 text-rose-800 border-rose-200';
           else if (inc.incidencia.includes('sin estar inscrita')) catColor = 'bg-blue-50 text-blue-800 border-blue-200';
           return `
             <div class="p-3 bg-amber-50/40 rounded-xl border border-amber-200/70 space-y-1">
@@ -2246,11 +2427,11 @@ function renderSchoolsTab() {
               <div class="flex items-center gap-2">
                 <i data-lucide="alert-circle" class="w-4 h-4 text-amber-600"></i>
                 <h5 class="text-xs font-bold uppercase tracking-wider text-slate-800">
-                  Incidencias de Terreno y Din�mica de Aula (${schoolIncs.length} ${schoolIncs.length === 1 ? 'caso documentado' : 'casos documentados'})
+                  Incidencias de Terreno y Dinámica de Aula (${schoolIncs.length} ${schoolIncs.length === 1 ? 'caso documentado' : 'casos documentados'})
                 </h5>
               </div>
-              <button onclick="openIncidenciasModal('${escapeHtml(s.school)}')" class="text-[11px] font-bold text-amber-800 hover:underline inline-flex items-center gap-1">
-                <span>Ver en Bit�cora General</span>
+              <button onclick="openIncidenciasModal('${escapeHtml(s.school)}')" class="text-[11px] font-bold text-amber-700 hover:underline inline-flex items-center gap-1">
+                <span>Ver Bitácora Completa</span>
                 <i data-lucide="arrow-right" class="w-3 h-3"></i>
               </button>
             </div>
@@ -2261,40 +2442,47 @@ function renderSchoolsTab() {
         `;
       } else {
         incidenciasSectionHTML = `
-          <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-            <div class="flex items-center gap-2">
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-slate-500">
+            <div class="flex items-center gap-1.5">
               <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500"></i>
               <span class="text-[11px]">Sin incidencias operativas reportadas para este establecimiento.</span>
             </div>
-            <span class="text-[10px] text-slate-400">N�mina y asistencia regular</span>
+            <span class="text-[10px] text-slate-400">Nómina y asistencia regular</span>
           </div>
         `;
       }
 
-      // Bloque SNCAE Oficial
-      const sncaeBox = `
-        <div class="p-4 rounded-2xl bg-gradient-to-r from-slate-50 via-white to-slate-50/50 border border-slate-200/80 space-y-2 text-xs">
-          <div class="flex items-center justify-between flex-wrap gap-2">
-            <div class="flex items-center gap-2">
-              <i data-lucide="award" class="w-4 h-4 ${sncaeInfo.vigente ? 'text-emerald-600' : 'text-slate-400'}"></i>
-              <span class="text-[10px] uppercase font-extrabold tracking-wider text-slate-500">Acreditaci�n Ambiental SNCAE (Ministerio del Medio Ambiente)</span>
+      // Bloque Climatón Ideas (5 Tarjetas en Grid Horizontal perfectamente cerrado)
+      let climatonSectionHTML = '';
+      if (climData && climData.ideas) {
+        const miniCards = climData.ideas.map(id => `
+          <div class="p-3.5 bg-slate-50/90 rounded-2xl border border-slate-200/80 hover:border-[#88C23F] hover:shadow-sm transition flex flex-col justify-between gap-2.5">
+            <div class="flex items-center justify-between text-[10px] font-bold text-slate-500">
+              <span class="px-2 py-0.5 rounded-full bg-slate-200/70 text-slate-700 font-extrabold">Idea ${id.numero}</span>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold ${climData.desafio_codigo === 'V1' ? 'bg-[#f1f9e9] text-[#52801b] border border-[#cbe99c]' : 'bg-[#e6f9fa] text-[#00737d] border border-[#9fe3e7]'}">${climData.desafio_codigo}</span>
             </div>
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${sncaeInfo.nivel === 'Excelencia' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : (sncaeInfo.nivel === 'Medio' ? 'bg-teal-100 text-teal-800 border border-teal-300' : 'bg-slate-100 text-slate-600 border border-slate-200')}">
-              ${sncaeInfo.nivel === 'Sin Certificaci�n' ? 'Sin Certificaci�n SNCAE' : `Nivel ${sncaeInfo.nivel} (${sncaeInfo.periodo})`}
-            </span>
+            <p class="text-xs font-semibold text-slate-800 leading-snug">"${escapeHtml(id.titulo)}"</p>
           </div>
-          <p class="text-slate-700 text-[11px] leading-relaxed">
-            ${escapeHtml(sncaeInfo.detalles)}
-          </p>
-          <div class="flex items-center gap-3 text-[10px] text-slate-400 pt-1.5 border-t border-slate-100 flex-wrap">
-            <span>RBD / Rol: <strong>${escapeHtml(sncaeInfo.rbd)}</strong></span>
-            <span>�</span>
-            <span>Estado Ministerial: <strong>${escapeHtml(sncaeInfo.estado)}</strong></span>
-            <span>�</span>
-            <span>Vigencia: <strong>${escapeHtml(sncaeInfo.periodo)}</strong></span>
+        `).join('');
+
+        climatonSectionHTML = `
+          <div class="pt-4 border-t border-slate-100 space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <i data-lucide="sparkles" class="w-4 h-4 text-[#88C23F]"></i>
+                <h5 class="text-xs font-bold uppercase tracking-wider text-slate-800">Propuestas Climatón 2026 (${climData.desafio_codigo} · ${escapeHtml(climData.desafio_nombre)})</h5>
+              </div>
+              <button onclick="openSchoolInClimaton('${escapeHtml(s.school)}')" class="text-[11px] font-bold text-[#52801b] hover:underline inline-flex items-center gap-1">
+                <span>Ver en Muro Digital</span>
+                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              </button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              ${miniCards}
+            </div>
           </div>
-        </div>
-      `;
+        `;
+      }
 
       card.innerHTML = `
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3.5">
@@ -2302,7 +2490,7 @@ function renderSchoolsTab() {
             ${eqNum ? `<span class="px-3 py-1 rounded-full text-xs font-extrabold bg-[#88C23F]/15 text-[#52801b] border border-[#88C23F]/35">Equipo ${parseInt(eqNum)}</span>` : ''}
             <div>
               <h4 class="text-base font-extrabold text-slate-900">${escapeHtml(s.school)}</h4>
-              <p class="text-xs text-slate-400 font-medium">${meta.direccion ? meta.direccion + ' � ' : ''}Dependencia: <strong>${s.dependencia}</strong></p>
+              <p class="text-xs text-slate-400 font-medium">${meta.direccion ? meta.direccion + ' · ' : ''}Dependencia: <strong>${s.dependencia}</strong></p>
             </div>
           </div>
           <div class="flex items-center gap-2 flex-wrap">
@@ -2322,14 +2510,14 @@ function renderSchoolsTab() {
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
           <div class="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100 space-y-1">
-            <div class="text-[10px] uppercase font-bold text-slate-400">Profesor/a L�der 1</div>
+            <div class="text-[10px] uppercase font-bold text-slate-400">Profesor/a Líder 1</div>
             <div class="text-slate-900 font-bold">${escapeHtml(s.lider1 || 'Coordinador del equipo')}</div>
-            <div class="text-slate-500 text-[11px]">${s.email1 ? '? ' + s.email1 : ''} ${s.tel1 ? '� ?? ' + s.tel1 : ''}</div>
+            <div class="text-slate-500 text-[11px]">${s.email1 ? '✉ ' + s.email1 : ''} ${s.tel1 ? '· 📞 ' + s.tel1 : ''}</div>
           </div>
           <div class="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100 space-y-1">
-            <div class="text-[10px] uppercase font-bold text-slate-400">Profesor/a L�der 2 / Apoyo</div>
+            <div class="text-[10px] uppercase font-bold text-slate-400">Profesor/a Líder 2 / Apoyo</div>
             <div class="text-slate-900 font-bold">${escapeHtml(s.lider2 || meta.lider2 || 'No registrado')}</div>
-            <div class="text-slate-500 text-[11px]">${s.email2 || meta.email2 ? '? ' + (s.email2 || meta.email2) : ''} ${(s.tel2 || meta.tel2) ? '� ?? ' + (s.tel2 || meta.tel2) : ''}</div>
+            <div class="text-slate-500 text-[11px]">${s.email2 || meta.email2 ? '✉ ' + (s.email2 || meta.email2) : ''} ${(s.tel2 || meta.tel2) ? '· 📞 ' + (s.tel2 || meta.tel2) : ''}</div>
           </div>
         </div>
 
@@ -2344,93 +2532,7 @@ function renderSchoolsTab() {
   if (window.lucide) lucide.createIcons();
 }
 
-// MODAL BIT�CORA DE INCIDENCIAS
-function openIncidenciasModal(filterSchool = 'todos') {
-  const modal = document.getElementById('modal-incidencias');
-  if (!modal) return;
-  modal.classList.remove('hidden');
-
-  const incList = (RAW_DATA && RAW_DATA.incidencias) || INCIDENCIAS_INITIAL;
-  
-  // Poblar select de colegios
-  const schSelect = document.getElementById('modal-inc-filter-school');
-  if (schSelect) {
-    const schoolsSet = new Set(incList.map(i => i.establecimiento));
-    let opts = '<option value="todos">Todos los colegios</option>';
-    Array.from(schoolsSet).sort().forEach(sch => {
-      const isSel = (filterSchool && filterSchool.toLowerCase() === sch.toLowerCase()) ? 'selected' : '';
-      opts += `<option value="${escapeHtml(sch)}" ${isSel}>${escapeHtml(sch)}</option>`;
-    });
-    schSelect.innerHTML = opts;
-  }
-
-  filterIncidenciasModal();
-  if (window.lucide) lucide.createIcons();
-}
-
-function closeIncidenciasModal() {
-  const modal = document.getElementById('modal-incidencias');
-  if (modal) modal.classList.add('hidden');
-}
-
-function filterIncidenciasModal() {
-  const schSelect = document.getElementById('modal-inc-filter-school');
-  const typeSelect = document.getElementById('modal-inc-filter-type');
-  const listContainer = document.getElementById('modal-inc-list');
-  const counterEl = document.getElementById('modal-inc-counter');
-  if (!listContainer) return;
-
-  const schVal = schSelect ? schSelect.value : 'todos';
-  const typeVal = typeSelect ? typeSelect.value : 'todos';
-
-  let list = (RAW_DATA && RAW_DATA.incidencias) || INCIDENCIAS_INITIAL;
-  if (schVal !== 'todos') {
-    list = list.filter(i => stripAccents(i.establecimiento) === stripAccents(schVal));
-  }
-  if (typeVal !== 'todos') {
-    list = list.filter(i => i.incidencia === typeVal);
-  }
-
-  if (counterEl) {
-    counterEl.innerText = `Mostrando ${list.length} de ${((RAW_DATA && RAW_DATA.incidencias) || INCIDENCIAS_INITIAL).length} incidencias`;
-  }
-
-  if (list.length === 0) {
-    listContainer.innerHTML = `
-      <div class="p-8 text-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-        No hay incidencias que coincidan con los filtros seleccionados.
-      </div>
-    `;
-    return;
-  }
-
-  listContainer.innerHTML = list.map((inc, idx) => {
-    let catClass = 'bg-amber-100 text-amber-900 border-amber-300';
-    if (inc.incidencia.includes('hu�rfano')) catClass = 'bg-rose-50 text-rose-800 border-rose-200';
-    else if (inc.incidencia.includes('sin estar inscrita')) catClass = 'bg-blue-50 text-blue-800 border-blue-200';
-
-    return `
-      <div class="p-4 rounded-2xl bg-white border border-slate-200/80 hover:border-amber-300 transition space-y-2 shadow-xs">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-extrabold text-xs flex items-center justify-center">${idx + 1}</span>
-            <strong class="text-sm font-extrabold text-slate-900">${escapeHtml(inc.caso)}</strong>
-            <span class="text-xs text-slate-500 font-medium">� ${escapeHtml(inc.establecimiento)}</span>
-          </div>
-          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${catClass}">
-            ${escapeHtml(inc.incidencia)}
-          </span>
-        </div>
-        <p class="text-xs text-slate-700 leading-relaxed bg-slate-50/70 p-3 rounded-xl border border-slate-100">
-          ${escapeHtml(inc.comentario)}
-        </p>
-      </div>
-    `;
-  }).join('');
-
-  if (window.lucide) lucide.createIcons();
-}
-
+// 3. TAB: PREGUNTAS Y DISTRACTORES
 function renderQuestionsTab() {
   const isGlobal = CURRENT_HITO === 'Ambos' || CURRENT_HITO === 'Global';
   const hitoKey = isGlobal ? 'Global' : CURRENT_HITO;
@@ -2913,14 +3015,19 @@ function renderParticipantsTab() {
       `<div class="font-bold text-[#52801b]">${p.post_score} <span class="text-[10px] text-emerald-600 font-normal">/ 5</span></div><div class="text-[10px] text-emerald-600 font-normal">(${p.post_score_raw} / 10 pts)</div>` : 
       `<span class="font-bold text-[#52801b]">${p.post_score}</span> <span class="text-[10px] text-slate-400">/ 5</span>`;
 
-    const pInc = p.incidencia || ((RAW_DATA.incidencias || INCIDENCIAS_INITIAL).find(i => stripAccents(i.caso) === stripAccents(p.name)));
-    const incPill = pInc ? 
-      `<span class="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300 shadow-xs cursor-help" title="${escapeHtml(pInc.incidencia)}: ${escapeHtml(pInc.comentario)}">Incidencia</span>` : '';
+    const incMatch = (RAW_DATA.incidencias || INCIDENCIAS_INITIAL).find(inc => {
+      const n1 = stripAccents(inc.caso).toLowerCase();
+      const n2 = stripAccents(p.name).toLowerCase();
+      return n1.length > 3 && (n1.includes(n2) || n2.includes(n1));
+    });
+    const incPill = incMatch ? 
+      `<button onclick="openIncidenciasModal('${escapeHtml(p.school)}'); event.stopPropagation();" class="ml-1.5 px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200 transition inline-flex items-center gap-1 shrink-0" title="${escapeHtml(incMatch.incidencia)}: ${escapeHtml(incMatch.comentario)}"><i data-lucide="alert-circle" class="w-2.5 h-2.5 text-amber-700"></i><span>Incidencia</span></button>` : '';
 
     tr.innerHTML = `
-      <td class="py-3.5 px-4 font-bold text-slate-900 flex items-center gap-2.5">
+      <td class="py-3.5 px-4 font-bold text-slate-900 flex items-center gap-2.5 flex-wrap">
         <span class="w-2.5 h-2.5 rounded-full ${p.gender === 'Femenino' ? 'bg-pink-400' : 'bg-blue-400'}"></span>
-        <span>${escapeHtml(p.name)}</span> ${incPill}
+        <span>${escapeHtml(p.name)}</span>
+        ${incPill}
       </td>
       <td class="py-3.5 px-3 text-slate-600 font-medium">${escapeHtml(p.school)} ${hitoBadge}</td>
       <td class="py-3.5 px-3 text-slate-500 text-[11px]">${escapeHtml(p.gender)}</td>
@@ -3054,27 +3161,6 @@ function renderModalContent(mode) {
   const h4Meta = (RAW_DATA.hitos['Hito 4'] && RAW_DATA.hitos['Hito 4'].questions) || [];
 
   container.innerHTML = '';
-
-  const pInc = p.incidencia || ((RAW_DATA.incidencias || INCIDENCIAS_INITIAL).find(i => stripAccents(i.caso) === stripAccents(p.name)));
-  if (pInc) {
-    const incBanner = document.createElement('div');
-    incBanner.className = 'p-4 bg-amber-50 rounded-2xl border border-amber-200/80 flex items-start gap-3 shadow-xs mb-4';
-    incBanner.innerHTML = `
-      <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 border border-amber-200 mt-0.5">
-        <i data-lucide="alert-circle" class="w-4 h-4"></i>
-      </div>
-      <div class="space-y-1">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-extrabold text-amber-900 uppercase tracking-wide">Incidencia de Terreno Registrada</span>
-          <span class="px-2 py-0.2 rounded text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">${escapeHtml(pInc.incidencia)}</span>
-        </div>
-        <p class="text-xs text-amber-900/90 leading-relaxed font-medium">
-          ${escapeHtml(pInc.comentario)}
-        </p>
-      </div>
-    `;
-    container.appendChild(incBanner);
-  }
 
   if (mode === 'consolidado') {
     // 1. Resumen consolidado KPIs
@@ -3881,10 +3967,6 @@ function buildPDFDocumentHTML(p, h3Data, h4Data, mode, h3Meta, h4Meta) {
               <div style="font-size: 9px; color: #334155; margin-top: 1px;">Género: <strong>${escapeHtml(p.gender)}</strong> · Rol: <strong>${escapeHtml(p.role || 'Estudiante')}</strong></div>
               <div style="font-size: 9px; color: #52801b; font-weight: bold; margin-top: 1px;">${coverageText}</div>
               <div style="font-size: 9px; color: #64748b; margin-top: 1px;">Condición Diagnóstica: <strong style="color: #0f172a;">${escapeHtml(p.real_status || p.status)}</strong></div>
-              ${(() => {
-                const pIncPdf = p.incidencia || ((RAW_DATA && RAW_DATA.incidencias) || INCIDENCIAS_INITIAL).find(i => stripAccents(i.caso) === stripAccents(p.name));
-                return pIncPdf ? `<div style="font-size: 7.5px; color: #92400e; font-weight: bold; margin-top: 2.5px; padding: 2.5px 6px; background-color: #fef3c7; border: 1px solid #fde68a; border-radius: 4px; line-height: 1.25;">⚠ <strong>Nota de Terreno:</strong> ${escapeHtml(pIncPdf.incidencia)} — ${escapeHtml(pIncPdf.comentario)}</div>` : '';
-              })()}
             </td>
           </tr>
         </table>

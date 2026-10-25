@@ -243,41 +243,6 @@
         </div>
       </div>
 
-      <!-- Banner de Trazabilidad Territorial y Contexto Institucional SNCAE -->
-      <div class="p-5 rounded-3xl bg-white border border-slate-200/90 card-shadow space-y-3">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center gap-2.5">
-            <span class="p-2 rounded-xl bg-amber-50 text-amber-800 border border-amber-200">
-              <i data-lucide="clipboard-check" class="w-4 h-4"></i>
-            </span>
-            <div>
-              <h4 class="text-sm font-extrabold text-slate-900">Trazabilidad Operativa y Contexto Territorial del Panel</h4>
-              <p class="text-xs text-slate-500">Hallazgos de terreno (16 incidencias documentadas) y cruce con acreditaci�n ambiental ministerial SNCAE</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <button onclick="openIncidenciasModal()" class="px-3 py-1.5 rounded-full text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition inline-flex items-center gap-1.5 shadow-xs">
-              <i data-lucide="list" class="w-3.5 h-3.5 text-amber-700"></i>
-              <span>Ver Bit�cora de Incidencias (16 casos)</span>
-            </button>
-            <button onclick="switchTab('establecimientos')" class="px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 transition inline-flex items-center gap-1.5 shadow-xs">
-              <i data-lucide="award" class="w-3.5 h-3.5 text-emerald-700"></i>
-              <span>Ver SNCAE en Colegios</span>
-            </button>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-600 leading-relaxed pt-1 border-t border-slate-100">
-          <div class="p-3 rounded-2xl bg-slate-50/70 border border-slate-100">
-            <strong class="text-slate-900 font-bold block mb-1">?? Acreditaci�n Ambiental SNCAE (Ministerio del Medio Ambiente):</strong>
-            Solo 3 de los 7 establecimientos cuentan con certificaci�n formal del MMA (Andr�s Sabella y Escuela Presbiteriana en <em>Nivel Excelencia</em>; Escuela H�roes de la Concepci�n en <em>Nivel Medio</em>). Para las otras 4 escuelas (La Bandera, R�mulo Pe�a, Bet-el y Greenhill), el PAC L�nea Verde opera como su primer catalizador de formaci�n en competencias ambientales escolares.
-          </div>
-          <div class="p-3 rounded-2xl bg-slate-50/70 border border-slate-100">
-            <strong class="text-slate-900 font-bold block mb-1">?? Trazabilidad de Muestra (Pesta�a Incidencias en vivo):</strong>
-            Las aparentes incongruencias de asistencia entre Hito 3 y Hito 4 est�n respaldadas por 16 registros de terreno: deserciones por falta de apoyo parental (Esc. Presbiteriana), estudiantes invitados que enriquecieron el taller sin estar en n�mina formal (R�mulo Pe�a, Sabella), reemplazos justificados y quiebre de stock de encuestas impresas en aula.
-          </div>
-        </div>
-      </div>
-
       <!-- KPI METRIC CARDS -->
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <!-- KPI 1: Rendimiento Favorable -->
@@ -511,6 +476,7 @@
           </div>
         </div>
 
+        
         <!-- Banner de Contexto Territorial: SNCAE e Incidencias en Vivo -->
         <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Card SNCAE -->
@@ -518,14 +484,14 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <i data-lucide="award" class="w-4 h-4 text-emerald-700"></i>
-                <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-900">Acreditaci�n Ambiental SNCAE (MMA)</span>
+                <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-900">Acreditación Ambiental SNCAE (MMA)</span>
               </div>
               <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
                 3 de 7 Certificados (42.9%)
               </span>
             </div>
             <p class="text-xs text-slate-700 leading-relaxed">
-              <strong>Liceo Andr�s Sabella</strong> y <strong>Escuela Presbiteriana</strong> registran certificaci�n en <em>Nivel Excelencia</em>; <strong>Escuela H�roes de la Concepci�n</strong> revalid� en <em>Nivel Medio</em> (2025-2027). Para las 4 escuelas restantes, el PAC constituye su principal proceso de educaci�n ambiental institucional.
+              <strong>Liceo Andrés Sabella</strong> y <strong>Escuela Presbiteriana</strong> registran certificación en <em>Nivel Excelencia</em>; <strong>Escuela Héroes de la Concepción</strong> revalidó en <em>Nivel Medio</em> (2025-2027). Para las 4 escuelas restantes, el PAC constituye su principal proceso de educación ambiental institucional.
             </p>
           </div>
 
@@ -538,11 +504,11 @@
               </div>
               <button onclick="openIncidenciasModal()" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 transition inline-flex items-center gap-1 shadow-xs">
                 <i data-lucide="list" class="w-3 h-3"></i>
-                <span>Ver Bit�cora (16 casos)</span>
+                <span>Ver Bitácora (16 casos)</span>
               </button>
             </div>
             <p class="text-xs text-slate-700 leading-relaxed">
-              Explicaci�n de variaciones de muestra: 3 deserciones justificadas/reemplazos iniciales, 5 registros hu�rfanos/invitados de aula, 2 integraciones definitivas a n�mina y 1 contingencia log�stica de encuestas impresas.
+              Explicación de variaciones de muestra: 3 deserciones justificadas/reemplazos iniciales, 5 registros huérfanos/invitados de aula, 2 integraciones definitivas a nómina y 1 contingencia logística de encuestas impresas.
             </p>
           </div>
         </div>
@@ -553,16 +519,16 @@
               <tr>
                 <th class="py-3.5 px-4 rounded-l-xl">Establecimiento</th>
                 <th class="py-3.5 px-3">Dependencia</th>
-                <th class="py-3.5 px-3">Acreditaci�n SNCAE (MMA)</th>
-                <th class="py-3.5 px-3 text-center">N� Eval.</th>
+                <th class="py-3.5 px-3">Acreditación SNCAE (MMA)</th>
+                <th class="py-3.5 px-3 text-center">N° Eval.</th>
                 <th class="py-3.5 px-3 text-center">Puntaje PRE</th>
                 <th class="py-3.5 px-3 text-center">Puntaje POST</th>
-                <th class="py-3.5 px-3 text-center">Variaci�n (Delta)</th>
+                <th class="py-3.5 px-3 text-center">Variación (Delta)</th>
                 <th class="py-3.5 px-3 text-center">% Mejora</th>
-                <th class="py-3.5 px-3">Distribuci�n</th>
+                <th class="py-3.5 px-3">Distribución</th>
                 <th class="py-3.5 px-3 text-center">Incidencias</th>
-                <th class="py-3.5 px-3">Profesor/a L�der</th>
-                <th class="py-3.5 px-4 text-center rounded-r-xl">Climat�n 2026</th>
+                <th class="py-3.5 px-3">Profesor/a Líder</th>
+                <th class="py-3.5 px-4 text-center rounded-r-xl">Climatón 2026</th>
               </tr>
             </thead>
             <tbody id="schools-table-body" class="divide-y divide-slate-100">
@@ -645,27 +611,60 @@
 
     <!-- 2.5 TAB: GALERÍA CLIMATÓN 2026 -->
     <section id="view-climaton" class="tab-view hidden space-y-6">
-      <!-- Banner Climatón -->
+      <!-- Banner Climatón Rediseñado: Distribución Balanceada y Métricas Clave -->
       <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 card-shadow text-slate-900 relative overflow-hidden border-l-4 border-l-[#88C23F]">
-        <div class="max-w-3xl relative z-10 space-y-2">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-[#88C23F]/15 text-[#52801b] border border-[#cbe99c]">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-            <span>Jornada Final Climatón 2026 · Línea Verde</span>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <!-- Columna Izquierda: Contexto Pedagógico y Territorial -->
+          <div class="lg:col-span-7 space-y-3">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-[#88C23F]/15 text-[#52801b] border border-[#cbe99c]">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#88C23F]"></i>
+              <span>Jornada Final Climatón 2026 · Línea Verde Antofagasta</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
+              Muro de Ideas: Propuestas Escolares hacia el 2050
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+              Catálogo oficial de las <strong>35 propuestas de innovación y acción climática</strong> formuladas por los 7 equipos escolares de la Línea Verde durante la Climatón PAC 2026. Cada tarjeta refleja la voz de los estudiantes resolviendo problemáticas territoriales de Antofagasta en dos desafíos clave: <em>V1 (Biodiversidad y Humedales Costeros)</em> y <em>V2 (Atmósfera, Radiación y Cielos Limpios)</em>.
+            </p>
           </div>
-          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-            Muro de Ideas: Propuestas Escolares hacia el 2050
-          </h2>
-          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-            Catálogo digital de las <strong>35 ideas de solución</strong> formuladas por los 7 equipos escolares de la Línea Verde durante la Climatón final. Cada tarjeta representa la propuesta original de los estudiantes para responder a los desafíos de biodiversidad urbana y cielos limpios en Antofagasta.
-          </p>
-          <div class="flex flex-wrap gap-4 pt-2 text-xs text-slate-500">
-            <span class="flex items-center gap-1.5"><strong class="text-slate-900">7</strong> Establecimientos</span>
-            <span>·</span>
-            <span class="flex items-center gap-1.5"><strong class="text-[#52801b]">35</strong> Ideas Formuladas</span>
-            <span>·</span>
-            <span class="flex items-center gap-1.5"><strong class="text-[#52801b]">V1</strong> (Biodiversidad y Humedales)</span>
-            <span>·</span>
-            <span class="flex items-center gap-1.5"><strong class="text-[#00737d]">V2</strong> (Atmósfera y Cielos)</span>
+
+          <!-- Columna Derecha: Tarjetas de Métricas de Alto Impacto (Aprovechamiento Integral del Espacio) -->
+          <div class="lg:col-span-5 grid grid-cols-2 gap-3">
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-[#88C23F] transition">
+              <div class="flex items-center justify-between text-xs text-slate-400 font-bold mb-1">
+                <span>IDEAS</span>
+                <i data-lucide="lightbulb" class="w-4 h-4 text-[#88C23F]"></i>
+              </div>
+              <div class="text-2xl font-black text-slate-900 tracking-tight">35</div>
+              <div class="text-[11px] text-slate-500 font-medium mt-0.5">5 por establecimiento</div>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-[#88C23F] transition">
+              <div class="flex items-center justify-between text-xs text-slate-400 font-bold mb-1">
+                <span>COLEGIOS</span>
+                <i data-lucide="school" class="w-4 h-4 text-slate-600"></i>
+              </div>
+              <div class="text-2xl font-black text-slate-900 tracking-tight">7</div>
+              <div class="text-[11px] text-slate-500 font-medium mt-0.5">100% Línea Verde</div>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-[#f1f9e9]/70 border border-[#cbe99c] hover:border-[#88C23F] transition">
+              <div class="flex items-center justify-between text-xs text-[#52801b] font-bold mb-1">
+                <span>DESAFÍO V1</span>
+                <i data-lucide="trees" class="w-4 h-4 text-[#74ab2e]"></i>
+              </div>
+              <div class="text-2xl font-black text-[#52801b] tracking-tight">20 Ideas</div>
+              <div class="text-[11px] text-slate-600 font-medium mt-0.5">Humedales y Biodiversidad</div>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-[#e6f9fa]/70 border border-[#9fe3e7] hover:border-[#00ADBB] transition">
+              <div class="flex items-center justify-between text-xs text-[#00737d] font-bold mb-1">
+                <span>DESAFÍO V2</span>
+                <i data-lucide="sun" class="w-4 h-4 text-[#00ADBB]"></i>
+              </div>
+              <div class="text-2xl font-black text-[#00737d] tracking-tight">15 Ideas</div>
+              <div class="text-[11px] text-slate-600 font-medium mt-0.5">Cielos Limpios y Atmósfera</div>
+            </div>
           </div>
         </div>
       </div>
@@ -1340,63 +1339,67 @@
     </div>
   </div>
 
-  <!-- MODAL: BIT�CORA DE INCIDENCIAS DE TERRENO Y AULA -->
-  <div id="modal-incidencias" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-      <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-amber-50/70 via-white to-white">
+  <!-- FOOTER -->
+  
+  <!-- Modal de Incidencias de Terreno (Drive en vivo) -->
+  <div id="modal-incidencias" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in duration-200">
+      <!-- Header -->
+      <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center border border-amber-200">
+          <div class="w-10 h-10 rounded-2xl bg-amber-100 border border-amber-300 text-amber-800 flex items-center justify-center shrink-0">
             <i data-lucide="clipboard-list" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="text-base font-extrabold text-slate-900">Bit�cora de Incidencias de Terreno y Aula</h3>
-            <p class="text-xs text-slate-500">Sincronizado en tiempo real con la pesta�a "incidencias" de Google Drive</p>
+            <h3 class="text-lg font-extrabold text-slate-900">Bitácora de Incidencias y Trazabilidad de Terreno</h3>
+            <p class="text-xs text-slate-500 font-medium">Registro oficial de contingencias de aula, deserciones y ajustes de nómina (Google Drive)</p>
           </div>
         </div>
-        <button onclick="closeIncidenciasModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition" title="Cerrar">
+        <button onclick="closeIncidenciasModal()" class="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <!-- Filters in modal -->
-      <div class="p-4 bg-slate-50 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
-        <div class="flex items-center gap-2 flex-wrap">
-          <label class="font-bold text-slate-600">Filtrar Colegio:</label>
-          <select id="modal-inc-filter-school" onchange="filterIncidenciasModal()" class="px-3 py-1.5 rounded-xl border border-slate-200 bg-white font-medium text-slate-800 focus:outline-none focus:border-amber-400">
-            <option value="todos">Todos los colegios</option>
-          </select>
-
-          <label class="font-bold text-slate-600 ml-2">Tipo:</label>
-          <select id="modal-inc-filter-type" onchange="filterIncidenciasModal()" class="px-3 py-1.5 rounded-xl border border-slate-200 bg-white font-medium text-slate-800 focus:outline-none focus:border-amber-400">
-            <option value="todos">Todos los tipos</option>
-            <option value="Registro hu�rfano">Registro hu�rfano</option>
-            <option value="No responde encuestas">No responde encuestas</option>
-            <option value="Responde encuesta sin estar inscrita al comienzo">Responde encuesta sin estar inscrita</option>
+      <!-- Filtros -->
+      <div class="px-6 py-3 bg-slate-50/30 border-b border-slate-100 flex items-center justify-between gap-3 flex-wrap text-xs">
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400 font-bold uppercase text-[10px]">Filtrar por Colegio:</span>
+          <select id="incidencias-filter-school" onchange="filterIncidenciasModal()" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 font-semibold text-slate-700 text-xs focus:outline-none focus:border-[#88C23F]">
+            <option value="ALL">Todos los Establecimientos</option>
           </select>
         </div>
-        <div class="text-xs text-slate-500 font-semibold" id="modal-inc-counter">
-          Mostrando 16 incidencias
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400 font-bold uppercase text-[10px]">Tipo:</span>
+          <select id="incidencias-filter-type" onchange="filterIncidenciasModal()" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 font-semibold text-slate-700 text-xs focus:outline-none focus:border-[#88C23F]">
+            <option value="ALL">Todos los Tipos</option>
+            <option value="huérfano">Registros Huérfanos / Invitados</option>
+            <option value="No responde encuestas">No responde encuestas / Deserción</option>
+            <option value="sin estar inscrita">Integrados a nómina definitiva</option>
+          </select>
         </div>
+        <span id="incidencias-count-badge" class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
+          16 Casos
+        </span>
       </div>
 
-      <!-- Modal Body (Table of incidents) -->
-      <div class="p-5 overflow-y-auto space-y-3" id="modal-inc-list">
+      <!-- Lista de Incidencias -->
+      <div id="incidencias-list-container" class="p-6 overflow-y-auto space-y-3 flex-1 divide-y divide-slate-100">
         <!-- Rendered dynamically -->
       </div>
 
-      <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between text-xs text-slate-500">
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span>Google Drive conectado � Pr�xima actualizaci�n de incidencias: <strong>Lunes</strong></span>
+      <!-- Footer -->
+      <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <div class="flex items-center gap-1.5 text-[11px]">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span>Sincronizado con Google Drive (actualización semanal cada lunes)</span>
         </div>
-        <button onclick="closeIncidenciasModal()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-full transition">
+        <button onclick="closeIncidenciasModal()" class="px-4 py-1.5 rounded-full bg-slate-200 text-slate-700 font-bold hover:bg-slate-300 transition">
           Cerrar
         </button>
       </div>
     </div>
   </div>
 
-  <!-- FOOTER -->
   <footer class="bg-white border-t border-slate-200 py-8 text-center text-xs text-slate-500 mt-auto">
     <div class="max-w-7xl mx-auto px-4 flex flex-col items-center justify-center space-y-3">
       <div class="flex items-center justify-center bg-slate-50 px-4 py-2 rounded-2xl shadow-sm border border-slate-200">
@@ -1411,6 +1414,6 @@
     </div>
   </footer>
 
-  <script src="app.js?v=3.0"></script>
+  <script src="app.js?v=3.1"></script>
 </body>
 </html>
